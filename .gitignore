@@ -6,7 +6,7 @@
 
 # IDE files
 *.ctxt #BlueJ
-*.idea #IntelliJ
+*.idea/ #IntelliJ
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
