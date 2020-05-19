@@ -1,0 +1,11 @@
+FROM node:13-alpine3.10
+
+WORKDIR /frontend
+
+ENV PATH /groupthinq_frontend/node_modules/.bin:$PATH
+
+COPY /groupthinq_frontend/package.json /frontend/package.json
+RUN npm install
+RUN npm install -g @vue/cli
+
+CMD ["npm", "run", "serve"]
