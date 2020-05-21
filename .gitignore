@@ -56,6 +56,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Database
+database/data/
+
 
 ## IDE and TOOLS
 # JetBrains template Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm

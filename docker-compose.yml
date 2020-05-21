@@ -1,0 +1,54 @@
+version: '3.6'
+services:
+  db:
+    image: postgres:alpine
+    container_name: postgres_dev
+    environment:
+      - POSTGRES_PASSWORD=${GTQ_DB_PASSWORD}
+      - POSTGRES_USER=${GTQ_DB_USER}
+      - POSTGRES_DB=${GTQ_DB_DB}
+    ports:
+      - 5433:5432
+    volumes:
+        - ./database/scripts:/docker-entrypoint-initdb.d
+        - /var/lib/postgresql/data
+    networks:
+      - backdb
+    expose: 
+      - 5433
+  
+  backend:
+    image: gradle
+    container_name: backend_dev
+    ports:
+      - 8080:8080
+    working_dir: /backend
+    volumes:
+      - ./backend:/backend
+    command: gradle clean build bootRun
+    depends_on:
+      - db
+    networks:
+      - frontback 
+      - backdb
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: DOCKERFILE
+    container_name: frontend_dev
+    ports:
+      - 8081:8080
+    volumes: 
+      - ./frontend/groupthinq_frontend:/frontend
+      - /frontend/node_modules
+    depends_on:
+      - backend
+    networks: 
+      - frontback     
+  
+networks: 
+  backdb:
+    driver: bridge
+  frontback:
+    driver: bridge
