@@ -1,4 +1,8 @@
 ## GENERAL
+
+# Docker-related metadata
+.metadata
+
 # Enviroment Variables
 .env
 .env.local
