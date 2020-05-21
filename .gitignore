@@ -1,7 +1,7 @@
 ## GENERAL
 
 # Docker-related metadata
-.metadata
+.metadata/
 
 # Enviroment Variables
 .env
