@@ -2,6 +2,7 @@
 
 # Docker-related metadata
 .metadata/
+example.env
 
 # Enviroment Variables
 .env
