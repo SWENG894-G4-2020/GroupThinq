@@ -4,6 +4,5 @@ LASTNAME VARCHAR NOT NULL,
 FIRSTNAME VARCHAR NOT NULL,
 EMAIL VARCHAR NOT NULL );
 
-INSERT INTO USERS
-VALUES
-('jsmith', 'John', 'Smith', 'jsmith@foo.com');
+INSERT INTO USERS VALUES ('jsmith', 'Smith', 'John', 'jsmith@foo.com');
+INSERT INTO USERS VALUES ('mboyer', 'Boyer', 'Matt', 'mboyer87@gmail.com');
