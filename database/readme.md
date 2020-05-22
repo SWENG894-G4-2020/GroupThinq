@@ -9,7 +9,7 @@ Then, run the following Docker command:
 (NOTE: you must use Powershell if running on Windows for this command to succeed)
 
 ```
-docker run --name postgres_dev -v ${PWD}\scripts:/docker-entrypoint-initdb.d -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres:alpine
+docker run --name postgres_dev -v ${PWD}\scripts:/docker-entrypoint-initdb.d -p 5433:5432 -e POSTGRES_PASSWORD=password -d postgres:alpine
 ```
 
 The above example will run a Postgres server on port 5432 containing a database after the setup statements have been run. The username and password are _postgres_ and _password_ respectively.
