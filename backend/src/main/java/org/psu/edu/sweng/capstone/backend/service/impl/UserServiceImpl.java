@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.impl.UserService;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	public UserDTO getUser(String userName) {
 		User user = userDao.findByUserName(userName);
 		
-		return buildUserDTO(user);
+		return (user != null) ? buildUserDTO(user) : null;
 	}
 	
 	@Override
@@ -100,13 +100,6 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	private UserDTO buildUserDTO(User u) {
-		UserDTO userDto = new UserDTO();
-		
-		userDto.setFirstName(u.getFirstName());
-		userDto.setLastName(u.getLastName());
-		userDto.setEmailAddress(u.getEmailAddress());
-		userDto.setUserName(u.getUserName());
-		
-		return userDto;
+		return new UserDTO(u.getUserName(), u.getLastName(), u.getFirstName(), u.getEmailAddress());
 	}
 }

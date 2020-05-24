@@ -10,6 +10,13 @@ public class UserDTO {
 	private String firstName;
 	private String emailAddress;
 	
+	public UserDTO(String userName, String lastName, String firstName, String emailAddress) {
+		this.userName = userName;
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.emailAddress = emailAddress;
+	}
+	
 	public String getUserName() {
 		return userName;
 	}
