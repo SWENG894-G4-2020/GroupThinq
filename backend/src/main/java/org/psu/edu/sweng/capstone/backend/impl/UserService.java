@@ -8,6 +8,6 @@ public interface UserService {
 	List<UserDTO> getUsers();
 	UserDTO getUser(String userName);
 	String deleteUser(String userName);
-	String updateUser(String userName, String lastName, String firstName, String email);
-	String createUser(String userName, String lastName, String firstName, String email);
+	String updateUser(String userName, UserDTO user);
+	String createUser(String userName, UserDTO user);
 }

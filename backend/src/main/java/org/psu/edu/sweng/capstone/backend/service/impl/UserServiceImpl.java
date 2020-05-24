@@ -55,23 +55,23 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String updateUser(String userName, String lastName, String firstName, String email) {
+	public String updateUser(String userName, UserDTO userDto) {
 		User user = userDao.findByUserName(userName);
 		
 		if (user == null) {
 			return "User does not exist";
 		}
 		
-		if (lastName != null) {
-			user.setLastName(lastName);
+		if (userDto.getLastName() != null) {
+			user.setLastName(userDto.getLastName());
 		}
 		
-		if (firstName != null) {
-			user.setFirstName(firstName);
+		if (userDto.getFirstName() != null) {
+			user.setFirstName(userDto.getFirstName());
 		}
 		
-		if (email != null) {
-			user.setEmailAddress(email);
+		if (userDto.getEmailAddress() != null) {
+			user.setEmailAddress(userDto.getEmailAddress());
 		}
 		
 		userDao.save(user);
@@ -83,14 +83,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String createUser(String userName, String lastName, String firstName, String email) {
+	public String createUser(String userName, UserDTO userDto) {
 		User user = userDao.findByUserName(userName);
 		
 		if (user != null) {
 			return "User already exists";
 		}
 		
-		User newUser = new User(userName, lastName, firstName, email);
+		User newUser = new User(userName, userDto.getLastName(), userDto.getFirstName(), userDto.getEmailAddress());
 		userDao.save(newUser);
 		
 		StringBuilder builder = new StringBuilder();
@@ -105,6 +105,7 @@ public class UserServiceImpl implements UserService {
 		userDto.setFirstName(u.getFirstName());
 		userDto.setLastName(u.getLastName());
 		userDto.setEmailAddress(u.getEmailAddress());
+		userDto.setUserName(u.getUserName());
 		
 		return userDto;
 	}
