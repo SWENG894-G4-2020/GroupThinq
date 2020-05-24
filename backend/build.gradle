@@ -8,6 +8,7 @@ plugins {
 
 group = 'org.psu.edu.sweng.capstone'
 version = '0.0.1-SNAPSHOT'
+
 sourceCompatibility = '1.8'
 
 configurations {
@@ -26,7 +27,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'    
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
 	
 	runtimeOnly 'org.postgresql:postgresql:42.2.6'
 }
