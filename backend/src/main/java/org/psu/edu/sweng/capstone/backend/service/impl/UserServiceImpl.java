@@ -1,8 +1,10 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
+import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.impl.UserService;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,25 +19,23 @@ public class UserServiceImpl implements UserService {
 	private UserDAO userDao;
 	
 	@Override
-	public String getUsers() {
+	public List<UserDTO> getUsers() {
 		List<User> users = userDao.findAll();
 		
-		StringBuilder builder = new StringBuilder();
-		for (User user : users) {
-			builder.append("First Name: ").append(user.getFirstName()).append(", Last Name: ").append(user.getLastName()).append(". \n");
+		List<UserDTO> response = new ArrayList<>();
+		for (User u : users) {
+			UserDTO userDto = buildUserDTO(u);
+			response.add(userDto);
 		}
 		
-		return builder.toString();
+		return response;
 	}
 
 	@Override
-	public String getUser(String userName) {
+	public UserDTO getUser(String userName) {
 		User user = userDao.findByUserName(userName);
 		
-		StringBuilder builder = new StringBuilder();
-		builder.append("First Name: ").append(user.getFirstName()).append(", Last Name: ").append(user.getLastName());
-		
-		return builder.toString();
+		return buildUserDTO(user);
 	}
 	
 	@Override
@@ -97,5 +97,15 @@ public class UserServiceImpl implements UserService {
 		builder.append(userName).append(" has been created.");
 		
 		return builder.toString();
+	}
+	
+	private UserDTO buildUserDTO(User u) {
+		UserDTO userDto = new UserDTO();
+		
+		userDto.setFirstName(u.getFirstName());
+		userDto.setLastName(u.getLastName());
+		userDto.setEmailAddress(u.getEmailAddress());
+		
+		return userDto;
 	}
 }

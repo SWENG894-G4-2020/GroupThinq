@@ -1,5 +1,8 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
+import java.util.List;
+
+import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +17,12 @@ public class UserController {
 	private UserService userService;
 	
 	@GetMapping("/users")
-	public String getUsers() {
+	public List<UserDTO> getUsers() {
 		return userService.getUsers();
 	}
 	
 	@GetMapping("/user/{userName}")
-	public String getUser(@PathVariable(value = "userName") String userName) {
+	public UserDTO getUser(@PathVariable(value = "userName") String userName) {
 		return userService.getUser(userName);
 	}
 	
