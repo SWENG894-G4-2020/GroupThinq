@@ -4,7 +4,7 @@ The full repository for the SWENG894 Group 4 Summer 2020 project.
 ## Setup a Local Development Enviroment
 
 ### Setup a .env file to define enviroment variables
-Copy the example.env file and rename it `.env`. Change the enviromental variables if necessary.
+Copy the `example.env` file and rename it `.env`. Change the enviromental variables if necessary.
 
 
 ### Start up the containers
