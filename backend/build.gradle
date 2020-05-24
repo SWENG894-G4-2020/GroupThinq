@@ -1,6 +1,3 @@
-group = 'org.psu.edu.sweng.capstone'
-version = '0.0.1-SNAPSHOT'
-
 plugins {
 	id 'org.springframework.boot' version '2.3.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
@@ -8,6 +5,9 @@ plugins {
     id 'eclipse'
     id 'idea'
 }
+
+group = 'org.psu.edu.sweng.capstone'
+version = '0.0.1-SNAPSHOT'
 
 sourceCompatibility = '1.8'
 
