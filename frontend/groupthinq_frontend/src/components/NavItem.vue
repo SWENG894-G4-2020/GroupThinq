@@ -1,19 +1,17 @@
 <template>
   <q-item
     clickable
-    tag="a"
-    target="_blank"
-    :href="link"
+    :to="link" exact
   >
     <q-item-section
       v-if="icon"
       avatar
     >
-      <q-icon :name="icon" />
+      <q-icon :name="icon" style='font-size: 3em' />
     </q-item-section>
 
     <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
+      <q-item-label style='font-size: 1.25em'>{{ title }}</q-item-label>
       <q-item-label caption>
         {{ caption }}
       </q-item-label>
@@ -23,7 +21,7 @@
 
 <script>
 export default {
-  name: 'EssentialLink',
+  name: 'NavItem',
   props: {
     title: {
       type: String,
