@@ -23,26 +23,25 @@ repositories {
 }
 
 dependencies {
-	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'    
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
-    
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'    
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+
 	runtimeOnly 'org.postgresql:postgresql:42.2.6'
     
-	testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
-	
-    testCompile('org.mockito:mockito-junit-jupiter:3.3.3')
-    testCompile('org.junit.jupiter:junit-jupiter-params:5.6.2')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    
-	testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
-    
+	testImplementation('org.mockito:mockito-junit-jupiter:3.3.3')
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+    testImplementation('org.junit.jupiter:junit-jupiter-params:5.6.2')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+
+	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
 }
 
 test {
