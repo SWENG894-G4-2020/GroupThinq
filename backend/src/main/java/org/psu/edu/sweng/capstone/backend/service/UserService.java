@@ -1,4 +1,4 @@
-package org.psu.edu.sweng.capstone.backend.impl;
+package org.psu.edu.sweng.capstone.backend.service;
 
 import java.util.List;
 

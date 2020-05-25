@@ -3,7 +3,7 @@ package org.psu.edu.sweng.capstone.backend.controller;
 import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.impl.UserService;
+import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("/")
+	@GetMapping("")
 	public List<UserDTO> getUsers() {
 		return userService.getUsers();
 	}
