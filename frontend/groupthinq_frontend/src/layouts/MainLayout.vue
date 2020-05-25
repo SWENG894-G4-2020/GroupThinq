@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header elevated class="q-py-lg">
       <q-toolbar>
         <q-btn
           flat
@@ -11,8 +11,11 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
 
-        <q-toolbar-title>
-          GroupThinq - Make Decisions. Together.
+        <q-toolbar-title vertical-bottom>
+          <div class="row items-end">
+            <div style="font-size: 1.5em">GroupThinq</div>
+            <div style="font-size: .75em">&nbsp;&nbsp;Make Decisions. Together.</div>
+          </div>
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -29,6 +32,7 @@
         <q-item-label
           header
           class="text-grey-8"
+          style="font-size: 1.25em"
         >
           Navigation
         </q-item-label>
