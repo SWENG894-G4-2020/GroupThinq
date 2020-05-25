@@ -10,6 +10,8 @@ public class UserDTO {
 	private String firstName;
 	private String emailAddress;
 	
+	protected UserDTO() {}
+	
 	public UserDTO(String userName, String lastName, String firstName, String emailAddress) {
 		this.userName = userName;
 		this.lastName = lastName;
