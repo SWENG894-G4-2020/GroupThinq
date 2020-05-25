@@ -1,11 +1,14 @@
-FROM node:13-alpine3.10
+FROM node:current-alpine
 
-WORKDIR /frontend
+WORKDIR /frontend/
 
 ENV PATH /groupthinq_frontend/node_modules/.bin:$PATH
 
 COPY /groupthinq_frontend/package.json /frontend/package.json
 RUN npm install
 RUN npm install -g @vue/cli
+RUN npm install -g @quasar/cli
 
-CMD ["npm", "run", "serve"]
+WORKDIR /frontend/groupthinq_frontend
+
+CMD ["quasar", "dev"]
