@@ -1,9 +1,10 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex flex-center" v-if='isLoaded'>
     <UserCard
       v-for="user in users"
       :key="user.userName"
       v-bind="user"
+      class='q-pa-md q-ma-lg'
       />
   </q-page>
 </template>
@@ -19,10 +20,10 @@ export default {
 
   methods: {
     loadUserData () {
-      console.log('In the loadUserData method.')
-      this.$axios.get('http://backend:8080/users/')
+      this.$axios.get('http://localhost:8080/users/')
         .then(response => (this.users = response.data))
-        .catch(console.log('Something went wrong :('))
+        .then(() => (this.isLoaded = true))
+        .catch(error => (console.log(error)))
     }
   },
 
@@ -32,6 +33,7 @@ export default {
 
   data () {
     return {
+      isLoaded: false,
       users: [
         {
           userName: 'jDoe',

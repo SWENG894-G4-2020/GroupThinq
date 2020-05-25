@@ -1,5 +1,5 @@
 <template>
-  <q-card class="myCard" flat bordered>
+  <q-card elevated bordered>
       <q-card-section horizontal>
         <q-card-section class="q-pt-xs">
           <div class="text-overline">{{userName}}</div>
