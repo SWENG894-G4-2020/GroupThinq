@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ApplicationServiceImpl implements UserService {
 
 	@Autowired
 	private UserDAO userDao;
@@ -97,9 +97,5 @@ public class UserServiceImpl implements UserService {
 		builder.append(userName).append(" has been created.");
 		
 		return builder.toString();
-	}
-	
-	private UserDTO buildUserDTO(User u) {
-		return new UserDTO(u.getUserName(), u.getLastName(), u.getFirstName(), u.getEmailAddress());
 	}
 }
