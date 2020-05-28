@@ -18,7 +18,7 @@
           </div>
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>Hello from 8081 Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
