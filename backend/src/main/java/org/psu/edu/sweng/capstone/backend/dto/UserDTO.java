@@ -1,5 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
+import org.psu.edu.sweng.capstone.backend.model.User;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -49,5 +51,9 @@ public class UserDTO {
 	
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
+	}
+	
+	public static UserDTO buildUserDTO(User u) {
+		return new UserDTO(u.getUserName(), u.getLastName(), u.getFirstName(), u.getEmailAddress());
 	}
 }

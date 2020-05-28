@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class UserServiceImpl extends ApplicationServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDAO userDao;
@@ -24,7 +24,7 @@ public class UserServiceImpl extends ApplicationServiceImpl implements UserServi
 		
 		List<UserDTO> response = new ArrayList<>();
 		for (User u : users) {
-			UserDTO userDto = buildUserDTO(u);
+			UserDTO userDto = UserDTO.buildUserDTO(u);
 			response.add(userDto);
 		}
 		
@@ -35,7 +35,7 @@ public class UserServiceImpl extends ApplicationServiceImpl implements UserServi
 	public UserDTO getUser(String userName) {
 		User user = userDao.findByUserName(userName);
 		
-		return (user != null) ? buildUserDTO(user) : null;
+		return (user != null) ? UserDTO.buildUserDTO(user) : null;
 	}
 	
 	@Override

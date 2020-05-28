@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class DecisionServiceImpl extends ApplicationServiceImpl implements DecisionService {
+public class DecisionServiceImpl implements DecisionService {
 
 	@Autowired
 	private DecisionDAO decisionDao;
@@ -29,7 +29,7 @@ public class DecisionServiceImpl extends ApplicationServiceImpl implements Decis
 		if (dec.isPresent()) {			
 			Set<DecisionUser> users = dec.get().getDecisionUsers();
 			for (DecisionUser du : users) {
-				UserDTO dto = buildUserDTO(du.getUser());
+				UserDTO dto = UserDTO.buildUserDTO(du.getUser());
 				
 				userList.add(dto);
 			}
