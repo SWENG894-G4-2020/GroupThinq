@@ -24,6 +24,14 @@ public class DecisionUser {
 	@JoinColumn(name = "USERNAME")
 	private User user;
 
+	protected DecisionUser() {}
+	
+	public DecisionUser(Long id, Decision decision, User user) {
+		this.id = id;
+		this.decision = decision;
+		this.user = user;
+	}
+	
 	public Long getId() {
 		return id;
 	}

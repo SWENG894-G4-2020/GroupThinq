@@ -29,6 +29,13 @@ public class Decision {
 	@Fetch(FetchMode.SELECT)
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 	
+	protected Decision() {}
+	
+	public Decision(Long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+	
 	public Long getId() {
 		return id;
 	}
