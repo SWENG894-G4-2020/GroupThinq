@@ -14,7 +14,7 @@
         <q-toolbar-title vertical-bottom>
           <div class="row items-end">
             <div style="font-size: 1.5em">GroupThinq</div>
-            <div style="font-size: .75em">&nbsp;&nbsp;Make Decisions. Together.</div>
+            <div style="font-size: .75em">&nbsp;&nbsp;Make Better Decisions. Together.</div>
           </div>
         </q-toolbar-title>
 
