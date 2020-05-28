@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
 		
 		List<UserDTO> response = new ArrayList<>();
 		for (User u : users) {
-			UserDTO userDto = buildUserDTO(u);
+			UserDTO userDto = UserDTO.buildUserDTO(u);
 			response.add(userDto);
 		}
 		
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	public UserDTO getUser(String userName) {
 		User user = userDao.findByUserName(userName);
 		
-		return (user != null) ? buildUserDTO(user) : null;
+		return (user != null) ? UserDTO.buildUserDTO(user) : null;
 	}
 	
 	@Override
@@ -97,9 +97,5 @@ public class UserServiceImpl implements UserService {
 		builder.append(userName).append(" has been created.");
 		
 		return builder.toString();
-	}
-	
-	private UserDTO buildUserDTO(User u) {
-		return new UserDTO(u.getUserName(), u.getLastName(), u.getFirstName(), u.getEmailAddress());
 	}
 }
