@@ -28,23 +28,23 @@ public class UserController {
 		return userService.getUsers();
 	}
 	
-	@GetMapping("/{userName}")
-	public UserDTO getUser(@PathVariable(value = "userName") String userName) {
+	@GetMapping("/{username}")
+	public UserDTO getUser(@PathVariable(value = "username") String userName) {
 		return userService.getUser(userName);
 	}
 	
-	@DeleteMapping("/{userName}")
-	public String deleteUser(@PathVariable(value = "userName") String userName) {
+	@DeleteMapping("/{username}")
+	public String deleteUser(@PathVariable(value = "username") String userName) {
 		return userService.deleteUser(userName);
 	}
 	
-	@PutMapping("/{userName}")
-	public String updateUser(@PathVariable(value = "userName") String userName, @RequestBody final UserDTO user) {
+	@PutMapping("/{username}")
+	public String updateUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.updateUser(userName, user);
 	}
 	
-	@PostMapping("/{userName}")
-	public String createUser(@PathVariable(value = "userName") String userName, @RequestBody final UserDTO user) {
+	@PostMapping("/{username}")
+	public String createUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.createUser(userName, user);
 	}
 }

@@ -3,7 +3,6 @@ package org.psu.edu.sweng.capstone.backend.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
@@ -27,8 +26,7 @@ public class DecisionServiceImpl implements DecisionService {
 		Optional<Decision> dec = decisionDao.findById(id);
 		
 		if (dec.isPresent()) {			
-			Set<DecisionUser> users = dec.get().getDecisionUsers();
-			for (DecisionUser du : users) {
+			for (DecisionUser du : dec.get().getDecisionUsers()) {
 				UserDTO dto = UserDTO.buildUserDTO(du.getUser());
 				
 				userList.add(dto);

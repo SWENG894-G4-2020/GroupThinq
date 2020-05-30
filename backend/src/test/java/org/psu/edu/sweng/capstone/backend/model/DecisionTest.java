@@ -13,11 +13,11 @@ class DecisionTest {
 	
 	private Decision testDecision = new Decision();
 	
-	private DecisionUser testUser1 = new DecisionUser(1L, testDecision, new User("jsmith", "fakepw", "Smith", "John", "jsmith@foo.bar", 
+	private DecisionUser testUser1 = new DecisionUser(testDecision, new User("jsmith", "fakepw", "Smith", "John", "jsmith@foo.bar", 
 			new Date(1337L), new Date()));
-	private DecisionUser testUser2 = new DecisionUser(2L, testDecision, new User("mboyer", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", 
+	private DecisionUser testUser2 = new DecisionUser(testDecision, new User("mboyer", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", 
 			new Date(1337L), new Date()));
-	private DecisionUser testUser3 = new DecisionUser(3L, testDecision, new User("testuser", "fakepw", "User", "Test", "testuser@dev.gov", 
+	private DecisionUser testUser3 = new DecisionUser(testDecision, new User("testuser", "fakepw", "User", "Test", "testuser@dev.gov", 
 			new Date(1337L), new Date()));
 	
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
@@ -55,7 +55,7 @@ class DecisionTest {
 	@Test
 	void setters_workProperly() {
 		// when
-		DecisionUser newUser = new DecisionUser(1L, testDecision, new User("treyob", "fakepw", "Reyob", "Ttam", "TttamReyob@gmail.com", 
+		DecisionUser newUser = new DecisionUser(testDecision, new User("treyob", "fakepw", "Reyob", "Ttam", "TttamReyob@gmail.com", 
 				new Date(1337L), new Date()));
 		decisionUsers.add(newUser);
 		

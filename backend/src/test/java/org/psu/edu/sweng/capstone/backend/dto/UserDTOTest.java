@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 class UserDTOTest {
 
-	private UserDTO testUser = new UserDTO("testUser", "fakepw", "user", "test", "testUser@foo.bar", new Date(1337L));
+	private UserDTO testUser = new UserDTO("testUser", "fakepw", "user", "test", "testUser@foo.bar", new Date(1337L), new Date(1L));
 	
 	@Test
 	void constructor_worksProperly() {
@@ -19,9 +19,10 @@ class UserDTOTest {
 		String firstName = "Matt";
 		String emailAddress = "mboyer87@gmail.com";
 		Date birthDate = new Date(1337L);
+		Date createdDate = new Date(1L);
 		
 		// when
-		UserDTO newUser = new UserDTO(username, password, lastName, firstName, emailAddress, birthDate);
+		UserDTO newUser = new UserDTO(username, password, lastName, firstName, emailAddress, birthDate, createdDate);
 		
 		// then
 		assertEquals("Boyer", newUser.getLastName());

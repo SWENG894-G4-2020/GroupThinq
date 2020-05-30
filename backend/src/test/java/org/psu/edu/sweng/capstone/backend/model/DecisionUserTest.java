@@ -20,15 +20,13 @@ class DecisionUserTest {
 	@Test
 	void constructor_worksProperly() {
 		// given
-		Long id = 1337L;
 		Decision newDecision = new Decision(2L, "New Decision");
 		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L), new Date());
 		
 		// when
-		DecisionUser newDecisionUser = new DecisionUser(id, newDecision, newUser);
+		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
 		
 		// then
-		assertEquals(1337L, newDecisionUser.getId());
 		assertEquals(2L, newDecisionUser.getDecision().getId());
 		assertEquals("New Decision", newDecisionUser.getDecision().getName());
 		assertEquals("TReyob", newDecisionUser.getUser().getUserName());

@@ -8,43 +8,43 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.psu.edu.sweng.capstone.backend.model.id.DecisionUserId;
+import org.psu.edu.sweng.capstone.backend.model.id.UserRoleId;
 
 @Entity
-@Table(name = "DECISION_USERS")
-@IdClass(DecisionUserId.class)
-public class DecisionUser {
-	
-	@Id
-	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
-	@JoinColumn(name = "DECISION_ID")
-	private Decision decision;
+@Table(name = "USER_ROLES")
+@IdClass(UserRoleId.class)
+public class UserRole {
 	
 	@Id
 	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
 	@JoinColumn(name = "USER_ID")
 	private User user;
-
-	protected DecisionUser() {}
 	
-	public DecisionUser(Decision decision, User user) {
-		this.decision = decision;
+	@Id
+	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+	@JoinColumn(name = "ROLE_ID")
+	private Role role;
+	
+	protected UserRole() {}
+	
+	public UserRole(User user, Role role) {;
 		this.user = user;
-	}
-
-	public Decision getDecision() {
-		return decision;
-	}
-
-	public void setDecision(Decision decision) {
-		this.decision = decision;
+		this.role = role;
 	}
 
 	public User getUser() {
 		return user;
 	}
-
+	
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+	
+	public void setRole(Role role) {
+		this.role = role;
 	}
 }

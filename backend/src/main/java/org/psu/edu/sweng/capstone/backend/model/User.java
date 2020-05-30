@@ -1,13 +1,21 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "USERS")
@@ -37,6 +45,10 @@ public class User {
 	
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
+	
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
+	@Fetch(FetchMode.SELECT)
+	private Set<UserRole> userRoles = new HashSet<>();
 	
 	protected User() {}
 	
@@ -106,6 +118,10 @@ public class User {
 		this.createdDate = createdDate;
 	}
 	
+	public Set<UserRole> getUserRoles() {
+		return userRoles;
+	}
+
 	public String getFullName() {
 		StringBuilder builder = new StringBuilder();
 		

@@ -51,7 +51,7 @@ class UserServiceImplTest {
 		birthDate = new Date(1337L);
 		createdDate = new Date();
 		
-		userDto = new UserDTO(userName, password, lastName, firstName, emailAddress, birthDate);
+		userDto = new UserDTO(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
 		user = new User(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
 	}
 	
@@ -111,8 +111,8 @@ class UserServiceImplTest {
 		userList.add(user1);
 		userList.add(user2);
 		
-		UserDTO userDto1 = new UserDTO("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L));
-		UserDTO userDto2 = new UserDTO("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L));
+		UserDTO userDto1 = new UserDTO("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L), new Date(1L));
+		UserDTO userDto2 = new UserDTO("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L), new Date(1L));
 		
 		List<UserDTO> userDTOList = new ArrayList<>();
 		userDTOList.add(userDto1);
@@ -154,7 +154,7 @@ class UserServiceImplTest {
 	void updateUser_savesUser_whenGivenNullValues() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(user);
-		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO(userName, null, null, null, null, null));
+		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO(userName, null, null, null, null, null, null));
 
 		// then
 		assertEquals(userName + " has been updated.", returnMessage);
