@@ -3,6 +3,7 @@ package org.psu.edu.sweng.capstone.backend.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +32,7 @@ class DecisionServiceImplTest {
 
 	private Long decisionId = 1337L;
 	private Decision dec = new Decision(1L, "Test Decision");
-	private DecisionUser decUser = new DecisionUser(1L, dec, new User("TestUser", "User", "Test", "TestUser@gmail.com"));
+	private DecisionUser decUser = new DecisionUser(1L, dec, new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L), new Date()));
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 		
 	@BeforeEach

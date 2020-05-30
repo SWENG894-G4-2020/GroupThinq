@@ -1,6 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -86,11 +87,17 @@ public class UserServiceImpl implements UserService {
 	public String createUser(String userName, UserDTO userDto) {
 		User user = userDao.findByUserName(userName);
 		
-		if (user != null) {
-			return "User already exists";
-		}
+		if (user != null) { return "User already exists"; }
 		
-		User newUser = new User(userName, userDto.getLastName(), userDto.getFirstName(), userDto.getEmailAddress());
+		User newUser = new User(userName,
+				userDto.getPassword(),
+				userDto.getLastName(),
+				userDto.getFirstName(),
+				userDto.getEmailAddress(),
+				userDto.getBirthDate(),
+			new Date() // Sets CREATED_DATE to the current time
+		);
+		
 		userDao.save(newUser);
 		
 		StringBuilder builder = new StringBuilder();

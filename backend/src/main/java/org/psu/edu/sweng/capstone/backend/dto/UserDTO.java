@@ -1,5 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
+import java.util.Date;
+
 import org.psu.edu.sweng.capstone.backend.model.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -8,17 +10,21 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class UserDTO {
 	
 	private String userName;
+	private String password;
 	private String lastName;
 	private String firstName;
 	private String emailAddress;
+	private Date birthDate;
 	
 	protected UserDTO() {}
 	
-	public UserDTO(String userName, String lastName, String firstName, String emailAddress) {
+	public UserDTO(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate) {
 		this.userName = userName;
+		this.password = password;
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.emailAddress = emailAddress;
+		this.birthDate = birthDate;
 	}
 	
 	public String getUserName() {
@@ -27,6 +33,14 @@ public class UserDTO {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getLastName() {
@@ -53,7 +67,15 @@ public class UserDTO {
 		this.emailAddress = emailAddress;
 	}
 	
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
 	public static UserDTO buildUserDTO(User u) {
-		return new UserDTO(u.getUserName(), u.getLastName(), u.getFirstName(), u.getEmailAddress());
+		return new UserDTO(u.getUserName(), u.getPassword(), u.getLastName(), u.getFirstName(), u.getEmailAddress(), u.getBirthDate());
 	}
 }

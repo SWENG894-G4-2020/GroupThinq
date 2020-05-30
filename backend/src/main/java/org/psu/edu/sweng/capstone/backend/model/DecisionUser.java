@@ -21,7 +21,7 @@ public class DecisionUser {
 	private Decision decision;
 	
 	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
-	@JoinColumn(name = "USERNAME")
+	@JoinColumn(name = "USER_ID")
 	private User user;
 
 	protected DecisionUser() {}

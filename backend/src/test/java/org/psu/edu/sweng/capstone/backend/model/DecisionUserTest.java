@@ -2,6 +2,8 @@ package org.psu.edu.sweng.capstone.backend.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Date;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +14,7 @@ class DecisionUserTest {
 	@BeforeEach
 	void setUp() {
 		decisionUser.setDecision(new Decision(1L, "Test Decision"));
-		decisionUser.setUser(new User("TestUser", "User", "Test", "TestUser@gmail.com"));
+		decisionUser.setUser(new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L), new Date()));
 	}
 	
 	@Test
@@ -20,7 +22,7 @@ class DecisionUserTest {
 		// given
 		Long id = 1337L;
 		Decision newDecision = new Decision(2L, "New Decision");
-		User newUser = new User("TReyob", "Reyob", "Ttam", "TtamReyob@gmail.com");
+		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L), new Date());
 		
 		// when
 		DecisionUser newDecisionUser = new DecisionUser(id, newDecision, newUser);
@@ -49,7 +51,7 @@ class DecisionUserTest {
 	void setters_workProperly() {
 		// given
 		Decision newTestDecision = new Decision(1337L, "New Test Decision");
-		User newTestUser = new User("jsmith", "Smith", "John", "JohnSmith@gmail.com");
+		User newTestUser = new User("jsmith", "fakepw", "Smith", "John", "JohnSmith@gmail.com", new Date(1337L), new Date());
 		
 		// when
 		decisionUser.setDecision(newTestDecision);
