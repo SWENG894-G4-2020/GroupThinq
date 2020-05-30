@@ -68,31 +68,31 @@ export default {
           title: 'Home',
           caption: 'Return to the Homescreen',
           icon: 'home',
-          link: '/'
+          link: '/main'
         },
         {
           title: 'Users',
           caption: 'View All Users',
           icon: 'face',
-          link: '/users'
+          link: '/main/users'
         },
         {
           title: 'Decisions',
           caption: 'View All Decisions',
           icon: 'speaker_notes',
-          link: '/decisions'
+          link: '/main/decisions'
         },
         {
           title: 'Results',
           caption: 'View All Results',
           icon: 'assignment_turned_in',
-          link: '/results'
+          link: '/main/results'
         },
         {
           title: 'Help',
           caption: 'GroupThinq Documentation',
           icon: 'help_outline',
-          link: '/help'
+          link: '/main/help'
         }
       ]
     }
