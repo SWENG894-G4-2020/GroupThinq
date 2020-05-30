@@ -58,7 +58,7 @@ class UserControllerTest {
 	@Test
 	void getUser_callsRightServiceFunction() throws Exception {
 		// when
-		mockMvc.perform(get("/users/{userName}", userName)).andExpect(status().isOk());
+		mockMvc.perform(get("/users/{username}", userName)).andExpect(status().isOk());
 		
 		// then
 		verify(userServiceImpl, times(1)).getUser(userName);		
@@ -67,7 +67,7 @@ class UserControllerTest {
 	@Test
 	void deleteUser_callsRightServiceFunction() throws Exception {
 		// when
-		mockMvc.perform(delete("/users/{userName}", userName)).andExpect(status().isOk());
+		mockMvc.perform(delete("/users/{username}", userName)).andExpect(status().isOk());
 		
 		// then
 		verify(userServiceImpl, times(1)).deleteUser(userName);
@@ -76,7 +76,7 @@ class UserControllerTest {
 	@Test
 	void createUser_callsRightServiceFunction() throws Exception {		
 		// when
-		mockMvc.perform(post("/users/{userName}", userName, userDto)
+		mockMvc.perform(post("/users/{username}", userName, userDto)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDto)))
@@ -89,7 +89,7 @@ class UserControllerTest {
 	@Test
 	void updateUser_callsRightServiceFunction() throws Exception {
 		// when
-		mockMvc.perform(put("/users/{userName}", userName, userDto)
+		mockMvc.perform(put("/users/{username}", userName, userDto)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDto)))

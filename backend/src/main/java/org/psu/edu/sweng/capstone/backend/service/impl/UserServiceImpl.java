@@ -9,6 +9,7 @@ import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDAO userDao;
+
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
 	public List<UserDTO> getUsers() {
@@ -90,7 +94,7 @@ public class UserServiceImpl implements UserService {
 		if (user != null) { return "User already exists"; }
 		
 		User newUser = new User(userName,
-				userDto.getPassword(),
+				bCryptPasswordEncoder.encode(userDto.getPassword()),
 				userDto.getLastName(),
 				userDto.getFirstName(),
 				userDto.getEmailAddress(),

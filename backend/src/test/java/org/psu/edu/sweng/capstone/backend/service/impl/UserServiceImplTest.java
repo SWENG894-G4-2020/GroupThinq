@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -38,6 +39,9 @@ class UserServiceImplTest {
 	@Mock
 	private UserDAO userDao;
 	
+	@Mock
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
 	@InjectMocks
 	private UserServiceImpl userServiceImpl;
 	
@@ -54,13 +58,15 @@ class UserServiceImplTest {
 		userDto = new UserDTO(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
 		user = new User(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
 	}
-	
+
+
 	@Test
 	void createUser_worksProperly_withUserNotAlreadyInSystem() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(null);
+		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
 		String returnMessage = userServiceImpl.createUser(userName, userDto);
-		
+
 		// then
 		assertEquals(userName + " has been created.", returnMessage);
 		verify(userDao, times(1)).save(Mockito.any());

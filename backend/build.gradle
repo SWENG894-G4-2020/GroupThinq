@@ -23,20 +23,23 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.auth0:java-jwt:3.10.3'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-test'
+
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'    
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
 
 	runtimeOnly 'org.postgresql:postgresql:42.2.6'
     
-	testImplementation('org.mockito:mockito-junit-jupiter:3.3.3')
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
     testImplementation('org.junit.jupiter:junit-jupiter-params:5.6.2')
+	testImplementation('org.mockito:mockito-junit-jupiter:3.3.3')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
