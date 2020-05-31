@@ -9,7 +9,7 @@ const auth = {
     return config
   },
   getEncodedToken () {
-    return LocalStorage.get('encodedToken')
+    return LocalStorage.getItem('encodedToken')
   }
 }
 

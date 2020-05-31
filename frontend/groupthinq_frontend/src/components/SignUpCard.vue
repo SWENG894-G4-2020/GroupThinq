@@ -80,7 +80,7 @@ export default {
         })
         .then(response => {
           if (response.status === 200) {
-            auth.storeToken(response.headers.Authorization)
+            auth.storeToken(response.headers.authorization)
           } else {
             redirect = '/login'
           }
