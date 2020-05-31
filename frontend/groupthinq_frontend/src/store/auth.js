@@ -26,6 +26,10 @@ const auth = {
       return true
     }
     return false
+  },
+  removeTokens () {
+    LocalStorage.remove('encodedToken')
+    LocalStorage.remove('tokenData')
   }
 }
 
