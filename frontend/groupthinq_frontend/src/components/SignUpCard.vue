@@ -81,7 +81,10 @@ export default {
           auth.storeToken(response.headers.authorization)
         })
         .then(this.$router.push('/main'))
-        .catch(error => (console.log(error)))
+        .catch(error => {
+          console.log(error)
+          this.$router.push('/login')
+        })
     }
   }
 }

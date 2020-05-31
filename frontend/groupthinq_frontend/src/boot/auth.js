@@ -6,7 +6,7 @@ export default ({ app, router, store, Vue }) => {
       if (auth.isLoggedIn()) {
         next()
       } else {
-        next({ path: 'login' })
+        next({ path: '/login' })
       }
     }
     next()
