@@ -1,21 +1,31 @@
 <template>
   <div>
-  <q-card elevated bordered>
+  <q-card bordered class="q-px-sm">
     <q-card-actions align="right">
-      <q-btn v-if="editEnabled" flat round transition-show="fade" color="red" @click="deleteConfirm = true" icon="delete_forever" />
+      <transition-group
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+        class="row items-center"
+      >
+        <div key="editText" v-if="editEnabled" class="text-grey-5">Editing... </div>
+        <q-btn key="deleteButton" v-if="editEnabled" flat round color="red" @click="deleteConfirm = true" icon="delete_forever" />
+      </transition-group>
       <q-btn flat round icon="edit" :disable="editEnabled" @click="editEnabled=!editEnabled" />
     </q-card-actions>
     <q-card-section>
-      <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="FirstName" label="First Name" />
+      <q-input filled class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="FirstName" label="First Name" />
       <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="LastName" label="Last Name" />
       <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="EmailAddress" label="Email Address" />
       <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="UserName" label="Username" />
-      <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="Password" type="password" label="Password" />
+      <q-input filled class="q-mt-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="Password" type="password" label="Password" />
     </q-card-section>
-    <q-card-actions v-if="editEnabled" align="right">
-      <q-btn label="cancel" @click="onCancel()" />
-      <q-btn color="primary" @click="onConfirm()" label="confirm edit" />
-    </q-card-actions>
+    <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+      <q-card-actions key="buttons" v-if="editEnabled" align="right">
+        <q-btn label="cancel" @click="onCancel()" />
+        <q-btn color="primary" @click="onConfirm()" label="confirm edit" />
+      </q-card-actions>
+    </transition>
   </q-card>
   <q-dialog v-model="deleteConfirm" persistent>
     <q-card>

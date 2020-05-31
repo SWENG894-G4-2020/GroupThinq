@@ -1,7 +1,7 @@
 <template>
-  <q-page padding class="fit column items-center">
+  <q-page padding class="column items-center justify-center">
     <div class="text-h4 text-grey q-pa-lg">Account Info</div>
-    <div><AccountInfoCard class="q-mx-xl"/></div>
+    <AccountInfoCard style="min-width: 50%" />
   </q-page>
 </template>
 
