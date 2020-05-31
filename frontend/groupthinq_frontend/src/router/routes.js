@@ -1,6 +1,7 @@
 
 const routes = [
   {
+    // These paths do not require auth
     path: '/',
     component: () => import('layouts/WelcomeLayout.vue'),
     children: [
@@ -10,6 +11,7 @@ const routes = [
     ]
   },
   {
+    // These paths require auth
     path: '/main',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -18,7 +20,10 @@ const routes = [
       { path: 'decisions', component: () => import('pages/Decisions.vue') },
       { path: 'results', component: () => import('pages/Results.vue') },
       { path: 'help', component: () => import('pages/Help.vue') }
-    ]
+    ],
+    meta: {
+      requiresAuth: true
+    }
   }
 ]
 

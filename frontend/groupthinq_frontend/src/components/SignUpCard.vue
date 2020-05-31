@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import auth from '../router/auth'
+import auth from '../store/auth'
 export default {
   name: 'SignUpCard',
 
@@ -61,7 +61,6 @@ export default {
     },
     signUp () {
       const isoDate = new Date(this.BirthDate).toISOString()
-      let redirect = '/main'
       this.$axios.post(`http://localhost:8080/users/${this.UserName}`,
         {
           userName: this.UserName,
@@ -72,20 +71,16 @@ export default {
           password: this.Password
         })
         .then(response => {
-          this.$axios.post('http://localhost:8080/login',
+          return this.$axios.post('http://localhost:8080/login',
             {
               userName: this.UserName,
               password: this.Password
             })
         })
         .then(response => {
-          if (response.status === 200) {
-            auth.storeToken(response.headers.authorization)
-          } else {
-            redirect = '/login'
-          }
+          auth.storeToken(response.headers.authorization)
         })
-        .then(this.$router.push(redirect))
+        .then(this.$router.push('/main'))
         .catch(error => (console.log(error)))
     }
   }

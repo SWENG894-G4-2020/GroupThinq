@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import auth from '../router/auth'
+import auth from '../store/auth'
 export default {
   name: 'LoginCard',
 
@@ -35,21 +35,15 @@ export default {
       this.$router.push('/')
     },
     login () {
-      let redirect = '/main'
       this.$axios
         .post('http://localhost:8080/login', {
           userName: this.UserName,
           password: this.Password
         })
         .then(response => {
-          console.log(response)
-          if (response.status === 200) {
-            auth.storeToken(response.headers.authorization)
-          } else {
-            redirect = '/login'
-          }
+          auth.storeToken(response.headers.authorization)
         })
-        .then(this.$router.push(redirect))
+        .then(this.$router.push('/main'))
         .catch(error => console.log(error))
     }
   }
