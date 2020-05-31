@@ -7,6 +7,15 @@
       <q-input filled class="q-my-md" v-model="FirstName" label="First Name" />
       <q-input filled class="q-my-md" v-model="LastName" label="Last Name" />
       <q-input filled class="q-my-md" v-model="EmailAddress" label="Email Address" />
+      <q-input filled class="q-my-md" v-model="BirthDate" mask="date" :rules="['date']" label="Birth Date">
+        <template v-slot:append>
+          <q-icon name="event" class="cursor-pointer">
+            <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+              <q-date v-model="BirthDate" @input="() => $refs.qDateProxy.hide()" />
+            </q-popup-proxy>
+          </q-icon>
+        </template>
+      </q-input>
       <q-input filled class="q-my-md" v-model="UserName" label="Username" />
       <q-input filled class="q-my-md" v-model="Password" type="password" label="Password" />
     </q-card-section>
@@ -36,6 +45,7 @@ export default {
       FirstName: '',
       LastName: '',
       EmailAddress: '',
+      BirthDate: '',
       UserName: '',
       Password: ''
     }
@@ -49,12 +59,15 @@ export default {
       this.$router.push('/')
     },
     signUp () {
+      const isoDate = new Date(this.BirthDate).toISOString()
       this.$axios.post(`http://localhost:8080/users/${this.UserName}`,
         {
           userName: this.UserName,
           firstName: this.FirstName,
           lastName: this.LastName,
-          emailAddress: this.EmailAddress
+          birthDate: isoDate,
+          emailAddress: this.EmailAddress,
+          password: this.Password
         })
         .then(this.$router.push('/main'))
         .catch(error => (console.log(error)))
