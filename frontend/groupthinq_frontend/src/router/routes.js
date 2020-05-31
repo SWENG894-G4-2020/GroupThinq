@@ -13,6 +13,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Index.vue') },
+      { path: 'account', component: () => import('pages/AccountInfo.vue') },
       { path: 'users', component: () => import('pages/Users.vue') },
       { path: 'decisions', component: () => import('pages/Decisions.vue') },
       { path: 'results', component: () => import('pages/Results.vue') },

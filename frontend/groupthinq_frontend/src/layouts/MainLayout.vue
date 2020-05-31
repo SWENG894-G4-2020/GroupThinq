@@ -71,10 +71,10 @@ export default {
           link: '/main'
         },
         {
-          title: 'Users',
-          caption: 'View All Users',
-          icon: 'face',
-          link: '/main/users'
+          title: 'Account Info',
+          caption: 'View and Edit Your Account Information',
+          icon: 'assignment_ind',
+          link: '/main/account'
         },
         {
           title: 'Decisions',
@@ -93,6 +93,12 @@ export default {
           caption: 'GroupThinq Documentation',
           icon: 'help_outline',
           link: '/main/help'
+        },
+        {
+          title: 'Users',
+          caption: 'View All Users',
+          icon: 'face',
+          link: '/main/users'
         }
       ]
     }
