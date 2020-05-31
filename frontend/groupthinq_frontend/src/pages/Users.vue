@@ -11,7 +11,6 @@
 
 <script>
 import UserCard from 'components/UserCard'
-import auth from '../store/auth'
 export default {
   name: 'PageUsers',
 
@@ -21,7 +20,7 @@ export default {
 
   methods: {
     loadUserData () {
-      this.$axios.get('http://localhost:8080/users', { headers: { Authorization: 'Bearer ' + auth.getEncodedToken() } })
+      this.$axios.get('http://localhost:8080/users')
         .then(response => { this.users = response.data })
         .then(() => (this.isLoaded = true))
         .catch(error => (console.log(error)))
