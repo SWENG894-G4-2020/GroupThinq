@@ -13,7 +13,7 @@ Then, run the image with the frontend application as a volume in the container, 
 (NOTE: you must use Powershell if running on Windows for this command to succeed)
 
 ```
-docker run -v ${PWD}/groupthinq_frontend:/frontend/groupthinq_frontend -v -p 8081:8081 --rm frontend:dev
+docker run -v ${PWD}/groupthinq_frontend:/frontend -v /frontend/node_modules -p 8081:8080 --rm frontend:dev
 ```
 
 The above example will run the frontend application on localhost:8081.

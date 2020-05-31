@@ -21,7 +21,7 @@ export default {
   methods: {
     loadUserData () {
       this.$axios.get('http://localhost:8080/users')
-        .then(response => { this.users = response.data })
+        .then(response => (this.users = response.data))
         .then(() => (this.isLoaded = true))
         .catch(error => (console.log(error)))
     }
