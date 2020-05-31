@@ -8,23 +8,16 @@
       <q-input filled class="q-my-md" v-model="Password" type="password" label="Password" />
     </q-card-section>
     <q-card-actions align="right">
-      <div class='row items-end'>
-        <q-btn
-          class="q-mx-sm"
-          label="Cancel"
-          @click="cancel()" />
-        <q-btn
-          label="Login"
-          class="bg-primary text-grey-3 q-mx-sm"
-          size="lg"
-          @click="login()" />
+      <div class="row items-end">
+        <q-btn class="q-mx-sm" label="Cancel" @click="cancel()" />
+        <q-btn label="Login" class="bg-primary text-grey-3 q-mx-sm" size="lg" @click="login()" />
       </div>
     </q-card-actions>
-
   </q-card>
 </template>
 
 <script>
+import auth from '../router/auth'
 export default {
   name: 'LoginCard',
 
@@ -35,21 +28,29 @@ export default {
     }
   },
 
-  props: {
-  },
+  props: {},
 
   methods: {
     cancel () {
       this.$router.push('/')
     },
     login () {
-      this.$axios.post('http://localhost:8080/login',
-        {
+      let redirect = '/main'
+      this.$axios
+        .post('http://localhost:8080/login', {
           userName: this.UserName,
           password: this.Password
         })
-        .then(this.$router.push('/main'))
-        .catch(error => (console.log(error)))
+        .then(response => {
+          console.log(response)
+          if (response.status === 200) {
+            auth.storeToken(response.headers.Authorization)
+          } else {
+            redirect = '/login'
+          }
+        })
+        .then(this.$router.push(redirect))
+        .catch(error => console.log(error))
     }
   }
 }
