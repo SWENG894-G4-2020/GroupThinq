@@ -23,3 +23,9 @@ Run the following command to stop all the containers.
 ```
 docker-compose down
 ```
+### Completely clean docker from the system
+Run the following commands to stop and remove all containers
+```
+chmod u+x ./docker-clean
+./docker-clean
+```
