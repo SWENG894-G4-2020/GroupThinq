@@ -14,7 +14,7 @@
 import DecisionCard from 'components/DecisionCard'
 
 export default {
-  name: 'PageIndex',
+  name: 'PageDecisions',
 
   components: {
     DecisionCard
