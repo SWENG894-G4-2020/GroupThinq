@@ -7,6 +7,12 @@
       color="primary"
       size="xl"
       class="q-ma-xl bg-secondary" />
+    <q-btn
+      to="/login"
+      label="Login!"
+      color="primary"
+      size="m"
+      class="q-ma-xl bg-secondary" />
   </q-page>
 </template>
 
