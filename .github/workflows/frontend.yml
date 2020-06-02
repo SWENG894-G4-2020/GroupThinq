@@ -23,21 +23,21 @@ jobs:
         
     - name: Install Vue CLI
       working-directory: ./frontend/groupthinq_frontend
-    - run: | 
+      run: | 
         npm install -g @vue/cli
         
     - name: Install Quasar CLI
       working-directory: ./frontend/groupthinq_frontend
-    - run: | 
+      run: | 
         npm install -g @quasar/cli
 
     - name: Install dependencies
       working-directory: ./frontend/groupthinq_frontend
-    - run: | 
+      run: | 
         npm install
 
     - name: Run build
       working-directory: ./frontend/groupthinq_frontend
-    - run: | 
+      run: | 
         quasar build
 
