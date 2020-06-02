@@ -11,17 +11,33 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Setup Node.js 13.x
     - uses: actions/setup-node@v1
       with:
-        node-version: '13'
-    - run: npm install -g @vue/cli
-    - run: npm install -g @quasar/cli
+        node-version: 13.x
+        
+    - name: Install Vue CLI
       working-directory: ./frontend/groupthinq_frontend
-    - run: npm install
+    - run: | 
+        npm install -g @vue/cli
+        
+    - name: Install Quasar CLI
       working-directory: ./frontend/groupthinq_frontend
-    - run: quasar build
+    - run: | 
+        npm install -g @quasar/cli
+
+    - name: Install dependencies
+      working-directory: ./frontend/groupthinq_frontend
+    - run: | 
+        npm install
+
+    - name: Run build
+      working-directory: ./frontend/groupthinq_frontend
+    - run: | 
+        quasar build
+
