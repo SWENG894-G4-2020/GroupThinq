@@ -4,8 +4,6 @@
 name: Backend CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -20,7 +18,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+
     - name: Grant execute permission for gradlew
+      working-directory: ./backend
       run: chmod +x gradlew
+      
     - name: Build with Gradle
+      working-directory: ./backend
       run: ./gradlew build
