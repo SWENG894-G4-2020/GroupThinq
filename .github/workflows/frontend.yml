@@ -22,13 +22,13 @@ jobs:
           node-version: 13.x
         
       - name: Install dependencies
-        working-directory: ./frontend/groupthinq_frontend
         run: | 
+          cd ./frontend/groupthinq_frontend
           npm install -g @vue/cli
           npm install -g @quasar/cli
           npm install
 
       - name: Run build
-        working-directory: ./frontend/groupthinq_frontend
         run: | 
+          cd ./frontend/groupthinq_frontend
           quasar build
