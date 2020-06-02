@@ -1,4 +1,4 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# This workflow will do a clean install of node dependencies, build the source code and run tests 
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 name: Frontend CI
@@ -13,31 +13,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
     
-    - name: Setup Node.js 13.x
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 13.x
+      - name: Setup Node.js 13.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 13.x
         
-    - name: Install Vue CLI
-      working-directory: ./frontend/groupthinq_frontend
-      run: | 
-        npm install -g @vue/cli
-        
-    - name: Install Quasar CLI
-      working-directory: ./frontend/groupthinq_frontend
-      run: | 
-        npm install -g @quasar/cli
+      - name: Install dependencies
+        working-directory: ./frontend/groupthinq_frontend
+        run: | 
+          npm install -g @vue/cli
+          npm install -g @quasar/cli
+          npm install
 
-    - name: Install dependencies
-      working-directory: ./frontend/groupthinq_frontend
-      run: | 
-        npm install
-
-    - name: Run build
-      working-directory: ./frontend/groupthinq_frontend
-      run: | 
-        quasar build
-
+      - name: Run build
+        working-directory: ./frontend/groupthinq_frontend
+        run: | 
+          quasar build
