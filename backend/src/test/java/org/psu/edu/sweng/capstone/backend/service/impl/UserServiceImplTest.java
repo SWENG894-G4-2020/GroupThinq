@@ -61,7 +61,7 @@ class UserServiceImplTest {
 		birthDate = new Date(1337L);
 		
 		user = new User(userName, password, lastName, firstName, emailAddress, birthDate);
-		userDto = UserDTO.buildUserDTO(user);
+		userDto = UserDTO.buildDTO(user);
 	}
 
 
@@ -123,8 +123,8 @@ class UserServiceImplTest {
 		userList.add(user1);
 		userList.add(user2);
 		
-		UserDTO userDto1 = UserDTO.buildUserDTO(user1);
-		UserDTO userDto2 = UserDTO.buildUserDTO(user2);
+		UserDTO userDto1 = UserDTO.buildDTO(user1);
+		UserDTO userDto2 = UserDTO.buildDTO(user2);
 		
 		List<UserDTO> userDTOList = new ArrayList<>();
 		userDTOList.add(userDto1);
