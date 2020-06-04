@@ -3,10 +3,15 @@ package org.psu.edu.sweng.capstone.backend.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +25,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserDAO userDao;
 
+	@Autowired
+	private RoleDAO roleDao;
+	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
@@ -101,6 +109,12 @@ public class UserServiceImpl implements UserService {
 				userDto.getBirthDate(),
 			new Date() // Sets CREATED_DATE to the current time
 		);
+		
+		Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+		
+		if (role.isPresent()) {
+			newUser.getUserRoles().add(new UserRole(newUser, role.get()));
+		}
 		
 		userDao.save(newUser);
 		

@@ -46,6 +46,9 @@ public class User {
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 	
+	@Column(name = "LAST_LOGGED_IN")
+	private Date lastLoggedIn;
+	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
 	@Fetch(FetchMode.SELECT)
 	private Set<UserRole> userRoles = new HashSet<>();
@@ -118,8 +121,20 @@ public class User {
 		this.createdDate = createdDate;
 	}
 	
+	public Date getLastLoggedIn() {
+		return lastLoggedIn;
+	}
+
+	public void setLastLoggedIn(Date lastLoggedIn) {
+		this.lastLoggedIn = lastLoggedIn;
+	}
+
 	public Set<UserRole> getUserRoles() {
 		return userRoles;
+	}
+
+	public void setUserRoles(Set<UserRole> userRoles) {
+		this.userRoles = userRoles;
 	}
 
 	public String getFullName() {

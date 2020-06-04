@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -38,6 +42,9 @@ class UserServiceImplTest {
 
 	@Mock
 	private UserDAO userDao;
+	
+	@Mock
+	private RoleDAO roleDao;
 	
 	@Mock
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -64,6 +71,7 @@ class UserServiceImplTest {
 	void createUser_worksProperly_withUserNotAlreadyInSystem() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(null);
+		when(roleDao.findByName(RoleEnum.USER.getDescription())).thenReturn(Optional.of(new Role()));
 		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
 		String returnMessage = userServiceImpl.createUser(userName, userDto);
 
