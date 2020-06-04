@@ -61,7 +61,9 @@ class UserServiceImplTest {
 		birthDate = new Date(1337L);
 		
 		user = new User(userName, password, lastName, firstName, emailAddress, birthDate);
+		
 		userDto = UserDTO.buildDTO(user);
+		userDto.setPassword("fakepw");
 	}
 
 

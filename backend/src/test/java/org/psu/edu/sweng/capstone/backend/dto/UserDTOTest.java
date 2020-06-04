@@ -24,6 +24,7 @@ class UserDTOTest {
 		user.getUserRoles().add(new UserRole(user, new Role()));
 		
 		testUser = UserDTO.buildDTO(user);
+		testUser.setPassword("fakepw");
 	}
 	
 	@Test
