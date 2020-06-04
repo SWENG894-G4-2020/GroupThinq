@@ -104,7 +104,6 @@ public class UserDTO {
 		UserDTO dto = new UserDTO();
 		
 		if (u.getUserName() != null) { dto.setUserName(u.getUserName()); }
-		if (u.getPassword() != null) { dto.setPassword(u.getPassword()); }
 		if (u.getLastName() != null) { dto.setLastName(u.getLastName()); }
 		if (u.getFirstName() != null) { dto.setFirstName(u.getFirstName()); }
 		if (u.getEmailAddress() != null) { dto.setEmailAddress(u.getEmailAddress()); }
