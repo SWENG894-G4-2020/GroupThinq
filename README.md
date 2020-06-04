@@ -2,6 +2,7 @@
 The full repository for the SWENG894 Group 4 Summer 2020 project.
 
 ![Frontend CI](https://github.com/jchbrown/SWENG894/workflows/Frontend%20CI/badge.svg)
+
 ![Backend CI](https://github.com/jchbrown/SWENG894/workflows/Backend%20CI/badge.svg)
 
 ## Setup a Local Development Enviroment
