@@ -46,6 +46,9 @@ public class User {
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 	
+	@Column(name = "UPDATED_DATE")
+	private Date updatedDate;
+	
 	@Column(name = "LAST_LOGGED_IN")
 	private Date lastLoggedIn;
 	
@@ -120,6 +123,14 @@ public class User {
 		this.createdDate = createdDate;
 	}
 	
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
 	public Date getLastLoggedIn() {
 		return lastLoggedIn;
 	}

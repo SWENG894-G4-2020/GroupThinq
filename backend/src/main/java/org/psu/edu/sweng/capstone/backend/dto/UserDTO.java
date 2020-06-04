@@ -19,7 +19,9 @@ public class UserDTO {
 	private String emailAddress;
 	private Date birthDate;
 	private Date createdDate;
+	private Date updatedDate;
 	private Date lastLoggedIn;
+	
 	private List<String> userRoles = new ArrayList<>();
 	
 	public String getUserName() {
@@ -78,6 +80,14 @@ public class UserDTO {
 		this.createdDate = createdDate;
 	}
 
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+
 	public Date getLastLoggedIn() {
 		return lastLoggedIn;
 	}
@@ -104,10 +114,11 @@ public class UserDTO {
 		if (u.getEmailAddress() != null) { dto.setEmailAddress(u.getEmailAddress()); }
 		if (u.getBirthDate() != null) { dto.setBirthDate(u.getBirthDate()); }
 		if (u.getCreatedDate() != null) { dto.setCreatedDate(u.getCreatedDate()); }
+		if (u.getUpdatedDate() != null) { dto.setUpdatedDate(u.getUpdatedDate()); }
 		if (u.getLastLoggedIn() != null) { dto.setLastLoggedIn(u.getLastLoggedIn()); }
 		
 		for (UserRole userRole : u.getUserRoles()) {
-			dto.getUserRoles().add(userRole.getRole().toString());
+			dto.getUserRoles().add(userRole.getRole().getName());
 		}
 		
 		return dto;
