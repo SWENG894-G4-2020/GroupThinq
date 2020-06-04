@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class UserControllerTest {
 	
 	private String userName = "TestUser";
-	private UserDTO userDto = new UserDTO("TestUser", "fakepw", "User", "Test", "TestUser@foo.bar", new Date(1337L), new Date());
+	private UserDTO userDto = new UserDTO("TestUser", "fakepw", "User", "Test", "TestUser@foo.bar", new Date(1337L), new Date(), new Date(7859L));
 	
 	@InjectMocks
 	private UserController userController;

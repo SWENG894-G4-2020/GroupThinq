@@ -19,12 +19,13 @@ public class UserDTO {
 	private String emailAddress;
 	private Date birthDate;
 	private Date createdDate;
+	private Date lastLoggedIn;
 	private List<String> userRoles = new ArrayList<>();
 	
 	public UserDTO() {}
 	
 	public UserDTO(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate,
-			Date createdDate) {
+			Date createdDate, Date lastLoggedIn) {
 		this.userName = userName;
 		this.password = password;
 		this.lastName = lastName;
@@ -32,6 +33,7 @@ public class UserDTO {
 		this.emailAddress = emailAddress;
 		this.birthDate = birthDate;
 		this.createdDate = createdDate;
+		this.lastLoggedIn = lastLoggedIn;
 	}
 	
 	public String getUserName() {
@@ -90,6 +92,14 @@ public class UserDTO {
 		this.createdDate = createdDate;
 	}
 
+	public Date getLastLoggedIn() {
+		return lastLoggedIn;
+	}
+
+	public void setLastLoggedIn(Date lastLoggedIn) {
+		this.lastLoggedIn = lastLoggedIn;
+	}
+
 	public List<String> getUserRoles() {
 		return userRoles;
 	}
@@ -100,10 +110,10 @@ public class UserDTO {
 
 	public static UserDTO buildUserDTO(User u) {
 		UserDTO dto = new UserDTO(u.getUserName(), u.getPassword(), u.getLastName(), u.getFirstName(), u.getEmailAddress(), u.getBirthDate(), 
-				u.getCreatedDate());
+				u.getCreatedDate(), u.getLastLoggedIn());
 		
 		for (UserRole userRole : u.getUserRoles()) {
-			dto.getUserRoles().add(userRole.getRole().getName().toString());
+			dto.getUserRoles().add(userRole.getRole().toString());
 		}
 		
 		return dto;
