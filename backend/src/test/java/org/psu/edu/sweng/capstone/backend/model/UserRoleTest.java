@@ -14,14 +14,14 @@ class UserRoleTest {
 	
 	@BeforeEach
 	void setUp() {
-		userRole.setUser(new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L), new Date()));
+		userRole.setUser(new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
 		userRole.setRole(new Role());
 	}
 	
 	@Test
 	void constructor_worksProperly() {
 		// given
-		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L), new Date());
+		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
 		Role newRole = new Role();
 		
 		// when
@@ -50,7 +50,7 @@ class UserRoleTest {
 	void setters_workProperly() {
 		// given
 		Role newRole = new Role();
-		User newTestUser = new User("jsmith", "fakepw", "Smith", "John", "JohnSmith@gmail.com", new Date(1337L), new Date());
+		User newTestUser = new User("jsmith", "fakepw", "Smith", "John", "JohnSmith@gmail.com", new Date(1337L));
 		
 		// when
 		userRole.setRole(newRole);

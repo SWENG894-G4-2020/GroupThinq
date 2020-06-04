@@ -31,10 +31,9 @@ class UserTest {
 		String firstName = "Matt";
 		String emailAddress = "mboyer87@gmail.com";
 		Date birthDate = new Date(1337);
-		Date createdDate = new Date();
 		
 		// when
-		User newUser = new User(username, password, lastName, firstName, emailAddress, birthDate, createdDate);
+		User newUser = new User(username, password, lastName, firstName, emailAddress, birthDate);
 		
 		// then
 		assertEquals("mwboyer", newUser.getUserName());
@@ -43,7 +42,6 @@ class UserTest {
 		assertEquals("Matt", newUser.getFirstName());
 		assertEquals("mboyer87@gmail.com", newUser.getEmailAddress());
 		assertEquals(birthDate, newUser.getBirthDate());
-		assertEquals(createdDate, newUser.getCreatedDate());
 	}
 	
 	@Test

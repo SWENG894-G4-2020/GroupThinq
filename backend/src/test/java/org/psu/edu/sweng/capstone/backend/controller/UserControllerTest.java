@@ -9,8 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-import java.util.Date;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class UserControllerTest {
 	
 	private String userName = "TestUser";
-	private UserDTO userDto = new UserDTO("TestUser", "fakepw", "User", "Test", "TestUser@foo.bar", new Date(1337L), new Date(), new Date(7859L));
+	private UserDTO userDto = new UserDTO();
 	
 	@InjectMocks
 	private UserController userController;

@@ -106,9 +106,10 @@ public class UserServiceImpl implements UserService {
 				userDto.getLastName(),
 				userDto.getFirstName(),
 				userDto.getEmailAddress(),
-				userDto.getBirthDate(),
-			new Date() // Sets CREATED_DATE to the current time
+				userDto.getBirthDate()
 		);
+		
+		newUser.setCreatedDate(new Date());
 		
 		Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
 		

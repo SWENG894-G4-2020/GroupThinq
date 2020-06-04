@@ -55,14 +55,13 @@ public class User {
 	
 	protected User() {}
 	
-	public User(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate, Date createdDate) {
+	public User(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate) {
 		this.userName = userName;
 		this.password = password;
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.emailAddress = emailAddress;
 		this.birthDate = birthDate;
-		this.createdDate = createdDate;
 	}
 
 	public String getUserName() {

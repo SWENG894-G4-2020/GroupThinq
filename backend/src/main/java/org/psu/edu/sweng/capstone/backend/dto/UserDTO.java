@@ -22,20 +22,6 @@ public class UserDTO {
 	private Date lastLoggedIn;
 	private List<String> userRoles = new ArrayList<>();
 	
-	public UserDTO() {}
-	
-	public UserDTO(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate,
-			Date createdDate, Date lastLoggedIn) {
-		this.userName = userName;
-		this.password = password;
-		this.lastName = lastName;
-		this.firstName = firstName;
-		this.emailAddress = emailAddress;
-		this.birthDate = birthDate;
-		this.createdDate = createdDate;
-		this.lastLoggedIn = lastLoggedIn;
-	}
-	
 	public String getUserName() {
 		return userName;
 	}
@@ -109,8 +95,16 @@ public class UserDTO {
 	}
 
 	public static UserDTO buildUserDTO(User u) {
-		UserDTO dto = new UserDTO(u.getUserName(), u.getPassword(), u.getLastName(), u.getFirstName(), u.getEmailAddress(), u.getBirthDate(), 
-				u.getCreatedDate(), u.getLastLoggedIn());
+		UserDTO dto = new UserDTO();
+		
+		if (u.getUserName() != null) { dto.setUserName(u.getUserName()); }
+		if (u.getPassword() != null) { dto.setPassword(u.getPassword()); }
+		if (u.getLastName() != null) { dto.setLastName(u.getLastName()); }
+		if (u.getFirstName() != null) { dto.setFirstName(u.getFirstName()); }
+		if (u.getEmailAddress() != null) { dto.setEmailAddress(u.getEmailAddress()); }
+		if (u.getBirthDate() != null) { dto.setBirthDate(u.getBirthDate()); }
+		if (u.getCreatedDate() != null) { dto.setCreatedDate(u.getCreatedDate()); }
+		if (u.getLastLoggedIn() != null) { dto.setLastLoggedIn(u.getLastLoggedIn()); }
 		
 		for (UserRole userRole : u.getUserRoles()) {
 			dto.getUserRoles().add(userRole.getRole().toString());

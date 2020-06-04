@@ -35,8 +35,6 @@ class UserServiceImplTest {
 	private String firstName;
 	private String emailAddress;
 	private Date birthDate;
-	private Date createdDate;
-	private Date lastLoggedIn;
 	
 	private User user;
 	private UserDTO userDto;
@@ -61,11 +59,9 @@ class UserServiceImplTest {
 		firstName = "Test";
 		emailAddress = "testUser@foo.bar";
 		birthDate = new Date(1337L);
-		createdDate = new Date();
-		lastLoggedIn = new Date(7859L);
 		
-		userDto = new UserDTO(userName, password, lastName, firstName, emailAddress, birthDate, createdDate, lastLoggedIn);
-		user = new User(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
+		user = new User(userName, password, lastName, firstName, emailAddress, birthDate);
+		userDto = UserDTO.buildUserDTO(user);
 	}
 
 
@@ -120,15 +116,15 @@ class UserServiceImplTest {
 	@Test
 	void getUsers_returnsListOfUsers() {
 		// given
-		User user1 = new User("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L), new Date());
-		User user2 = new User("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L), new Date());
+		User user1 = new User("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L));
+		User user2 = new User("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L));
 		
 		List<User> userList = new ArrayList<>();
 		userList.add(user1);
 		userList.add(user2);
 		
-		UserDTO userDto1 = new UserDTO("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L), new Date(1L), new Date(7859L));
-		UserDTO userDto2 = new UserDTO("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L), new Date(1L), new Date(7859L));
+		UserDTO userDto1 = UserDTO.buildUserDTO(user1);
+		UserDTO userDto2 = UserDTO.buildUserDTO(user2);
 		
 		List<UserDTO> userDTOList = new ArrayList<>();
 		userDTOList.add(userDto1);
@@ -170,7 +166,7 @@ class UserServiceImplTest {
 	void updateUser_savesUser_whenGivenNullValues() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(user);
-		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO(userName, null, null, null, null, null, null, null));
+		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO());
 
 		// then
 		assertEquals(userName + " has been updated.", returnMessage);
