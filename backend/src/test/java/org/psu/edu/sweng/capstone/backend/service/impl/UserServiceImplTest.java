@@ -35,6 +35,9 @@ class UserServiceImplTest {
 	private String firstName;
 	private String emailAddress;
 	private Date birthDate;
+	private Date createdDate;
+	private Date updatedDate;
+	private Date lastLoggedIn;
 	
 	private User user;
 	private UserDTO userDto;
@@ -59,13 +62,18 @@ class UserServiceImplTest {
 		firstName = "Test";
 		emailAddress = "testUser@foo.bar";
 		birthDate = new Date(1337L);
+		createdDate = new Date(1111L);
+		updatedDate = new Date (2222L);
+		lastLoggedIn = new Date(3333L);
 		
 		user = new User(userName, password, lastName, firstName, emailAddress, birthDate);
+		user.setCreatedDate(createdDate);
+		user.setUpdatedDate(updatedDate);
+		user.setLastLoggedIn(lastLoggedIn);
 		
 		userDto = UserDTO.buildDTO(user);
 		userDto.setPassword("fakepw");
 	}
-
 
 	@Test
 	void createUser_worksProperly_withUserNotAlreadyInSystem() {
