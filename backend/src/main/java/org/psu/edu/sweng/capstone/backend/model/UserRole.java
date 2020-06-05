@@ -16,12 +16,12 @@ import org.psu.edu.sweng.capstone.backend.model.id.UserRoleId;
 public class UserRole {
 	
 	@Id
-	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "USER_ID")
 	private User user;
 	
 	@Id
-	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "ROLE_ID")
 	private Role role;
 	

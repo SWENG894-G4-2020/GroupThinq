@@ -2,27 +2,24 @@ package org.psu.edu.sweng.capstone.backend.model.id;
 
 import java.io.Serializable;
 
-import org.psu.edu.sweng.capstone.backend.model.Decision;
-import org.psu.edu.sweng.capstone.backend.model.User;
-
 public class DecisionUserId implements Serializable {
 	private static final long serialVersionUID = 1689625905121985251L;
 	
-	private Decision decision;
-	private User user;
+	private Long decision;
+	private Long user;
 
 	public DecisionUserId() {}
 	
-	public DecisionUserId(Decision decision, User user) {
+	public DecisionUserId(Long decision, Long user) {
 		this.decision = decision;
 		this.user = user;
 	}
 
-	public Decision getDecision() {
+	public Long getDecision() {
 		return decision;
 	}
 
-	public User getUser() {
+	public Long getUser() {
 		return user;
 	}
 }
