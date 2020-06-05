@@ -67,8 +67,8 @@ public class UserServiceImpl implements UserService {
 		if (user == null) {
 			return "User does not exist";
 		}
-		
-		ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
+    
+    ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
 		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
 		
 		if (userRoles.size() > 0) {
@@ -95,17 +95,12 @@ public class UserServiceImpl implements UserService {
 			return "User does not exist";
 		}
 		
-		if (userDto.getLastName() != null) {
-			user.setLastName(userDto.getLastName());
-		}
-		
-		if (userDto.getFirstName() != null) {
-			user.setFirstName(userDto.getFirstName());
-		}
-		
-		if (userDto.getEmailAddress() != null) {
-			user.setEmailAddress(userDto.getEmailAddress());
-		}
+		if (userDto.getLastName() != null) { user.setLastName(userDto.getLastName()); }
+		if (userDto.getFirstName() != null) { user.setFirstName(userDto.getFirstName()); }
+		if (userDto.getEmailAddress() != null) { user.setEmailAddress(userDto.getEmailAddress()); }
+		if (userDto.getBirthDate() != null) { user.setBirthDate(userDto.getBirthDate()); }
+
+		user.setUpdatedDate(new Date());
 		
 		userDao.save(user);
 		
