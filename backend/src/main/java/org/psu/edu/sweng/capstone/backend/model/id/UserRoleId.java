@@ -2,27 +2,24 @@ package org.psu.edu.sweng.capstone.backend.model.id;
 
 import java.io.Serializable;
 
-import org.psu.edu.sweng.capstone.backend.model.Role;
-import org.psu.edu.sweng.capstone.backend.model.User;
-
 public class UserRoleId implements Serializable {
 	private static final long serialVersionUID = 1736396020700157582L;
 
-	private User user;
-	private Role role;
+	private Long user;
+	private Long role;
 
 	public UserRoleId() {}
 	
-	public UserRoleId(User user, Role role) {
+	public UserRoleId(Long user, Long role) {
 		this.user = user;
 		this.role = role;
 	}
 
-	public User getUser() {
+	public Long getUser() {
 		return user;
 	}
 
-	public Role getRole() {
+	public Long getRole() {
 		return role;
 	}
 }

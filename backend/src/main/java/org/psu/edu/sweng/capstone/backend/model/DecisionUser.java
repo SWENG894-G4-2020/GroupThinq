@@ -16,12 +16,12 @@ import org.psu.edu.sweng.capstone.backend.model.id.DecisionUserId;
 public class DecisionUser {
 	
 	@Id
-	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "DECISION_ID")
 	private Decision decision;
 	
 	@Id
-	@ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "USER_ID")
 	private User user;
 

@@ -18,12 +18,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +52,12 @@ class UserServiceImplTest {
 	
 	@Mock
 	private RoleDAO roleDao;
+	
+	@Mock
+	private UserRoleDAO userRoleDao;
+	
+	@Mock
+	private DecisionUserDAO decisionUserDao;
 	
 	@Mock
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -162,9 +173,40 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	void deleteUser_worksProperly_withUserAlreadyInSystem() {
+	void deleteUser_worksProperly_withUserAlreadyInSystem_noChildDependencies() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(user);
+		when(userRoleDao.findAllByUser(user)).thenReturn(new ArrayList<>());
+		when(decisionUserDao.findAllByUser(user)).thenReturn(new ArrayList<>());
+		String returnMessage = userServiceImpl.deleteUser(userName);
+		
+		// then
+		assertEquals(userName + " has been deleted.", returnMessage);
+		verify(userDao, times(1)).delete(Mockito.any());
+	}
+
+	@Test
+	void deleteUser_worksProperly_withUserAlreadyInSystem_childDependencies() {
+		// given
+		ArrayList<UserRole> userRoles = new ArrayList<>();
+		ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
+		
+		Decision newDecision = new Decision(2L, "New Decision");
+		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
+		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
+		
+		// given
+		User newUser2 = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
+		Role newRole = new Role();
+		UserRole userRole = new UserRole(newUser2, newRole);
+		
+		decisionUsers.add(newDecisionUser);
+		userRoles.add(userRole);
+		
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(user);
+		when(userRoleDao.findAllByUser(user)).thenReturn(userRoles);
+		when(decisionUserDao.findAllByUser(user)).thenReturn(decisionUsers);
 		String returnMessage = userServiceImpl.deleteUser(userName);
 		
 		// then

@@ -3,11 +3,7 @@ package org.psu.edu.sweng.capstone.backend.model.id;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.util.Date;
-
 import org.junit.jupiter.api.Test;
-import org.psu.edu.sweng.capstone.backend.model.Decision;
-import org.psu.edu.sweng.capstone.backend.model.User;
 
 class DecisionUserIdTest {
 
@@ -16,21 +12,15 @@ class DecisionUserIdTest {
 	@Test
 	void constructor_worksProperly() {
 		// given
-		User user = new User("jsmith",
-				"password",
-				"Smith",
-				"John",
-				"jsmith@gmail.com",
-				new Date(1337L)
-		);
+		Long decisionId = 1L;
+		Long userId = 2L;
 		
 		// when
-		decisionUserID = new DecisionUserId(new Decision(1L, "Decision"), user);
+		decisionUserID = new DecisionUserId(decisionId, userId);
 		
 		// then
-		assertEquals((Long)1L, decisionUserID.getDecision().getId());
-		assertEquals("Decision", decisionUserID.getDecision().getName());
-		assertEquals("jsmith", decisionUserID.getUser().getUserName());		
+		assertEquals((Long)1L, decisionUserID.getDecision());
+		assertEquals((Long)2L, decisionUserID.getUser());		
 	}
 	
 	@Test

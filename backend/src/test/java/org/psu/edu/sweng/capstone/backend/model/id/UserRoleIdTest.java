@@ -3,11 +3,7 @@ package org.psu.edu.sweng.capstone.backend.model.id;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.util.Date;
-
 import org.junit.jupiter.api.Test;
-import org.psu.edu.sweng.capstone.backend.model.Role;
-import org.psu.edu.sweng.capstone.backend.model.User;
 
 class UserRoleIdTest {
 
@@ -16,21 +12,15 @@ class UserRoleIdTest {
 	@Test
 	void constructor_worksProperly() {
 		// given
-		User user = new User("jsmith",
-				"password",
-				"Smith",
-				"John",
-				"jsmith@gmail.com",
-				new Date(1337L)
-		);
+		Long userId = 1L;
+		Long roleId = 2L;
 		
 		// when
-		userRoleId = new UserRoleId(user, new Role());
+		userRoleId = new UserRoleId(userId, roleId);
 		
 		// then
-		assertNull(userRoleId.getRole().getId());
-		assertNull(userRoleId.getRole().getName());
-		assertEquals("jsmith", userRoleId.getUser().getUserName());		
+		assertEquals((Long)1L, userRoleId.getUser());
+		assertEquals((Long)2L, userRoleId.getRole());
 	}
 	
 	@Test

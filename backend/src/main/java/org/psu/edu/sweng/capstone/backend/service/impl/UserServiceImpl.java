@@ -5,10 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
@@ -27,6 +30,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private RoleDAO roleDao;
+	
+	@Autowired
+	private UserRoleDAO userRoleDao;
+	
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -58,11 +67,20 @@ public class UserServiceImpl implements UserService {
 		if (user == null) {
 			return "User does not exist";
 		}
-
+    
+    ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
+		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
 		
+		if (userRoles.size() > 0) {
+			userRoleDao.deleteAll(userRoles);
+		}
+		
+		if (userDecisions.size() > 0) {
+			decisionUserDao.deleteAll(userDecisions);
+		}
 		
 		userDao.delete(user);
-		
+
 		StringBuilder builder = new StringBuilder();
 		builder.append(userName).append(" has been deleted.");
 		
