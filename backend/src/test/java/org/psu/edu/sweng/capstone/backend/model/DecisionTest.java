@@ -14,11 +14,11 @@ class DecisionTest {
 	private Decision testDecision = new Decision();
 	
 	private DecisionUser testUser1 = new DecisionUser(testDecision, new User("jsmith", "fakepw", "Smith", "John", "jsmith@foo.bar", 
-			new Date(1337L), new Date()));
+			new Date(1337L)));
 	private DecisionUser testUser2 = new DecisionUser(testDecision, new User("mboyer", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", 
-			new Date(1337L), new Date()));
+			new Date(1337L)));
 	private DecisionUser testUser3 = new DecisionUser(testDecision, new User("testuser", "fakepw", "User", "Test", "testuser@dev.gov", 
-			new Date(1337L), new Date()));
+			new Date(1337L)));
 	
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 	
@@ -56,7 +56,7 @@ class DecisionTest {
 	void setters_workProperly() {
 		// when
 		DecisionUser newUser = new DecisionUser(testDecision, new User("treyob", "fakepw", "Reyob", "Ttam", "TttamReyob@gmail.com", 
-				new Date(1337L), new Date()));
+				new Date(1337L)));
 		decisionUsers.add(newUser);
 		
 		testDecision.setName("New Test Decision");	

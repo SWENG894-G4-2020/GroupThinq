@@ -3,10 +3,15 @@ package org.psu.edu.sweng.capstone.backend.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +26,9 @@ public class UserServiceImpl implements UserService {
 	private UserDAO userDao;
 
 	@Autowired
+	private RoleDAO roleDao;
+	
+	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
@@ -29,7 +37,7 @@ public class UserServiceImpl implements UserService {
 		
 		List<UserDTO> response = new ArrayList<>();
 		for (User u : users) {
-			UserDTO userDto = UserDTO.buildUserDTO(u);
+			UserDTO userDto = UserDTO.buildDTO(u);
 			response.add(userDto);
 		}
 		
@@ -40,7 +48,7 @@ public class UserServiceImpl implements UserService {
 	public UserDTO getUser(String userName) {
 		User user = userDao.findByUserName(userName);
 		
-		return (user != null) ? UserDTO.buildUserDTO(user) : null;
+		return (user != null) ? UserDTO.buildDTO(user) : null;
 	}
 	
 	@Override
@@ -98,9 +106,16 @@ public class UserServiceImpl implements UserService {
 				userDto.getLastName(),
 				userDto.getFirstName(),
 				userDto.getEmailAddress(),
-				userDto.getBirthDate(),
-			new Date() // Sets CREATED_DATE to the current time
+				userDto.getBirthDate()
 		);
+		
+		newUser.setCreatedDate(new Date());
+		
+		Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+		
+		if (role.isPresent()) {
+			newUser.getUserRoles().add(new UserRole(newUser, role.get()));
+		}
 		
 		userDao.save(newUser);
 		

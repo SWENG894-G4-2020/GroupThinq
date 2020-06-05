@@ -21,8 +21,7 @@ class UserRoleIdTest {
 				"Smith",
 				"John",
 				"jsmith@gmail.com",
-				new Date(1337L),
-				new Date()
+				new Date(1337L)
 		);
 		
 		// when

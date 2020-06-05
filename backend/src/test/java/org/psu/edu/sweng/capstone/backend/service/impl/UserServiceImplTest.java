@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -31,13 +35,15 @@ class UserServiceImplTest {
 	private String firstName;
 	private String emailAddress;
 	private Date birthDate;
-	private Date createdDate;
 	
 	private User user;
 	private UserDTO userDto;
 
 	@Mock
 	private UserDAO userDao;
+	
+	@Mock
+	private RoleDAO roleDao;
 	
 	@Mock
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -53,10 +59,11 @@ class UserServiceImplTest {
 		firstName = "Test";
 		emailAddress = "testUser@foo.bar";
 		birthDate = new Date(1337L);
-		createdDate = new Date();
 		
-		userDto = new UserDTO(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
-		user = new User(userName, password, lastName, firstName, emailAddress, birthDate, createdDate);
+		user = new User(userName, password, lastName, firstName, emailAddress, birthDate);
+		
+		userDto = UserDTO.buildDTO(user);
+		userDto.setPassword("fakepw");
 	}
 
 
@@ -64,6 +71,7 @@ class UserServiceImplTest {
 	void createUser_worksProperly_withUserNotAlreadyInSystem() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(null);
+		when(roleDao.findByName(RoleEnum.USER.getDescription())).thenReturn(Optional.of(new Role()));
 		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
 		String returnMessage = userServiceImpl.createUser(userName, userDto);
 
@@ -110,15 +118,15 @@ class UserServiceImplTest {
 	@Test
 	void getUsers_returnsListOfUsers() {
 		// given
-		User user1 = new User("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L), new Date());
-		User user2 = new User("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L), new Date());
+		User user1 = new User("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L));
+		User user2 = new User("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L));
 		
 		List<User> userList = new ArrayList<>();
 		userList.add(user1);
 		userList.add(user2);
 		
-		UserDTO userDto1 = new UserDTO("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L), new Date(1L));
-		UserDTO userDto2 = new UserDTO("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L), new Date(1L));
+		UserDTO userDto1 = UserDTO.buildDTO(user1);
+		UserDTO userDto2 = UserDTO.buildDTO(user2);
 		
 		List<UserDTO> userDTOList = new ArrayList<>();
 		userDTOList.add(userDto1);
@@ -160,7 +168,7 @@ class UserServiceImplTest {
 	void updateUser_savesUser_whenGivenNullValues() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(user);
-		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO(userName, null, null, null, null, null, null));
+		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO());
 
 		// then
 		assertEquals(userName + " has been updated.", returnMessage);
