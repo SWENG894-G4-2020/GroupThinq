@@ -1,5 +1,17 @@
 <template>
-  <q-btn dense class="q-mx-sm" label="logout" @click="logout()" />
+  <q-btn color="primary" :label="userName" icon-right="keyboard_arrow_down">
+    <q-menu>
+      <q-list style="min-width: 150px">
+        <q-item clickable v-close-popup @click="goToSettings()">
+          <q-item-section>Account Settings</q-item-section>
+        </q-item>
+        <q-separator />
+        <q-item clickable v-close-popup @click="logout()">
+          <q-item-section class="text-negative">Logout</q-item-section>
+        </q-item>
+      </q-list>
+    </q-menu>
+  </q-btn>
 </template>
 
 <script>
@@ -7,11 +19,18 @@ import auth from '../store/auth'
 export default {
   name: 'UserMenu',
   data () {
-    return {}
+    return {
+      userName: ''
+    }
   },
+
+  mounted () {
+    this.userName = auth.getTokenData().sub
+  },
+
   methods: {
     goToSettings () {
-
+      this.$router.push('/main/account')
     },
 
     logout () {
