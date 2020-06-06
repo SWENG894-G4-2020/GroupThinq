@@ -18,7 +18,7 @@
           </div>
         </q-toolbar-title>
 
-        <div>Hello from 8081 Quasar v{{ $q.version }}</div>
+        <div><UserMenu /></div>
       </q-toolbar>
     </q-header>
 
@@ -52,12 +52,14 @@
 
 <script>
 import NavItem from 'components/NavItem'
+import UserMenu from 'components/UserMenu'
 
 export default {
   name: 'MainLayout',
 
   components: {
-    NavItem
+    NavItem,
+    UserMenu
   },
 
   data () {
