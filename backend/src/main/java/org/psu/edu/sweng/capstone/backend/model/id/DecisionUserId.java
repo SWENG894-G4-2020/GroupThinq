@@ -31,8 +31,13 @@ public class DecisionUserId implements Serializable {
 	
 	@Override
 	public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DecisionUserId)) return false;
+        if (this == o) {
+        	return true;
+        }
+        
+        if (!(o instanceof DecisionUserId)) {
+        	return false;
+        }
         
         DecisionUserId decisionUserId = (DecisionUserId) o;
         
