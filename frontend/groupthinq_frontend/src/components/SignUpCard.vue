@@ -61,7 +61,7 @@ export default {
     },
     signUp () {
       const isoDate = new Date(this.BirthDate).toISOString()
-      this.$axios.post(`http://localhost:8080/users/${this.UserName}`,
+      this.$axios.post(`${process.env.BACKEND_URL}/users/${this.UserName}`,
         {
           userName: this.UserName,
           firstName: this.FirstName,
@@ -71,7 +71,7 @@ export default {
           password: this.Password
         })
         .then(response => {
-          return this.$axios.post('http://localhost:8080/login',
+          return this.$axios.post(`${process.env.BACKEND_URL}/login`,
             {
               userName: this.UserName,
               password: this.Password

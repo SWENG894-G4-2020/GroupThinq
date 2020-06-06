@@ -53,7 +53,7 @@ export default {
       this.getData()
     },
     onConfirm () {
-      // this.$axios.put(`http://localhost:8080/users/${this.UserName}`,
+      // this.$axios.put(`${process.env.BACKEND_URL}/users/${this.UserName}`,
       //   {
       //     userName: this.UserName,
       //     firstName: this.FirstName,
@@ -67,14 +67,14 @@ export default {
       this.editEnabled = false
     },
     onDelete () {
-      // this.$axios.delete('http://localhost:8080/users/$(this.UserName)')
+      // this.$axios.delete(`${process.env.BACKEND_URL}/users/$(this.UserName)`)
       //   .then(() => (this.$router.push('/')))
       //   .catch(error => (console.log(error)))
 
       this.$router.push('/')
     },
     getData () {
-      // this.$axios.get('http://localhost:8080/users')
+      // this.$axios.get(`${process.env.BACKEND_URL}/users`)
       //   .then(response => (this.users = response.data))
       //   .then(() => (this.isLoaded = true))
       //   .catch(error => (console.log(error)))

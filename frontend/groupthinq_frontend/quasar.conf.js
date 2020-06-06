@@ -76,7 +76,7 @@ module.exports = function (/* ctx */) {
 
       env: {
         BACKEND_URL: JSON.stringify(process.env.BACKEND_URL)
-      }
+      },
       // rtl: false, // https://quasar.dev/options/rtl-support
       // preloadChunks: true,
       // showProgress: false,
