@@ -8,7 +8,8 @@ export default ({ app, router, store, Vue }) => {
       } else {
         next({ path: '/login' })
       }
+    } else {
+      next()
     }
-    next()
   })
 }

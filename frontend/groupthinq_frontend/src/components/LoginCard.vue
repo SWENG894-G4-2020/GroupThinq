@@ -40,12 +40,15 @@ export default {
           userName: this.UserName,
           password: this.Password
         })
-        .then(response => {
+        .then((response) => {
           auth.storeToken(response.headers.authorization)
         })
-        .then(this.$router.push('/main'))
+        .then(() => {
+          this.$router.push('/main')
+            .catch(error => { console.log('The vue router errored ' + error) })
+        })
         .catch(error => {
-          console.log(error)
+          console.log('There was a login error: ' + error)
           this.$router.push('/login')
         })
     }
