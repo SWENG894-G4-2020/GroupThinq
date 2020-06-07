@@ -9,16 +9,31 @@
         class="row items-center"
       >
         <div key="editText" v-if="editEnabled" class="text-grey-5">Editing... </div>
-        <q-btn key="deleteButton" v-if="editEnabled" flat round color="red" @click="deleteConfirm = true" icon="delete_forever" />
       </transition-group>
-      <q-btn flat round icon="edit" :disable="editEnabled" @click="editEnabled=!editEnabled" />
+      <q-btn round icon="edit">
+        <q-menu>
+          <q-list>
+            <q-item clickable v-close-popup @click="editEnabled=!editEnabled">
+              <q-item-section>Edit</q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup @click="deleteConfirm = true">
+              <q-item-section class="text-negative">DELETE</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
     </q-card-actions>
     <q-card-section>
-      <q-input filled class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="FirstName" label="First Name" />
-      <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="LastName" label="Last Name" />
-      <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="EmailAddress" label="Email Address" />
-      <q-input filled class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="UserName" label="Username" />
-      <q-input filled class="q-mt-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="Password" type="password" label="Password" />
+      <q-input filled dense class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.firstName" label="First Name" />
+      <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.lastName" label="Last Name" />
+      <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.emailAddress" label="Email Address" />
+      <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.birthDate" label="Birthdate" />
+      <q-input filled dense class="q-my-md" readonly v-model="userInfo.userName" label="Username" />
+      <q-input filled dense class="q-mt-md" readonly v-model="userInfo.password" type="password" label="Password" />
+      <q-input filled dense class="q-mt-md" readonly v-model="userInfo.createdDate" label="Created On" />
+      <q-input filled dense class="q-mt-md" readonly v-model="userInfo.updatedDate" label="Last Updated" />
+      <q-input filled dense class="q-mt-md" readonly v-model="userInfo.lastLoggedIn" label="Last Logged In" />
     </q-card-section>
     <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
       <q-card-actions key="buttons" v-if="editEnabled" align="right">
@@ -43,8 +58,41 @@
 </template>
 
 <script>
+import auth from '../store/auth'
 export default {
   name: 'AccountInfoCard',
+
+  data () {
+    return {
+      deleteConfirm: false,
+      editEnabled: false,
+      storedUserName: '',
+
+      userInfo: {
+        birthDate: '',
+        createdDate: '',
+        emailAddress: '',
+        firstName: '',
+        lastLoggedIn: '',
+        lastName: '',
+        password: '',
+        updatedDate: '',
+        userName: ''
+      }
+    }
+  },
+
+  computed: {
+    fieldColor: function () {
+      return this.editEnabled ? 'blue-1' : ''
+    }
+  },
+
+  mounted () {
+    this.storedUserName = auth.getTokenData().sub
+    console.log(this.storedUserName)
+    this.getData()
+  },
 
   methods: {
     onCancel () {
@@ -53,6 +101,7 @@ export default {
       this.getData()
     },
     onConfirm () {
+<<<<<<< HEAD
       // this.$axios.put(`${process.env.BACKEND_URL}/users/${this.UserName}`,
       //   {
       //     userName: this.UserName,
@@ -63,17 +112,31 @@ export default {
       //   })
       //   .then(this.$router.push('/main'))
       //   .catch(error => (console.log(error)))
+=======
+      this.updatedDate = Date.now()
+      this.$axios.put(`${process.env.BACKEND_URL}/users/${this.storedUserName}`,
+        this.userInfo)
+        .then(() => { this.$router.push('/main/account') })
+        .catch(error => (console.log(error)))
+>>>>>>> CAP-50_Frontend_AccountEditDelete
 
       this.editEnabled = false
     },
     onDelete () {
+<<<<<<< HEAD
       // this.$axios.delete(`${process.env.BACKEND_URL}/users/$(this.UserName)`)
       //   .then(() => (this.$router.push('/')))
       //   .catch(error => (console.log(error)))
+=======
+      this.$axios.delete(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
+        .then(() => { this.$router.push('/') })
+        .catch(error => (console.log(error)))
+>>>>>>> CAP-50_Frontend_AccountEditDelete
 
       this.$router.push('/')
     },
     getData () {
+<<<<<<< HEAD
       // this.$axios.get(`${process.env.BACKEND_URL}/users`)
       //   .then(response => (this.users = response.data))
       //   .then(() => (this.isLoaded = true))
@@ -103,6 +166,14 @@ export default {
       EmailAddress: 'FirstLast@foo.com',
       UserName: 'flTest',
       Password: 'test'
+=======
+      this.$axios.get(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
+        .then((response) => {
+          console.log(response.data)
+          this.userInfo = response.data
+        })
+        .catch(error => (console.log(error)))
+>>>>>>> CAP-50_Frontend_AccountEditDelete
     }
   }
 }
