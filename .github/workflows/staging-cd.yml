@@ -70,6 +70,9 @@ jobs:
       working-directory: ./backend
       run: ./gradlew build
 
+    - name: Docker Permissions
+      run: sudo usermod -a -G docker ${USER}
+
     - name: Docker Build
       run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
 
@@ -82,6 +85,6 @@ jobs:
         args: auth configure-docker
         cli: gcloud
 
-    - name: Docker Build
+    - name: Docker Push
       run: docker push gcr.io/sweng894-gp4-cap/backend-staging
       
