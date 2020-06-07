@@ -96,7 +96,7 @@ jobs:
       with:
         service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     - run: |
-        gcloud beta compute --project=sweng894-gp4-cap instance-templates create-with-container backend-staging-${{ steps.vars.outputs.sha_short }} \ 
+        gcloud compute --project=sweng894-gp4-cap instance-templates create-with-container backend-staging-${{ steps.vars.outputs.sha_short }} \ 
         --machine-type=n1-standard-1 \
         --network=projects/sweng894-gp4-cap/global/networks/default \
         --network-tier=PREMIUM \
