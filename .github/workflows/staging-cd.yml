@@ -74,7 +74,7 @@ jobs:
       run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
 
     - name: Configure Google Cloud and Docker
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     - run: |
