@@ -71,20 +71,18 @@ jobs:
       run: ./gradlew build
 
     - name: Docker Permissions
-      run: sudo usermod -a -G docker ${USER}
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
     - name: Docker Build
       run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
 
     - name: Login to Docker
-      uses: actions-hub/gcloud@master
-      env:
-        PROJECT_ID: sweng894-gp4-cap
-        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      with:
-        args: auth configure-docker
-        cli: gcloud
+    - run: |
+        gcloud auth configure-docker
 
     - name: Docker Push
-      run: docker push gcr.io/sweng894-gp4-cap/backend-staging
+      run: |
+        docker push gcr.io/sweng894-gp4-cap/backend-staging
       
