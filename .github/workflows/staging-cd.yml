@@ -24,24 +24,6 @@ jobs:
         args: cp ./database/scripts/setup.sql gs://db-sql-staging/
         cli: gsutil
 
-    - name: Delete Database
-      uses: actions-hub/gcloud@master
-      env:
-        PROJECT_ID: sweng894-gp4-cap
-        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      with:
-        args: sql databases delete groupthinq --instance=groupthinq-db-staging
-        cli: gcloud
-
-    - name: Add Database
-      uses: actions-hub/gcloud@master
-      env:
-        PROJECT_ID: sweng894-gp4-cap
-        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      with:
-        args: sql databases create groupthinq --instance=groupthinq-db-staging
-        cli: gcloud
-
     - name: Import SQL
       uses: actions-hub/gcloud@master
       env:
