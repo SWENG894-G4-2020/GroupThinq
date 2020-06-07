@@ -27,11 +27,17 @@ jobs:
       working-directory: ./backend
       run: ./gradlew build
 
-    - name: Push to Google Cloud Registry
+    - name: Docker Build
+      run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
+
+    - name: Auth Docker with Google Cloud
       uses: actions-hub/gcloud@master
       env:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       with:
-        args: builds submit --tag gcr.io/sweng894-gp4-cap/backend-stage
+        args: auth configure-docker
         cli: gcloud
+
+    - name: Docker Build
+      run: docker push gcr.io/sweng894-gp4-cap/backend-staging
