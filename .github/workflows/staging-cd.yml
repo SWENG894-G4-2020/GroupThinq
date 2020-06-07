@@ -73,14 +73,33 @@ jobs:
     - name: Docker Build
       run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
 
-    - name: Auth Docker with Google Cloud
+    - name: Generate local key for Google Cloud
       uses: actions-hub/gcloud@master
       env:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       with:
-        args: auth configure-docker
+        args: iam service-accounts keys create keyfile.json --iam-account github-actions@sweng894-gp4-cap.iam.gserviceaccount.com
+        cli: gcloud
+
+    - name: Activate service account with key
+      uses: actions-hub/gcloud@master
+      env:
+        PROJECT_ID: sweng894-gp4-cap
+        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      with:
+        args: auth activate-service-account github-actions@sweng894-gp4-cap.iam.gserviceaccount.com --key-file=keyfile.json
+        cli: gcloud
+
+    - name: Login to Google Cloud Registry
+      uses: actions-hub/gcloud@master
+      env:
+        PROJECT_ID: sweng894-gp4-cap
+        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      with:
+        args: auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io
         cli: gcloud
 
     - name: Docker Build
       run: docker push gcr.io/sweng894-gp4-cap/backend-staging
+      
