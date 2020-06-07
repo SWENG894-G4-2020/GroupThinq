@@ -48,5 +48,5 @@ jobs:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       with:
-        args: gcloud sql import sql groupthinq-db-staging gs://db-sql-staging/setup.sql --database=groupthinq
+        args: sql import sql groupthinq-db-staging gs://db-sql-staging/setup.sql --database=groupthinq
         cli: gscloud
