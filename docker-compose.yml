@@ -46,6 +46,8 @@ services:
       context: ./frontend
       dockerfile: DOCKERFILE
     container_name: frontend_dev
+    environment: 
+      - BACKEND_URL=${BACKEND_URL}
     ports:
       - 8081:8081
     volumes: 
