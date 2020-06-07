@@ -101,79 +101,26 @@ export default {
       this.getData()
     },
     onConfirm () {
-<<<<<<< HEAD
-      // this.$axios.put(`${process.env.BACKEND_URL}/users/${this.UserName}`,
-      //   {
-      //     userName: this.UserName,
-      //     firstName: this.FirstName,
-      //     lastName: this.LastName,
-      //     emailAddress: this.EmailAddress,
-      //     password: this.Password
-      //   })
-      //   .then(this.$router.push('/main'))
-      //   .catch(error => (console.log(error)))
-=======
       this.updatedDate = Date.now()
       this.$axios.put(`${process.env.BACKEND_URL}/users/${this.storedUserName}`,
         this.userInfo)
         .then(() => { this.$router.push('/main/account') })
         .catch(error => (console.log(error)))
->>>>>>> CAP-50_Frontend_AccountEditDelete
-
       this.editEnabled = false
     },
     onDelete () {
-<<<<<<< HEAD
-      // this.$axios.delete(`${process.env.BACKEND_URL}/users/$(this.UserName)`)
-      //   .then(() => (this.$router.push('/')))
-      //   .catch(error => (console.log(error)))
-=======
       this.$axios.delete(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
         .then(() => { this.$router.push('/') })
         .catch(error => (console.log(error)))
->>>>>>> CAP-50_Frontend_AccountEditDelete
-
       this.$router.push('/')
     },
     getData () {
-<<<<<<< HEAD
-      // this.$axios.get(`${process.env.BACKEND_URL}/users`)
-      //   .then(response => (this.users = response.data))
-      //   .then(() => (this.isLoaded = true))
-      //   .catch(error => (console.log(error)))
-      //
-      // this is just a placeholder for the UI
-      this.FirstName = 'First'
-      this.LastName = 'Last'
-      this.EmailAddress = 'FirstLast@foo.com'
-      this.UserName = 'flTest'
-      this.Password = 'test'
-    }
-  },
-
-  computed: {
-    fieldColor: function () {
-      return this.editEnabled ? 'blue-1' : ''
-    }
-  },
-
-  data () {
-    return {
-      deleteConfirm: false,
-      editEnabled: false,
-      FirstName: 'First',
-      LastName: 'Last',
-      EmailAddress: 'FirstLast@foo.com',
-      UserName: 'flTest',
-      Password: 'test'
-=======
       this.$axios.get(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
         .then((response) => {
           console.log(response.data)
           this.userInfo = response.data
         })
         .catch(error => (console.log(error)))
->>>>>>> CAP-50_Frontend_AccountEditDelete
     }
   }
 }
