@@ -30,7 +30,7 @@ jobs:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       with:
-        args: sql databases delete groupthinq --instance=sweng894-gp4-cap:us-central1:groupthinq-db-staging
+        args: sql databases delete groupthinq --instance=groupthinq-db-staging
         cli: gcloud
 
     - name: Add Database
@@ -39,7 +39,7 @@ jobs:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       with:
-        args: sql databases create groupthinq --instance=sweng894-gp4-cap:us-central1:groupthinq-db-staging
+        args: sql databases create groupthinq --instance=groupthinq-db-staging
         cli: gcloud
 
     - name: Import SQL
@@ -48,5 +48,5 @@ jobs:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       with:
-        args: gcloud sql import sql sweng894-gp4-cap:us-central1:groupthinq-db-staging gs://db-sql-staging/setup.sql --database=groupthinq
+        args: gcloud sql import sql groupthinq-db-staging gs://db-sql-staging/setup.sql --database=groupthinq
         cli: gscloud
