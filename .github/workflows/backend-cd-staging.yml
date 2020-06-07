@@ -29,7 +29,6 @@ jobs:
 
     - name: Push to Google Cloud Registry
       uses: actions-hub/gcloud@master
-      working-directory: ./backend
       env:
         PROJECT_ID: sweng894-gp4-cap
         APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
