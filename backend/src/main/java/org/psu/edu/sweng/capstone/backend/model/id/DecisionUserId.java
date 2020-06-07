@@ -1,6 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.model.id;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class DecisionUserId implements Serializable {
 	private static final long serialVersionUID = 1689625905121985251L;
@@ -21,5 +22,26 @@ public class DecisionUserId implements Serializable {
 
 	public Long getUser() {
 		return user;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+        if (this == o) {
+        	return true;
+        }
+        
+        if (!(o instanceof DecisionUserId)) {
+        	return false;
+        }
+        
+        DecisionUserId decisionUserId = (DecisionUserId) o;
+        
+        return (Objects.equals(this.getDecision(), decisionUserId.getDecision()) &&
+        		Objects.equals(this.getUser(), decisionUserId.getUser()));
 	}
 }
