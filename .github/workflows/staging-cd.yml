@@ -99,7 +99,7 @@ jobs:
       
     - name: Roll out update across instance group
       run: |
-        gcloud compute instance-groups managed rolling-action start-update ${{ secrets.STAGE_INSTANCE_GROUP }} --version template=backend-staging-${{ steps.vars.outputs.sha_short }} --zone us-central1-a
+        gcloud compute instance-groups managed rolling-action start-update ${{ secrets.STAGE_INSTANCE_GROUP }} --version template=backend-staging-${{ steps.vars.outputs.sha_short }} --zone us-central1-a --project=sweng894-gp4-cap
 
   deploy-frontend:
     runs-on: ubuntu-latest
