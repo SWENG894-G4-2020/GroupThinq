@@ -102,7 +102,7 @@ export default {
     },
     onConfirm () {
       this.updatedDate = Date.now()
-      this.$axios.put(`http://localhost:8080/users/${this.storedUserName}`,
+      this.$axios.put(`${process.env.BACKEND_URL}/users/${this.storedUserName}`,
         this.userInfo)
         .then(() => { this.$router.push('/main/account') })
         .catch(error => (console.log(error)))
@@ -110,14 +110,14 @@ export default {
       this.editEnabled = false
     },
     onDelete () {
-      this.$axios.delete(`http://localhost:8080/users/${this.storedUserName}`)
+      this.$axios.delete(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
         .then(() => { this.$router.push('/') })
         .catch(error => (console.log(error)))
 
       this.$router.push('/')
     },
     getData () {
-      this.$axios.get(`http://localhost:8080/users/${this.storedUserName}`)
+      this.$axios.get(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
         .then((response) => {
           console.log(response.data)
           this.userInfo = response.data
