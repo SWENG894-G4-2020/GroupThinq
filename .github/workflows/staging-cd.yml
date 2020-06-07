@@ -57,9 +57,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -76,7 +73,10 @@ jobs:
     - name: Docker Build
       run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
 
-    - name: Login to Docker
+    - name: Configure Google Cloud and Docker
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     - run: |
         gcloud auth configure-docker
 
