@@ -96,7 +96,7 @@ jobs:
       with:
         service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     - run: |
-        gcloud compute --project=sweng894-gp4-cap instance-templates create-with-container backend-staging-${{ steps.vars.outputs.sha_short }} \ 
+        gcloud compute --project=sweng894-gp4-cap instance-templates create-with-container backend-staging-${{ steps.vars.outputs.sha_short }} \
         --machine-type=n1-standard-1 \
         --network=projects/sweng894-gp4-cap/global/networks/default \
         --network-tier=PREMIUM \
@@ -116,8 +116,9 @@ jobs:
         --container-image=gcr.io/sweng894-gp4-cap/backend-staging \
         --container-restart-policy=always \
         --container-env=POSTGRES_PASSWORD=${{ secrets.STAGE_POSTGRES_PASSWORD }},POSTGRES_USER=${{ secrets.STAGE_POSTGRES_USER }},POSTGRES_DB=${{ secrets.STAGE_POSTGRES_DB }},JWT_SECRET=${{ secrets.STAGE_JWT_SECRET }},JWT_EXP=${{ secrets.STAGE_JWt_EXP }},DB_CONN=${{ secrets.STAGE_DB_CONN }} \
-        --labels=container-backend-img-${{ steps.vars.outputs.sha_short }} 
+        --labels=container-backend-img-${{ steps.vars.outputs.sha_short }} \
         --reservation-affinity=any \
+        /
       
     - name: Roll out update across instance group
       uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
@@ -126,7 +127,8 @@ jobs:
     - run: |
         gcloud compute instance-groups managed rolling-action start-update ${{ secrets.STAGE_INSTANCE_GROUP }} \
         --version template=backend-staging-${{ steps.vars.outputs.sha_short }} \
-        --zone us-central1-a
+        --zone us-central1-a \
+        /
 
   deploy-frontend:
     runs-on: ubuntu-latest
