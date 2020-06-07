@@ -73,11 +73,13 @@ jobs:
     - name: Docker Build
       run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
 
-    - name: Configure Google Cloud and Docker
+    - name: Configure Google Cloud SDK CLI
       uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-    - run: |
+
+    - name: Run gcloud Auth for Docker Login
+      run: |
         gcloud auth configure-docker
 
     - name: Docker Push
@@ -90,11 +92,6 @@ jobs:
       run: |
         echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
-    - name: Create new Google Cloud SDK CLI
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
     
     - name: Create new instance template based on docker image
       run: |
