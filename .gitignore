@@ -57,6 +57,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Test Reports
+/frontend/groupthinq_frontend/test/jest/coverage
+
 # Database
 database/data/
 
