@@ -1,5 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,7 +8,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -19,11 +24,24 @@ import org.hibernate.annotations.FetchMode;
 public class Decision {
 
 	@Id
-	@Column(name = "ID")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column(name = "NAME")
 	private String name;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "OWNER_ID")
+	private User ownerId;
+	
+	@Column(name = "EXPIRATION_DATE")
+	private Date expirationDate;
+	
+	@Column(name = "CREATED_DATE")
+	private Date createdDate;
+
+	@Column(name = "UPDATED_DATE")
+	private Date updatedDate;
 	
 	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
 	@Fetch(FetchMode.SELECT)
@@ -46,6 +64,30 @@ public class Decision {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public User getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(User ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 
 	public Set<DecisionUser> getDecisionUsers() {
