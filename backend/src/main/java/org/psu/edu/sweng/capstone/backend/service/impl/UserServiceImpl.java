@@ -68,14 +68,14 @@ public class UserServiceImpl implements UserService {
 			return "User does not exist";
 		}
     
-    ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
+		ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
 		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
 		
-		if (userRoles.size() > 0) {
+		if (!userRoles.isEmpty()) {
 			userRoleDao.deleteAll(userRoles);
 		}
 		
-		if (userDecisions.size() > 0) {
+		if (!userDecisions.isEmpty()) {
 			decisionUserDao.deleteAll(userDecisions);
 		}
 		
