@@ -1,9 +1,11 @@
 plugins {
+	id 'idea'
+	id 'java'
+	id 'jacoco'
+	id 'eclipse'
+	id 'org.barfuin.gradle.jacocolog' version '1.0.1'
 	id 'org.springframework.boot' version '2.3.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'java'
-    id 'eclipse'
-    id 'idea'
 }
 
 group = 'org.psu.edu.sweng.capstone'
@@ -50,4 +52,9 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
 }
