@@ -14,11 +14,11 @@ import static java.util.Collections.emptyList;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserDAO userDAO;
+    private UserDAO userDao;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDAO.findByUserName(username);
+    public UserDetails loadUserByUsername(String username) {
+        User user = userDao.findByUserName(username);
         
         if (user == null) {
             throw new UsernameNotFoundException(username);
