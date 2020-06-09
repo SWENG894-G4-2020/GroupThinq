@@ -16,6 +16,8 @@ import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,8 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 	
 	@Override
 	public List<UserDTO> getUsers() {
@@ -114,7 +118,10 @@ public class UserServiceImpl implements UserService {
 	public String createUser(String userName, UserDTO userDto) {
 		User user = userDao.findByUserName(userName);
 		
-		if (user != null) { return "User already exists"; }
+		if (user != null) {
+			LOGGER.debug("{} already exists", userName);
+			return "User already exists"; 
+		}
 		
 		User newUser = new User(userName,
 				bCryptPasswordEncoder.encode(userDto.getPassword()),
@@ -133,6 +140,7 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		userDao.save(newUser);
+		LOGGER.info("{} has been created.", userName);
 		
 		StringBuilder builder = new StringBuilder();
 		builder.append(userName).append(" has been created.");
