@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import LoginCard from 'components/LoginCard'
+import LoginCard from 'src/components/LoginCard'
 export default {
   name: 'PageLogin',
 

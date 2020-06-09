@@ -25,6 +25,8 @@ repositories {
 }
 
 dependencies {
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+
 	implementation 'com.auth0:java-jwt:3.10.3'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import AccountInfoCard from 'components/AccountInfoCard'
+import AccountInfoCard from 'src/components/AccountInfoCard'
 export default {
   name: 'PageAccountInfo',
 

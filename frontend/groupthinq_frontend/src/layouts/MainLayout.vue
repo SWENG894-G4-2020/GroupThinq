@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import NavItem from 'components/NavItem'
-import UserMenu from 'components/UserMenu'
+import NavItem from 'src/components/NavItem'
+import UserMenu from 'src/components/UserMenu'
 
 export default {
   name: 'MainLayout',
