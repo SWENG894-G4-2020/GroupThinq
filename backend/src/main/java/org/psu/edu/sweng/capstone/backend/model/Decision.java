@@ -49,9 +49,11 @@ public class Decision {
 	
 	protected Decision() {}
 	
-	public Decision(Long id, String name) {
+	public Decision(Long id, String name, User ownerId, Date expirationDate) {
 		this.id = id;
 		this.name = name;
+		this.ownerId = ownerId;
+		this.expirationDate = expirationDate;
 	}
 	
 	public Long getId() {
