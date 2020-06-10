@@ -117,12 +117,4 @@ jobs:
       with:
         args: cp -r ./frontend/groupthinq_frontend/dist/spa/. gs://staging.groupthinq.page
         cli: gsutil
-
-    - name: Purge the CDN
-      uses: actions-hub/gcloud@master
-      env:
-        PROJECT_ID: sweng894-gp4-cap
-        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      with:
-        args: compute url-maps invalidate-cdn-cache staging-lb --path "/*"
-        cli: gcloud
+        key:  
