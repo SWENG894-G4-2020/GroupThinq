@@ -100,6 +100,11 @@ jobs:
         npm install -g @vue/cli
         npm install -g @quasar/cli
         npm install
+        
+    - name: Execute Tests
+      working-directory: ./frontend/groupthinq_frontend
+      run: | 
+        quasar test --unit jest
 
     - name: Run build
       working-directory: ./frontend/groupthinq_frontend
