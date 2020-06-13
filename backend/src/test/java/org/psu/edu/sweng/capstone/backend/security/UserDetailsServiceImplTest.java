@@ -39,8 +39,13 @@ class UserDetailsServiceImplTest {
 	
 	@Test
 	void loadUserByUsername_findsNoUser() {
-		when(userDao.findByUserName(username)).thenReturn(null);
+		// given
+		Optional<User> user = Optional.empty();
 		
+		// when
+		when(userDao.findByUserName(username)).thenReturn(user);
+		
+		// then
 		assertThrows(UsernameNotFoundException.class, () -> userDetailsServiceImpl.loadUserByUsername(username));
 	}
 }
