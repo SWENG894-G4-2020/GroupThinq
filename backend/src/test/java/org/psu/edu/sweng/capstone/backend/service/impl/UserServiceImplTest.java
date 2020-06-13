@@ -83,7 +83,7 @@ class UserServiceImplTest {
 		user.setUpdatedDate(updatedDate);
 		user.setLastLoggedIn(lastLoggedIn);
 		
-		userDto = UserDTO.buildDTO(user);
+		userDto = UserDTO.build(user);
 		userDto.setPassword("fakepw");
 	}
 
@@ -174,8 +174,8 @@ class UserServiceImplTest {
 		userList.add(user1);
 		userList.add(user2);
 		
-		UserDTO userDto1 = UserDTO.buildDTO(user1);
-		UserDTO userDto2 = UserDTO.buildDTO(user2);
+		UserDTO userDto1 = UserDTO.build(user1);
+		UserDTO userDto2 = UserDTO.build(user2);
 		
 		List<UserDTO> userDTOList = new ArrayList<>();
 		userDTOList.add(userDto1);

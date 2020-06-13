@@ -27,7 +27,7 @@ public class DecisionServiceImpl implements DecisionService {
 		
 		if (dec.isPresent()) {			
 			for (DecisionUser du : dec.get().getDecisionUsers()) {
-				UserDTO dto = UserDTO.buildDTO(du.getUser());
+				UserDTO dto = UserDTO.build(du.getUser());
 				userList.add(dto);
 			}
 		}

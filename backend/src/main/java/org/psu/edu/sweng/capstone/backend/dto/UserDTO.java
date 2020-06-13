@@ -100,7 +100,7 @@ public class UserDTO {
 		return userRoles;
 	}
 
-	public static UserDTO buildDTO(User u) {
+	public static UserDTO build(User u) {
 		UserDTO dto = new UserDTO();
 		
 		if (u.getUserName() != null) { dto.setUserName(u.getUserName()); }

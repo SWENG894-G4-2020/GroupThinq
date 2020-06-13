@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
 			List<User> users = userDao.findAll();
 			
 			for (User u : users) {
-				UserDTO userDto = UserDTO.buildDTO(u);
+				UserDTO userDto = UserDTO.build(u);
 				response.getData().add(userDto);
 			}
 			
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
 			Optional<User> user = userDao.findByUserName(userName);
 			
 			if (user.isPresent()) {
-				response.getData().add(UserDTO.buildDTO(user.get()));
+				response.getData().add(UserDTO.build(user.get()));
 				
 				response.attachGenericSuccess();
 			}
