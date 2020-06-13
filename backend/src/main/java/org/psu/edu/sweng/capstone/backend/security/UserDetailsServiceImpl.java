@@ -16,11 +16,11 @@ import java.util.Optional;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserDAO userDAO;
+    private UserDAO userDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        Optional<User> user = userDAO.findByUserName(username);
+        Optional<User> user = userDao.findByUserName(username);
         
         if (!user.isPresent()) {
             throw new UsernameNotFoundException(username);
