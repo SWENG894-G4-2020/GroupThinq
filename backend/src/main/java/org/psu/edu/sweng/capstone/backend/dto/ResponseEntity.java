@@ -37,16 +37,8 @@ public class ResponseEntity<T> {
 		return data;
 	}
 	
-	public void setData(List<T> data) {
-		this.data = data;
-	}
-	
 	public List<ResponseError> getErrors() {
 		return errors;
-	}
-	
-	public void setErrors(List<ResponseError> errors) {
-		this.errors = errors;
 	}
 	
 	public void attachExceptionError(Exception e) {
