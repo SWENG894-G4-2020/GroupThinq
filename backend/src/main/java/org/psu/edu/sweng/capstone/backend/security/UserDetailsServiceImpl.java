@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import static java.util.Collections.emptyList;
 
+import java.util.Optional;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -17,13 +19,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserDAO userDAO;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDAO.findByUserName(username);
+    public UserDetails loadUserByUsername(String username) {
+        Optional<User> user = userDAO.findByUserName(username);
         
-        if (user == null) {
+        if (!user.isPresent()) {
             throw new UsernameNotFoundException(username);
         }
         
-        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), emptyList());
+        User u = user.get();
+        
+        return new org.springframework.security.core.userdetails.User(u.getUserName(), u.getPassword(), emptyList());
     }
 }

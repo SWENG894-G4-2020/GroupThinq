@@ -9,16 +9,18 @@ import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
+import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.dto.ResponseError;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,110 +43,171 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-	
-	@Override
-	public List<UserDTO> getUsers() {
-		List<User> users = userDao.findAll();
 		
-		List<UserDTO> response = new ArrayList<>();
-		for (User u : users) {
-			UserDTO userDto = UserDTO.buildDTO(u);
-			response.add(userDto);
+	@Override
+	public ResponseEntity<UserDTO> getUsers() {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+		
+		try {
+			List<User> users = userDao.findAll();
+			
+			for (User u : users) {
+				UserDTO userDto = UserDTO.buildDTO(u);
+				response.getData().add(userDto);
+			}
+			
+			response.attachGenericSuccess();
+		}
+		catch (Exception e) {
+			response.attachExceptionError(e);
 		}
 		
 		return response;
 	}
 
 	@Override
-	public UserDTO getUser(String userName) {
-		User user = userDao.findByUserName(userName);
-		
-		return (user != null) ? UserDTO.buildDTO(user) : null;
-	}
-	
-	@Override
-	public String deleteUser(String userName) {
-		User user = userDao.findByUserName(userName);
-		
-		if (user == null) {
-			return "User does not exist";
-		}
-    
-		ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
-		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
-		
-		if (!userRoles.isEmpty()) {
-			userRoleDao.deleteAll(userRoles);
-		}
-		
-		if (!userDecisions.isEmpty()) {
-			decisionUserDao.deleteAll(userDecisions);
-		}
-		
-		userDao.delete(user);
+	public ResponseEntity<UserDTO> getUser(String userName) {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 
-		StringBuilder builder = new StringBuilder();
-		builder.append(userName).append(" has been deleted.");
+		try {
+			Optional<User> user = userDao.findByUserName(userName);
+			
+			if (user.isPresent()) {
+				response.getData().add(UserDTO.buildDTO(user.get()));
+				
+				response.attachGenericSuccess();
+			}
+			else {
+				response.getErrors().add(new ResponseError
+						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
+				
+				response.setStatus(HttpStatus.NO_CONTENT.value());
+				response.setSuccess(false);
+			}
+		}
+		catch (Exception e) {
+			response.attachExceptionError(e);
+		}
 		
-		return builder.toString();
+		return response;
 	}
 
 	@Override
-	public String updateUser(String userName, UserDTO userDto) {
-		User user = userDao.findByUserName(userName);
-		
-		if (user == null) {
-			return "User does not exist";
+	public ResponseEntity<UserDTO> deleteUser(String userName) {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+
+		try {
+			Optional<User> user = userDao.findByUserName(userName);
+
+			if (user.isPresent()) {
+				User u = user.get();
+				
+				ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(u);
+				ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(u);
+				
+				if (!userRoles.isEmpty()) {
+					userRoleDao.deleteAll(userRoles);
+				}
+				
+				if (!userDecisions.isEmpty()) {
+					decisionUserDao.deleteAll(userDecisions);
+				}
+				
+				userDao.delete(user.get());
+				
+				response.attachGenericSuccess();
+			}
+			else {
+				response.getErrors().add(new ResponseError
+						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
+				
+				response.setStatus(HttpStatus.NO_CONTENT.value());
+				response.setSuccess(false);
+			}
+		}
+		catch (Exception e) {
+			response.attachExceptionError(e);	
 		}
 		
-		if (userDto.getLastName() != null) { user.setLastName(userDto.getLastName()); }
-		if (userDto.getFirstName() != null) { user.setFirstName(userDto.getFirstName()); }
-		if (userDto.getEmailAddress() != null) { user.setEmailAddress(userDto.getEmailAddress()); }
-		if (userDto.getBirthDate() != null) { user.setBirthDate(userDto.getBirthDate()); }
-
-		user.setUpdatedDate(new Date());
-		
-		userDao.save(user);
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append(userName).append(" has been updated.");
-		
-		return builder.toString();
+		return response;
 	}
 
 	@Override
-	public String createUser(String userName, UserDTO userDto) {
-		User user = userDao.findByUserName(userName);
+	public ResponseEntity<UserDTO> updateUser(String userName, UserDTO userDto) {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
-		if (user != null) {
-			LOGGER.debug("{} already exists", userName);
-			return "User already exists"; 
+		try {
+			Optional<User> user = userDao.findByUserName(userName);
+			
+			if (user.isPresent()) {
+				User u = user.get();
+				
+				if (userDto.getLastName() != null) { u.setLastName(userDto.getLastName()); }
+				if (userDto.getFirstName() != null) { u.setFirstName(userDto.getFirstName()); }
+				if (userDto.getEmailAddress() != null) { u.setEmailAddress(userDto.getEmailAddress()); }
+				if (userDto.getBirthDate() != null) { u.setBirthDate(userDto.getBirthDate()); }
+
+				u.setUpdatedDate(new Date());
+				
+				userDao.save(u);
+				
+				response.attachGenericSuccess();
+			}
+			else {
+				response.getErrors().add(new ResponseError
+						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
+				
+				response.setStatus(HttpStatus.NO_CONTENT.value());
+				response.setSuccess(false);
+			}
+		}
+		catch (Exception e) {
+			response.attachExceptionError(e);
+		}
+				
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<UserDTO> createUser(String userName, UserDTO userDto) {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+
+		try {
+			Optional<User> user = userDao.findByUserName(userName);
+			
+			if (user.isPresent()) {
+				response.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, userName + " already exists."));
+				
+				response.setSuccess(false);
+				response.setStatus(HttpStatus.CONFLICT.value());
+			}
+			else {			
+				User newUser = new User(userName,
+						bCryptPasswordEncoder.encode(userDto.getPassword()),
+						userDto.getLastName(),
+						userDto.getFirstName(),
+						userDto.getEmailAddress(),
+						userDto.getBirthDate()
+				);
+				
+				newUser.setCreatedDate(new Date());
+				
+				Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+				
+				if (role.isPresent()) {
+					newUser.getUserRoles().add(new UserRole(newUser, role.get()));
+				}
+				
+				userDao.save(newUser);
+				
+				response.setSuccess(true);
+				response.setStatus(HttpStatus.CREATED.value());
+			}
+		}
+		catch (Exception e) {
+			response.attachExceptionError(e);
 		}
 		
-		User newUser = new User(userName,
-				bCryptPasswordEncoder.encode(userDto.getPassword()),
-				userDto.getLastName(),
-				userDto.getFirstName(),
-				userDto.getEmailAddress(),
-				userDto.getBirthDate()
-		);
-		
-		newUser.setCreatedDate(new Date());
-		
-		Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
-		
-		if (role.isPresent()) {
-			newUser.getUserRoles().add(new UserRole(newUser, role.get()));
-		}
-		
-		userDao.save(newUser);
-		LOGGER.info("{} has been created.", userName);
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append(userName).append(" has been created.");
-		
-		return builder.toString();
+		return response;
 	}
 }

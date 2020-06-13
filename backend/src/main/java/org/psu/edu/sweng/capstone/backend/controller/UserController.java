@@ -1,7 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
-import java.util.List;
-
+import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,27 +23,27 @@ public class UserController {
 	private UserService userService;
 	
 	@GetMapping("")
-	public List<UserDTO> getUsers() {
+	public ResponseEntity<UserDTO> getUsers() {
 		return userService.getUsers();
 	}
 	
 	@GetMapping("/{username}")
-	public UserDTO getUser(@PathVariable(value = "username") String userName) {
+	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") String userName) {
 		return userService.getUser(userName);
 	}
 	
 	@DeleteMapping("/{username}")
-	public String deleteUser(@PathVariable(value = "username") String userName) {
+	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") String userName) {
 		return userService.deleteUser(userName);
 	}
 	
 	@PutMapping("/{username}")
-	public String updateUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
+	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.updateUser(userName, user);
 	}
 	
 	@PostMapping("/{username}")
-	public String createUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
+	public ResponseEntity<UserDTO> createUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.createUser(userName, user);
 	}
 }
