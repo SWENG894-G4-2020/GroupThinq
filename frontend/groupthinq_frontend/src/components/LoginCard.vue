@@ -45,10 +45,10 @@ export default {
         })
         .then(() => {
           this.$router.push('/main')
-            .catch(error => { console.log('The vue router errored ' + error) })
+            .catch(error => { console.log(`Vue router error: ${error}`) })
         })
         .catch(error => {
-          console.log('There was a login error: ' + error)
+          console.log(error)
           this.$router.push('/login')
         })
     }

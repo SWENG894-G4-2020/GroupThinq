@@ -10,9 +10,6 @@ import axios from 'axios'
 import auth from 'src/store/auth'
 import * as All from 'quasar'
 
-jest.mock('axios')
-jest.mock('src/store/auth')
-
 // add all of the Quasar objects to the test harness
 const { Quasar, date } = All
 const components = Object.keys(All).reduce((object, key) => {
@@ -52,7 +49,7 @@ describe('Decisions page tests', () => {
   it('contains a Decision card after initial data fetch', async () => {
     
     // set up the Axios mock
-    axios.get.mockImplementation(() => Promise.resolve(testData))
+    axios.get = jest.fn(() => Promise.resolve(testData))
     localVue.prototype.$axios = axios
 
     // mount the component under test
@@ -67,7 +64,7 @@ describe('Decisions page tests', () => {
   
   it('catches axios get errors', async () => {
     console.log = jest.fn()
-    axios.get.mockImplementation(() => Promise.reject("Test Error"))
+    axios.get = jest.fn(() => Promise.reject("Test Error"))
     localVue.prototype.$axios = axios
     const wrapper = shallowMount(Decisions, { localVue })
     const vm = wrapper.vm
@@ -88,7 +85,7 @@ describe('Decisions page tests', () => {
   })
 
   it('opens and cancels the create decision dialog', async () => {
-    auth.getTokenData.mockImplementation(() => ({sub: 'testOwner'}))
+    auth.getTokenData = jest.fn(() => ({sub: 'testOwner'}))
 
     const wrapper = shallowMount(Decisions, { localVue })
     const vm = wrapper.vm

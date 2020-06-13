@@ -113,7 +113,7 @@ export default {
     users: {
       type: Array,
       default: function () {
-        return { Users: [] }
+        return []
       }
     }
   },

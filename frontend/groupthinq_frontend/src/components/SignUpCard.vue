@@ -37,18 +37,20 @@
 </template>
 
 <script>
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 export default {
   name: 'SignUpCard',
 
   data () {
     return {
-      FirstName: '',
-      LastName: '',
-      EmailAddress: '',
-      BirthDate: '',
-      UserName: '',
-      Password: ''
+      newUser: {
+        firstName: '',
+        lastName: '',
+        emailAddress: '',
+        birthDate: '',
+        userName: '',
+        password: ''
+      }
     }
   },
 
@@ -59,32 +61,21 @@ export default {
     cancel () {
       this.$router.push('/')
     },
-    signUp () {
-      const isoDate = new Date(this.BirthDate).toISOString()
-      this.$axios.post(`${process.env.BACKEND_URL}/users/${this.UserName}`,
-        {
-          userName: this.UserName,
-          firstName: this.FirstName,
-          lastName: this.LastName,
-          birthDate: isoDate,
-          emailAddress: this.EmailAddress,
-          password: this.Password
-        })
-        .then(response => {
-          return this.$axios.post(`${process.env.BACKEND_URL}/login`,
-            {
-              userName: this.UserName,
-              password: this.Password
-            })
-        })
-        .then(response => {
-          auth.storeToken(response.headers.authorization)
-        })
-        .then(() => (this.$router.push('/main')))
-        .catch(error => {
-          console.log(error)
-          this.$router.push('/login')
-        })
+    async signUp () {
+      this.newUser.birthDate = new Date(this.newUser.birthDate).toISOString()
+      try {
+        await this.$axios.post(`${process.env.BACKEND_URL}/users/${this.UserName}`, this.newUser)
+        const loginResponse = await this.$axios.post(`${process.env.BACKEND_URL}/login`,
+          {
+            userName: this.newUser.userName,
+            password: this.newUser.password
+          })
+        auth.storeToken(loginResponse.headers.authorization)
+        this.$router.push('/main')
+      } catch (error) {
+        console.log(error)
+        this.$router.push('/login')
+      }
     }
   }
 }
