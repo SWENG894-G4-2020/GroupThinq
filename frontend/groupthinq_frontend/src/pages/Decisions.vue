@@ -55,7 +55,7 @@
 
 <script>
 import auth from '../store/auth'
-import DecisionCard from 'components/DecisionCard'
+import DecisionCard from 'src/components/DecisionCard'
 
 export default {
   name: 'PageDecisions',
@@ -93,14 +93,15 @@ export default {
   },
 
   methods: {
-    getData () {
-      this.$axios.get(`${process.env.BACKEND_URL}/decisions`)
-        .then(response => (this.decisionList = response.data))
-        .then(() => (this.isLoaded = true))
-        .catch(error => {
-          console.log(error)
-          this.isError = true
-        })
+    async getData () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/decisions`)
+        this.decisionList = response.data
+        this.isLoaded = true
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
     },
 
     createDecision () {
@@ -152,8 +153,8 @@ export default {
   },
 
   mounted () {
-    this.isLoaded = true
-    // this.getData()
+    // this.isLoaded = true
+    this.getData()
   }
 }
 </script>
