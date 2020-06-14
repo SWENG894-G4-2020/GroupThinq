@@ -37,9 +37,10 @@ class DecisionTest {
 		// given
 		Long id = 1337L;
 		String name = "Leetest Decision";
+		Date expiration = new Date();
 		
 		// when
-		Decision newDecision = new Decision(id, name);
+		Decision newDecision = new Decision(id, name, expiration);
 		
 		// then
 		assertEquals(1337L, newDecision.getId());

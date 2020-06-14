@@ -1,13 +1,16 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.model.Decision;
-import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
+import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.*;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +22,10 @@ public class DecisionServiceImpl implements DecisionService {
 
 	@Autowired
 	private DecisionDAO decisionDao;
-	
+
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
+
 	@Override
 	public List<UserDTO> getUsers(Long id) {
 		List<UserDTO> userList = new ArrayList<>();
@@ -33,6 +39,77 @@ public class DecisionServiceImpl implements DecisionService {
 		}
 		
 		return userList;
+	}
+
+	@Override
+	public String updateDecision(Long id, DecisionDTO decisionDto) {
+		Decision decision = decisionDao.findById(id.toString());
+
+		if (decision == null) {
+			return "Decision does not exist";
+		}
+
+		if (decisionDto.getDecisionName() != null) { decision.setName(decisionDto.getDecisionName()); }
+		if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
+
+		decision.setUpdatedDate(new Date());
+
+		decisionDao.save(decision);
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("Decision ").append(id).append(" has been updated.");
+
+		return builder.toString();
+	}
+
+	@Override
+	public String createDecision(Long id, DecisionDTO decisionDto) {
+		Decision decision = decisionDao.findById(id.toString());
+
+		if (decision != null) { return "Decision already exists"; }
+
+		Decision newDecision = new Decision(id,
+				decisionDto.getDecisionName(),
+				decisionDto.getExpirationDate()
+		);
+
+		newDecision.setCreatedDate(new Date());
+
+		decisionDao.save(newDecision);
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("Decision ").append(id).append(" has been created.");
+
+		return builder.toString();
+	}
+
+	@Override
+	public String deleteDecision(Long id) {
+		Decision decision = decisionDao.findById(id.toString());
+
+		if (decision == null) {
+			return "Decision does not exist";
+		}
+
+		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByDecision(decision);
+
+		if (userDecisions.size() > 0) {
+			decisionUserDao.deleteAll(userDecisions);
+		}
+
+		decisionDao.delete(decision);
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("Decision ").append(id).append(" has been deleted.");
+
+		return builder.toString();
+	}
+
+	@Override
+	public DecisionDTO getDecision(Long id) {
+		Decision decision = decisionDao.findById(id.toString());
+
+		return (decision != null) ? DecisionDTO.buildDTO(decision) : null;
 	}
 
 }
