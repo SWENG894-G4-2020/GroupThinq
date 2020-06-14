@@ -44,15 +44,6 @@ public class Decision {
 	@JoinColumn(name = "OWNER_ID")
 	private User ownerId;
 
-	@Column(name = "EXPIRATION_DATE")
-	private Date expirationDate;
-
-	@Column(name = "CREATED_DATE")
-	private Date createdDate;
-
-	@Column(name = "UPDATED_DATE")
-	private Date updatedDate;
-
 	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
 	@Fetch(FetchMode.SELECT)
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
@@ -107,22 +98,6 @@ public class Decision {
 
 	public void setDecisionUsers(Set<DecisionUser> users) {
 		this.decisionUsers = users;
-	}
-
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public Date getExpirationDate() {
-		return expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
 	}
 
 	public Date getUpdatedDate() {
