@@ -58,15 +58,14 @@ test {
 }
 
 jacocoTestReport {
-	afterEvaluate {
-		classDirectories.setFrom(files(classDirectories.files.collect {
-			// Testing this class which deploys an entire application 
-			// is too heavy of a lift to only cover 12 instruction steps.
-			fileTree(dir: it, exclude: 'org/psu/edu/sweng/capstone/backend/application/**')
-			
-			fileTree(dir: it, exclude: 'org/psu/edu/sweng/capstone/backend/security/WebSecurityConfig.class')
-		}))
-	}
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'org/psu/edu/sweng/capstone/backend/application/*',
+                   'org/psu/edu/sweng/capstone/backend/security/**'
+            ])
+        }))
+    }
     
-	dependsOn test
+    dependsOn test
 }
