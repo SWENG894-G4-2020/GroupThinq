@@ -31,7 +31,8 @@ class DecisionServiceImplTest {
 	private DecisionServiceImpl decisionServiceImpl;
 
 	private Long decisionId = 1337L;
-	private Decision dec = new Decision(1L, "Test Decision");
+	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+	private Decision dec = new Decision(1L, "Test Decision", new Date(), testUser);
 	private DecisionUser decUser = new DecisionUser(dec, new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 		

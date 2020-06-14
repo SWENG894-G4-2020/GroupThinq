@@ -1,5 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,38 +27,40 @@ public class Decision {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column(name = "NAME")
 	private String name;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "OWNER_ID")
-	private User ownerId;
-	
-	@Column(name = "EXPIRATION_DATE")
-	private Date expirationDate;
-	
+
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 
+	@Column(name = "EXPIRATION_DATE")
+	private Date expirationDate;
+
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
-	
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "OWNER_ID")
+	private User ownerId;
+
 	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
 	@Fetch(FetchMode.SELECT)
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
-	
+
 	protected Decision() {}
-	
-	public Decision(Long id, String name) {
+
+	public Decision(Long id, String name, Date expirationDate, User ownerId) {
 		this.id = id;
 		this.name = name;
+		this.expirationDate = expirationDate;
+		this.ownerId = ownerId;
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -96,5 +99,13 @@ public class Decision {
 
 	public void setDecisionUsers(Set<DecisionUser> users) {
 		this.decisionUsers = users;
+	}
+
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 }

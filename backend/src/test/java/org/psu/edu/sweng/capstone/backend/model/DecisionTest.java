@@ -21,6 +21,8 @@ class DecisionTest {
 			new Date(1337L)));
 	
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
+
+	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	
 	@BeforeEach
 	void setUp() {
@@ -30,6 +32,7 @@ class DecisionTest {
 		
 		testDecision.setName("Test Decision");
 		testDecision.setDecisionUsers(decisionUsers);
+		testDecision.setOwnerId(testUser);
 	}
 	
 	@Test
@@ -37,19 +40,22 @@ class DecisionTest {
 		// given
 		Long id = 1337L;
 		String name = "Leetest Decision";
+		Date expiration = new Date();
 		
 		// when
-		Decision newDecision = new Decision(id, name);
+		Decision newDecision = new Decision(id, name, expiration, testUser);
 		
 		// then
 		assertEquals(1337L, newDecision.getId());
 		assertEquals("Leetest Decision", newDecision.getName());
+		assertEquals(testUser, newDecision.getOwnerId());
 	}
 	
 	@Test
 	void getters_workProperly() {
 		assertEquals("Test Decision", testDecision.getName());
 		assertEquals(3, testDecision.getDecisionUsers().size());
+		assertEquals(testUser, testDecision.getOwnerId());
 	}
 	
 	@Test
@@ -61,9 +67,11 @@ class DecisionTest {
 		
 		testDecision.setName("New Test Decision");	
 		testDecision.setDecisionUsers(decisionUsers);
+		testDecision.setOwnerId(testUser);
 		
 		// then
 		assertEquals("New Test Decision", testDecision.getName());
 		assertEquals(4, testDecision.getDecisionUsers().size());
+		assertEquals(testUser, testDecision.getOwnerId());
 	}
 }

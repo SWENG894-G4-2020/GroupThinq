@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DecisionDAO extends JpaRepository<Decision, Long> {}
+public interface DecisionDAO extends JpaRepository<Decision, Long> {
+    Decision findByName(String decisionName);
+}
