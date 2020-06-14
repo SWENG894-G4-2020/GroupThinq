@@ -51,4 +51,15 @@ describe('Decision Card tests', () => {
     jest.advanceTimersByTime(1001)
     expect(vm.$data.expired).toBe(true)
   })
+
+  it('uses a default users list when none is provided', async () => {
+    const wrapper = shallowMount(DecisionCard, {
+      propsData: {
+        title: 'test',
+        expiration: new Date('2020-09-01T09:26:00-04:00'),
+      }
+    , localVue })
+    const vm = wrapper.vm
+    expect(vm.$props.users).toStrictEqual([])
+  })
 })
