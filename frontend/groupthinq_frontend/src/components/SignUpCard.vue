@@ -4,20 +4,20 @@
       <div class="text-h4">Sign Up for GroupThinq!</div>
     </q-card-section>
     <q-card-section>
-      <q-input filled class="q-my-md" v-model="FirstName" label="First Name" />
-      <q-input filled class="q-my-md" v-model="LastName" label="Last Name" />
-      <q-input filled class="q-my-md" v-model="EmailAddress" label="Email Address" />
-      <q-input filled class="q-my-md" v-model="BirthDate" mask="date" :rules="['date']" label="Birth Date">
+      <q-input filled class="q-my-md" v-model="newUser.firstName" label="First Name" />
+      <q-input filled class="q-my-md" v-model="newUser.lastName" label="Last Name" />
+      <q-input filled class="q-my-md" v-model="newUser.emailAddress" label="Email Address" />
+      <q-input filled class="q-my-md" v-model="newUser.birthDate" mask="date" :rules="['date']" label="Birth Date">
         <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-              <q-date v-model="BirthDate" @input="() => $refs.qDateProxy.hide()" />
+              <q-date v-model="newUser.birthDate" @input="() => $refs.qDateProxy.hide()" />
             </q-popup-proxy>
           </q-icon>
         </template>
       </q-input>
-      <q-input filled class="q-my-md" v-model="UserName" label="Username" />
-      <q-input filled class="q-my-md" v-model="Password" type="password" label="Password" />
+      <q-input filled class="q-my-md" v-model="newUser.userName" label="Username" />
+      <q-input filled class="q-my-md" v-model="newUser.password" type="password" label="Password" />
     </q-card-section>
     <q-card-actions align="right">
       <div class='row items-end'>
@@ -62,9 +62,17 @@ export default {
       this.$router.push('/')
     },
     async signUp () {
-      this.newUser.birthDate = new Date(this.newUser.birthDate).toISOString()
+      const isoDate = new Date(this.newUser.birthDate).toISOString()
       try {
-        await this.$axios.post(`${process.env.BACKEND_URL}/users/${this.UserName}`, this.newUser)
+        await this.$axios.post(`${process.env.BACKEND_URL}/users/${this.newUser.userName}`,
+          {
+            firstName: this.newUser.firstName,
+            lastName: this.newUser.lastName,
+            emailAddress: this.newUser.emailAddress,
+            birthDate: isoDate,
+            userName: this.newUser.userName,
+            password: this.newUser.password
+          })
         const loginResponse = await this.$axios.post(`${process.env.BACKEND_URL}/login`,
           {
             userName: this.newUser.userName,

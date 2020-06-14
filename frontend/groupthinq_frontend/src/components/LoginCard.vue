@@ -4,8 +4,8 @@
       <div class="text-h4">Login</div>
     </q-card-section>
     <q-card-section>
-      <q-input filled class="q-my-md" v-model="UserName" label="Username" />
-      <q-input filled class="q-my-md" v-model="Password" type="password" label="Password" />
+      <q-input filled class="q-my-md" v-model="userName" label="Username" />
+      <q-input filled class="q-my-md" v-model="password" type="password" label="Password" />
     </q-card-section>
     <q-card-actions align="right">
       <div class="row items-end">
@@ -17,14 +17,14 @@
 </template>
 
 <script>
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 export default {
   name: 'LoginCard',
 
   data () {
     return {
-      UserName: '',
-      Password: ''
+      userName: '',
+      password: ''
     }
   },
 
@@ -37,8 +37,8 @@ export default {
     login () {
       this.$axios
         .post(`${process.env.BACKEND_URL}/login`, {
-          userName: this.UserName,
-          password: this.Password
+          userName: this.userName,
+          password: this.password
         })
         .then((response) => {
           auth.storeToken(response.headers.authorization)
