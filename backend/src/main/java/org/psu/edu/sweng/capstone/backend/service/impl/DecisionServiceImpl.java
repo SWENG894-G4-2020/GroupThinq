@@ -43,11 +43,13 @@ public class DecisionServiceImpl implements DecisionService {
 
 	@Override
 	public String updateDecision(Long id, DecisionDTO decisionDto) {
-		Decision decision = decisionDao.findById(id.toString());
+		Optional<Decision> decisionOpt = decisionDao.findById(id);
 
-		if (decision == null) {
+		if (!decisionOpt.isPresent()) {
 			return "Decision does not exist";
 		}
+
+		Decision decision = decisionOpt.get();
 
 		if (decisionDto.getDecisionName() != null) { decision.setName(decisionDto.getDecisionName()); }
 		if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
@@ -64,13 +66,14 @@ public class DecisionServiceImpl implements DecisionService {
 
 	@Override
 	public String createDecision(Long id, DecisionDTO decisionDto) {
-		Decision decision = decisionDao.findById(id.toString());
+		Optional<Decision> decisionOpt = decisionDao.findById(id);
 
-		if (decision != null) { return "Decision already exists"; }
+		if (decisionOpt.isPresent()) { return "Decision already exists"; }
 
 		Decision newDecision = new Decision(id,
 				decisionDto.getDecisionName(),
-				decisionDto.getExpirationDate()
+				decisionDto.getExpirationDate(),
+				decisionDto.getOwnerId()
 		);
 
 		newDecision.setCreatedDate(new Date());
@@ -85,11 +88,13 @@ public class DecisionServiceImpl implements DecisionService {
 
 	@Override
 	public String deleteDecision(Long id) {
-		Decision decision = decisionDao.findById(id.toString());
+		Optional<Decision> decisionOpt = decisionDao.findById(id);
 
-		if (decision == null) {
+		if (!decisionOpt.isPresent()) {
 			return "Decision does not exist";
 		}
+
+		Decision decision = decisionOpt.get();
 
 		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByDecision(decision);
 
@@ -107,9 +112,9 @@ public class DecisionServiceImpl implements DecisionService {
 
 	@Override
 	public DecisionDTO getDecision(Long id) {
-		Decision decision = decisionDao.findById(id.toString());
+		Optional<Decision> decisionOpt = decisionDao.findById(id);
 
-		return (decision != null) ? DecisionDTO.buildDTO(decision) : null;
+		return decisionOpt.map(DecisionDTO::buildDTO).orElse(null);
 	}
 
 }

@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DecisionDAO extends JpaRepository<Decision, Long> {
     Decision findByName(String decisionName);
-    Decision findById(String id);
 }
