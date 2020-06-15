@@ -61,8 +61,8 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
-                    'org/psu/edu/sweng/capstone/backend/application/*',
-                   'org/psu/edu/sweng/capstone/backend/security/**'
+				'org/psu/edu/sweng/capstone/backend/application/*',
+				'org/psu/edu/sweng/capstone/backend/security/**'
             ])
         }))
     }

@@ -78,7 +78,7 @@ class UserControllerTest {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDto)))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 		
 		// then
 		verify(userServiceImpl, times(1)).createUser(Mockito.anyString(), Mockito.any(UserDTO.class));

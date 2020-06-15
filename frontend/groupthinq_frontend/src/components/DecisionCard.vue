@@ -1,10 +1,12 @@
 <template>
-  <q-card bordered class="q-ma-xl">
+  <q-card bordered class="q-mx-xl q-my-md">
     <q-card-section>
       <div class="text-h5 q-mt-sm q-mb-xs row justify-between">
-        <div class="col">{{Title}}</div>
+        <div class="col">{{title}}</div>
       </div>
-      <div class="text-caption text-grey">{{Description}}</div>
+      <div class="text-caption text-grey">{{description}}</div>
+      <div class="text-negative" v-if="!expired">Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
+      <div class="text-negative" v-else>Voting has closed.</div>
     </q-card-section>
     <q-card-actions class="row justify-between">
       <div class="col">
@@ -21,18 +23,18 @@
       <div class="justify-end">
           <q-btn label="View Results"
             class="q-mx-xs"
-            :outline="!Status.results"
-            :disable="!Status.results"
+            :outline="!status.results"
+            :disable="!status.results"
             color="primary" />
           <q-btn label="Nominate"
             class="q-mx-xs"
-            :outline="!Status.nominate"
-            :disable="!Status.nominate"
+            :outline="!status.nominate"
+            :disable="!status.nominate"
             color="primary" />
           <q-btn label="Vote"
             class="q-mx-xs"
-            :outline="!Status.vote"
-            :disable="!Status.vote"
+            :outline="!status.vote"
+            :disable="!status.vote"
             color="primary" />
         </div>
     </q-card-actions>
@@ -43,17 +45,18 @@
         <q-card-section horizontal>
             <q-card-section class="col-4 q-mx-md">
                 <div class="text-overline">Owner</div>
-                <div class="text-h7">{{ Owner }}</div>
+                <div class="text-h7">{{ owner }}</div>
             <q-separator class="q-my-md" />
                 <div class="text-overline">Members</div>
-                <div class="text-h7 row" v-for="user in Users" :key="user">{{ user }}</div>
+                <div class="text-h7 row"> not implemented. </div>
+                <!-- <div class="text-h7 row" v-for="user in users" :key="user">{{ user }}</div> -->
             </q-card-section>
             <q-card-section>
                 <div class="text-overline">Voting Deadline</div>
-                <div class="text-h7 row">{{ VoteDeadline }}</div>
+                <div class="text-h7 row">{{ expiration }}</div>
                 <q-separator class="q-my-md" />
                 <div class="text-overline">Nomination Deadline</div>
-                <div class="text-h7 row">{{ NominationDeadline }}</div>
+                <div class="text-h7 row"> not implemented. </div>
             </q-card-section>
         </q-card-section>
       </div>
@@ -67,50 +70,78 @@ export default {
 
   data () {
     return {
-      expanded: false
+      expanded: false,
+      expired: false,
+      daysRemaining: '',
+      hoursRemaining: '',
+      minutesRemaining: '',
+      secondsRemaining: ''
     }
   },
 
   computed: {
-
+    status: function () {
+      if (!this.expired) {
+        return { vote: true, nominate: false, results: false }
+      } else {
+        return { vote: false, nominate: false, results: true }
+      }
+    }
   },
 
   props: {
-    Title: {
+    title: {
       type: String,
       required: true
     },
 
-    Description: {
+    description: {
       type: String,
       default: ''
     },
 
-    VoteDeadline: {
-      type: Object
+    expiration: {
+      type: Date,
+      required: true
     },
 
-    NominationDeadline: {
-      type: Object
-    },
-
-    Owner: {
+    owner: {
       type: String,
       default: ''
     },
 
-    Users: {
+    users: {
       type: Array,
       default: function () {
         return { Users: [] }
       }
-    },
+    }
+  },
 
-    Status: {
-      type: Object,
-      default: function () {
-        return { Status: {} }
-      }
+  mounted () {
+    this.calculateRemainingTime()
+  },
+
+  methods: {
+    calculateRemainingTime () {
+      const secondsTiemr = setInterval(() => {
+        const diff = (this.expiration - Date.now()) / 1000
+
+        if (diff < 0) {
+          clearInterval(secondsTiemr)
+          this.expired = true
+          return
+        }
+
+        const days = Math.floor(diff / (3600 * 24))
+        const hours = Math.floor((diff % (3600 * 24)) / 3600)
+        const minutes = Math.floor((diff % 3600) / 60)
+        const seconds = Math.floor((diff % 60))
+        this.daysRemaining = days
+        this.hoursRemaining = hours
+        this.minutesRemaining = minutes
+        this.secondsRemaining = seconds
+      }, 1000)
     }
   }
 }

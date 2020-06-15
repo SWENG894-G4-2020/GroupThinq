@@ -2,14 +2,11 @@ package org.psu.edu.sweng.capstone.backend.controller;
 
 import java.util.List;
 
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
@@ -19,8 +16,29 @@ public class DecisionController {
 	@Autowired
 	private DecisionService decisionService;
 	
-	@GetMapping("/{id}")
+	@GetMapping("/users/{id}")
 	public List<UserDTO> getUsers(@PathVariable(value = "id") Long id) {
 		return decisionService.getUsers(id);
 	}
+
+	@PostMapping("/{id}")
+	public String createDecision(@PathVariable(value = "id") Long id, @RequestBody final DecisionDTO decision) {
+		return decisionService.createDecision(id, decision);
+	}
+
+	@DeleteMapping("/{id}")
+	public String deleteDecision(@PathVariable(value = "id") Long id){
+		return decisionService.deleteDecision(id);
+	}
+
+	@GetMapping("/{id}")
+	public DecisionDTO getDecision(@PathVariable(value = "id") Long id){
+		return decisionService.getDecision(id);
+	}
+
+	@PutMapping("/{id}")
+	public String updateDecision(@PathVariable(value = "id") Long id, @RequestBody final DecisionDTO decision){
+		return decisionService.updateDecision(id, decision);
+	}
+
 }

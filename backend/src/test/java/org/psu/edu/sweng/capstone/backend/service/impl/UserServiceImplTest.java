@@ -222,11 +222,9 @@ class UserServiceImplTest {
 		// given
 		ArrayList<UserRole> userRoles = new ArrayList<>();
 		ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
-		
-		Decision newDecision = new Decision(2L, "New Decision",
-				new User("mboyer", "fakepw", "Boyer", "Matthew", "mboyer87@gmail.com", new Date()),
-				new Date());
-		
+
+		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+		Decision newDecision = new Decision(2L, "New Decision", new Date(), testUser);
 		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
 		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
 		
