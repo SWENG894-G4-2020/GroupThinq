@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.model.*;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DecisionServiceImpl implements DecisionService {
 
+	private static final String DECISION_STRING = "Decision ";
+	
+	@Autowired
+	private UserDAO userDao;
+	
 	@Autowired
 	private DecisionDAO decisionDao;
-
+	
 	@Autowired
 	private DecisionUserDAO decisionUserDao;
 
@@ -51,7 +56,7 @@ public class DecisionServiceImpl implements DecisionService {
 
 		Decision decision = decisionOpt.get();
 
-		if (decisionDto.getDecisionName() != null) { decision.setName(decisionDto.getDecisionName()); }
+		if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
 		if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
 
 		decision.setUpdatedDate(new Date());
@@ -59,29 +64,34 @@ public class DecisionServiceImpl implements DecisionService {
 		decisionDao.save(decision);
 
 		StringBuilder builder = new StringBuilder();
-		builder.append("Decision ").append(id).append(" has been updated.");
+		builder.append(DECISION_STRING).append(id).append(" has been updated.");
 
 		return builder.toString();
 	}
 
 	@Override
-	public String createDecision(Long id, DecisionDTO decisionDto) {
-		Optional<Decision> decisionOpt = decisionDao.findById(id);
-
-		if (decisionOpt.isPresent()) { return "Decision already exists"; }
-
-		Decision newDecision = new Decision(id,
-				decisionDto.getDecisionName(),
-				decisionDto.getExpirationDate(),
-				decisionDto.getOwnerId()
-		);
-
-		newDecision.setCreatedDate(new Date());
-
-		decisionDao.save(newDecision);
+	public String createDecision(DecisionDTO decisionDto) {
+		User user = userDao.findByUserName(decisionDto.getOwnerUsername());
 
 		StringBuilder builder = new StringBuilder();
-		builder.append("Decision ").append(id).append(" has been created.");
+		if (user != null) {
+			Decision newDecision = new Decision(
+					decisionDto.getName(),
+					decisionDto.getDescription(),
+					decisionDto.getExpirationDate(),
+					user
+			);
+	
+			newDecision.setCreatedDate(new Date());
+	
+			decisionDao.save(newDecision);
+			
+			builder.append(DECISION_STRING).append("has been created.");
+		}
+		else {
+			builder.append(DECISION_STRING).append("could not be created.");
+		}
+		
 
 		return builder.toString();
 	}
@@ -98,14 +108,14 @@ public class DecisionServiceImpl implements DecisionService {
 
 		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByDecision(decision);
 
-		if (userDecisions.size() > 0) {
+		if (!userDecisions.isEmpty()) {
 			decisionUserDao.deleteAll(userDecisions);
 		}
 
 		decisionDao.delete(decision);
 
 		StringBuilder builder = new StringBuilder();
-		builder.append("Decision ").append(id).append(" has been deleted.");
+		builder.append(DECISION_STRING).append(id).append(" has been deleted.");
 
 		return builder.toString();
 	}

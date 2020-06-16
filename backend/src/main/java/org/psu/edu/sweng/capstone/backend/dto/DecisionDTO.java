@@ -2,21 +2,22 @@ package org.psu.edu.sweng.capstone.backend.dto;
 
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
-import org.psu.edu.sweng.capstone.backend.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class DecisionDTO {
 
     private Long id;
-    private String decisionName;
-    private ArrayList<String> includedUsers;
+    private String name;
+    private String description;
     private Date createdDate;
     private Date expirationDate;
     private Date updatedDate;
-    private User ownerId;
-
+    private String ownerUsername;
+    private ArrayList<String> includedUsers;
+    
     public Long getId() {
         return id;
     }
@@ -25,22 +26,22 @@ public class DecisionDTO {
         this.id = id;
     }
 
-    public String getDecisionName() {
-        return decisionName;
+    public String getName() {
+        return name;
     }
 
-    public void setDecisionName(String decisionName) {
-        this.decisionName = decisionName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public ArrayList<String> getIncludedUsers() {
-        return includedUsers;
-    }
+    public String getDescription() {
+		return description;
+	}
 
-    public void setIncludedUsers(ArrayList<String> includedUsers) {
-        this.includedUsers = includedUsers;
-    }
-
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -65,23 +66,28 @@ public class DecisionDTO {
         this.updatedDate = updatedDate;
     }
 
-    public User getOwnerId() {
-        return ownerId;
+    public String getOwnerUsername() {
+        return ownerUsername;
     }
 
-    public void setOwnerId(User ownerId) {
-        this.ownerId = ownerId;
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
+	
+    public List<String> getIncludedUsers() {
+        return includedUsers;
     }
 
     public static DecisionDTO buildDTO(Decision d) {
         DecisionDTO dto = new DecisionDTO();
 
         if(d.getId() != null) { dto.setId(d.getId());}
-        if (d.getName() != null) { dto.setDecisionName(d.getName()); }
+        if (d.getName() != null) { dto.setName(d.getName()); }
+        if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
         if (d.getExpirationDate() != null) { dto.setExpirationDate(d.getExpirationDate()); }
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
-        if (d.getOwnerId() != null) {dto.setOwnerId(d.getOwnerId());}
+        if (d.getOwnerId().getUserName() != null) {dto.setOwnerUsername(d.getOwnerId().getUserName());}
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
             dto.getIncludedUsers().add(decisionUser.getUser().getUserName());

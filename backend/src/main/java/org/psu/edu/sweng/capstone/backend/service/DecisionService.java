@@ -9,7 +9,7 @@ public interface DecisionService {
 
 	List<UserDTO> getUsers(Long id);
 	String updateDecision(Long id, DecisionDTO decision);
-	String createDecision(Long id, DecisionDTO decision);
+	String createDecision(DecisionDTO decision);
 	String deleteDecision(Long id);
 	DecisionDTO getDecision(Long id);
 

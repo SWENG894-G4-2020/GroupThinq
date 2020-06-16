@@ -2,6 +2,7 @@ package org.psu.edu.sweng.capstone.backend.controller;
 
 import java.util.List;
 
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,10 @@ public class UserController {
 	@PostMapping("/{username}")
 	public String createUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.createUser(userName, user);
+	}
+	
+	@GetMapping("/decision")
+	public List<DecisionDTO> getUserDecisions(@RequestBody final UserDTO user) {
+		return userService.getDecisions(user);
 	}
 }
