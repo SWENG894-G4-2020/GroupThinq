@@ -71,6 +71,7 @@ export default {
       createDecisionDialog: false,
       decisionList: [
         {
+          id: 4,
           UUID: '12341234-3245sdfg1345',
           title: 'Main Decision Title',
           // eslint-disable-next-line no-multi-str
@@ -153,8 +154,8 @@ export default {
   },
 
   mounted () {
-    // this.isLoaded = true
-    this.getData()
+    this.isLoaded = true
+    // this.getData()
   }
 }
 </script>
