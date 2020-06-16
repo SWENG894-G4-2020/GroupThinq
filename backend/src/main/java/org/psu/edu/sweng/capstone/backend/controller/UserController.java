@@ -49,8 +49,8 @@ public class UserController {
 		return userService.createUser(userName, user);
 	}
 	
-	@GetMapping("/decision")
-	public List<DecisionDTO> getUserDecisions(@RequestBody final UserDTO user) {
-		return userService.getDecisions(user);
+	@GetMapping("/{username}/decision")
+	public List<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
+		return userService.getDecisions(userName, user);
 	}
 }
