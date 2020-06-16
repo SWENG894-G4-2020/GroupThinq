@@ -50,7 +50,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/{username}/decision")
-	public List<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
-		return userService.getDecisions(userName, user);
+	public List<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName) {
+		return userService.getDecisions(userName);
 	}
 }

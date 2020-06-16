@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<DecisionDTO> getDecisions(String userName, UserDTO userDto) {
+	public List<DecisionDTO> getDecisions(String userName) {
 		List<DecisionDTO> decisionDTOList = new ArrayList<>();
 		
 		User user = userDao.findByUserName(userName);

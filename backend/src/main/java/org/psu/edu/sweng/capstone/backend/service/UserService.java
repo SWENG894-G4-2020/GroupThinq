@@ -11,5 +11,5 @@ public interface UserService {
 	String deleteUser(String userName);
 	String updateUser(String userName, UserDTO user);
 	String createUser(String userName, UserDTO user);
-	List<DecisionDTO> getDecisions(String userName, UserDTO user);
+	List<DecisionDTO> getDecisions(String userName);
 }
