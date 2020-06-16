@@ -162,12 +162,10 @@ public class UserServiceImpl implements UserService {
 		
 		if (user != null) {
 			ArrayList<Decision> decisions = decisionDao.findAllByOwnerId(user);
-						
+			
 			for (Decision d : decisions) {
 				decisionDTOList.add(DecisionDTO.buildDTO(d));
 			}
-			
-			return decisionDTOList;
 		}
 		
 		return decisionDTOList;
