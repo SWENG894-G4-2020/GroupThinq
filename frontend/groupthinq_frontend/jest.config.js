@@ -16,7 +16,8 @@ module.exports = {
     '<rootDir>/src/**/*.vue',
     '<rootDir>/src/**/*.js',
     '<rootDir>/src/**/*.ts',
-    '<rootDir>/src/**/*.jsx'
+    '<rootDir>/src/**/*.jsx',
+    '!<rootDir>/src/boot/*.js'
   ],
   coverageThreshold: {
     global: {

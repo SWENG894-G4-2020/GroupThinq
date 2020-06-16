@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import SignUpCard from 'components/SignUpCard'
+import SignUpCard from 'src/components/SignUpCard'
 export default {
   name: 'PageSignup',
 
