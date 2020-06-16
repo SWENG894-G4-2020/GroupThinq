@@ -155,10 +155,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<DecisionDTO> getDecisions(UserDTO userDto) {
+	public List<DecisionDTO> getDecisions(String userName, UserDTO userDto) {
 		List<DecisionDTO> decisionDTOList = new ArrayList<>();
 		
-		User user = userDao.findByUserName(userDto.getUserName());
+		User user = userDao.findByUserName(userName);
 		
 		if (user != null) {
 			ArrayList<Decision> decisions = decisionDao.findAllByOwnerId(user);
