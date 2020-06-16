@@ -56,6 +56,10 @@ public class User {
 	@Fetch(FetchMode.SELECT)
 	private Set<UserRole> userRoles = new HashSet<>();
 	
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
+	@Fetch(FetchMode.SELECT)
+	private Set<DecisionUser> userDecisions = new HashSet<>();
+	
 	protected User() {}
 	
 	public User(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate) {
@@ -141,6 +145,10 @@ public class User {
 
 	public Set<UserRole> getUserRoles() {
 		return userRoles;
+	}
+	
+	public Set<DecisionUser> getUserDecisions() {
+		return userDecisions;
 	}
 
 	public String getFullName() {

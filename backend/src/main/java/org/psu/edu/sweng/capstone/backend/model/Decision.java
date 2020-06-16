@@ -52,9 +52,9 @@ public class Decision {
 
 	protected Decision() {}
 
-	public Decision(Long id, String name, Date expirationDate, User ownerId) {
-		this.id = id;
+	public Decision(String name, String description, Date expirationDate, User ownerId) {
 		this.name = name;
+		this.description = description;
 		this.expirationDate = expirationDate;
 		this.ownerId = ownerId;
 	}
@@ -69,6 +69,14 @@ public class Decision {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setId(Long id) {
