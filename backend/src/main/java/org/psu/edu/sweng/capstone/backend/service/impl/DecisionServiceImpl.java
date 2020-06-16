@@ -9,7 +9,6 @@ import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.model.*;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,7 @@ public class DecisionServiceImpl implements DecisionService {
 
 		Decision decision = decisionOpt.get();
 
-		if (decisionDto.getDecisionName() != null) { decision.setName(decisionDto.getDecisionName()); }
+		if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
 		if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
 
 		decision.setUpdatedDate(new Date());
@@ -71,7 +70,7 @@ public class DecisionServiceImpl implements DecisionService {
 		if (decisionOpt.isPresent()) { return "Decision already exists"; }
 
 		Decision newDecision = new Decision(id,
-				decisionDto.getDecisionName(),
+				decisionDto.getName(),
 				decisionDto.getExpirationDate(),
 				decisionDto.getOwnerId()
 		);

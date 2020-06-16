@@ -1,6 +1,5 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +29,9 @@ public class Decision {
 
 	@Column(name = "NAME")
 	private String name;
+	
+	@Column(name = "DESCRIPTION")
+	private String description;
 
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
@@ -67,6 +69,10 @@ public class Decision {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public User getOwnerId() {
