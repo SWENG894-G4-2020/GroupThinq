@@ -2,10 +2,12 @@
     <q-page padding class="column">
       <div v-if="isLoaded" class="column items-center">
         <q-btn color="green-8" label="New Decision" icon-right="add"  class="self-start" @click="createDecision()"/>
+        <div class="text-h5 text-primary" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
         <DecisionCard
-          v-for="decision in decisionList.slice().sort((a,b) => a.expiration - b.expiration)"
-          :key="decision.title"
+          v-for="decision in decisionList.slice().sort((a,b) => new Date(a.expirationDate) - new Date(b.expirationDate))"
+          :key="decision.name"
           v-bind="decision"
+          @needReload="getData()"
         />
       </div>
       <div v-else-if="!isError">
@@ -25,12 +27,13 @@
         <q-card>
           <q-card-section class='column items-center'>
             <div class="text-h5 q-pa-md"> Create A New Decision </div>
-            <q-input filled class="q-mb-md" style="width: 100%" v-model="newDecision.title" label="Title" />
-            <q-input filled v-model="newDecision.expiration">
+            <q-input filled class="q-mb-md" style="width: 100%" v-model="newDecision.name" label="Title" />
+            <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="newDecision.description" label="Description" />
+            <q-input filled v-model="newDecision.expirationDate">
               <template v-slot:prepend>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-date v-model="newDecision.expiration" mask="YYYY-MM-DD HH:mm" />
+                    <q-date v-model="newDecision.expirationDate" mask="YYYY-MM-DD HH:mm" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -38,7 +41,7 @@
               <template v-slot:append>
                 <q-icon name="access_time" class="cursor-pointer">
                   <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-time v-model="newDecision.expiration" mask="YYYY-MM-DD HH:mm" />
+                    <q-time v-model="newDecision.expirationDate" mask="YYYY-MM-DD HH:mm" />
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -69,26 +72,7 @@ export default {
       isLoaded: false,
       isError: false,
       createDecisionDialog: false,
-      decisionList: [
-        {
-          id: 4,
-          UUID: '12341234-3245sdfg1345',
-          title: 'Main Decision Title',
-          // eslint-disable-next-line no-multi-str
-          description: 'Decision description. Dolorem numquam nor nesciunt and adipisci, explicabo ratione. \
-                      Architecto aut. Ab esse ad. Esse. Accusantium quo. Id rem dolorem nor \
-                      sequi dolor yet adipisci. Quam do et anim dolorem. Dolore officia labore \
-                      anim pariatur architecto, cillum. Aut anim so do. Vel. Si nostrud quia, \
-                      for iure so lorem. Veritatis nostrum yet nisi yet ullamco.',
-          expiration: new Date('2020-09-01T09:26:00-04:00'),
-          owner: 'MBoyer',
-          users: [
-            'JDoe',
-            'PMcCartney',
-            'FMiller'
-          ]
-        }
-      ],
+      decisionList: [],
       newDecision: {}
     }
   },
@@ -96,7 +80,8 @@ export default {
   methods: {
     async getData () {
       try {
-        const response = await this.$axios.get(`${process.env.BACKEND_URL}/decisions`)
+        const userName = auth.getTokenData().sub
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/users/${userName}/decision`)
         this.decisionList = response.data
         this.isLoaded = true
       } catch (error) {
@@ -115,47 +100,32 @@ export default {
       this.createDecisionDialog = false
     },
 
-    onCreate () {
-      this.decisionList.push(
-        {
-          title: this.newDecision.title,
-          description: this.newDecision.description,
-          expiration: new Date(this.newDecision.expiration),
-          owner: auth.getTokenData().sub,
-          users: []
-        })
-      this.createDecisionDialog = false
-      /*
-      this.$axios.post(`${process.env.BACKEND_URL}/decision/${this.UUID}`, this.newDecision)
-        .then(() => {
-          this.resetNewDecision()
-          this.createDecisionDialog = false
-        })
-        .catch(error => {
-          console.log(error)
-          this.isError = true
-        })
-      */
+    async onCreate () {
+      this.newDecision.expirationDate = new Date(this.newDecision.expirationDate).toISOString()
+      try {
+        await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
+        this.resetNewDecision()
+        this.createDecisionDialog = false
+        this.getData()
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
     },
 
     resetNewDecision () {
       this.newDecision = {
-        title: '',
-        // eslint-disable-next-line no-multi-str
-        description: 'Decision description. Dolorem numquam nor nesciunt and adipisci, explicabo ratione. \
-                      Architecto aut. Ab esse ad. Esse. Accusantium quo. Id rem dolorem nor \
-                      sequi dolor yet adipisci. Quam do et anim dolorem. Dolore officia labore \
-                      anim pariatur architecto, cillum. Aut anim so do. Vel. Si nostrud quia, \
-                      for iure so lorem. Veritatis nostrum yet nisi yet ullamco.',
-        expiration: '',
-        users: []
+        name: '',
+        description: '',
+        expirationDate: '',
+        ownerUsername: auth.getTokenData().sub
       }
     }
   },
 
   mounted () {
-    this.isLoaded = true
-    // this.getData()
+    // this.isLoaded = true
+    this.getData()
   }
 }
 </script>
