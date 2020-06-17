@@ -57,6 +57,7 @@ public class DecisionServiceImpl implements DecisionService {
 		Decision decision = decisionOpt.get();
 
 		if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
+		if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
 		if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
 
 		decision.setUpdatedDate(new Date());
