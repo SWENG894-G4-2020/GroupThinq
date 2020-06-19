@@ -1,6 +1,6 @@
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 
-export default ({ app, router, store, Vue }) => {
+export default ({ router }) => {
   router.beforeEach((to, from, next) => {
     if (to.matched.some(route => route.meta.requiresAuth)) {
       if (auth.isLoggedIn()) {

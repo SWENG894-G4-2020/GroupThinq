@@ -75,14 +75,14 @@ class DecisionControllerTest {
 	void createDecision_callsRightServiceFunction() throws Exception {
 
 		// when
-		mockMvc.perform(post("/decision/{id}", decisionId, decisionDto)
+		mockMvc.perform(post("/decision", decisionDto)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(decisionDto)))
 				.andExpect(status().isOk());
 
 		// then
-		verify(decisionServiceImpl, times(1)).createDecision(Mockito.anyLong(), Mockito.any(DecisionDTO.class));
+		verify(decisionServiceImpl, times(1)).createDecision(Mockito.any(DecisionDTO.class));
 	}
 
 	@Test

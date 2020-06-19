@@ -21,9 +21,9 @@ public class DecisionController {
 		return decisionService.getUsers(id);
 	}
 
-	@PostMapping("/{id}")
-	public String createDecision(@PathVariable(value = "id") Long id, @RequestBody final DecisionDTO decision) {
-		return decisionService.createDecision(id, decision);
+	@PostMapping("")
+	public String createDecision(@RequestBody final DecisionDTO decision) {
+		return decisionService.createDecision(decision);
 	}
 
 	@DeleteMapping("/{id}")

@@ -38,15 +38,14 @@ class DecisionTest {
 	@Test
 	void constructor_worksProperly() {
 		// given
-		Long id = 1337L;
 		String name = "Leetest Decision";
+		String description = "The description of this Decision";
 		Date expiration = new Date();
 		
 		// when
-		Decision newDecision = new Decision(id, name, expiration, testUser);
+		Decision newDecision = new Decision(name, description, expiration, testUser);
 		
 		// then
-		assertEquals(1337L, newDecision.getId());
 		assertEquals("Leetest Decision", newDecision.getName());
 		assertEquals(testUser, newDecision.getOwnerId());
 	}

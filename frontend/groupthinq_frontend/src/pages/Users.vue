@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import UserCard from 'components/UserCard'
+import UserCard from 'src/components/UserCard'
 export default {
   name: 'PageUsers',
 
@@ -19,11 +19,14 @@ export default {
   },
 
   methods: {
-    loadUserData () {
-      this.$axios.get(`${process.env.BACKEND_URL}/users`)
-        .then(response => (this.users = response.data))
-        .then(() => (this.isLoaded = true))
-        .catch(error => (console.log(error)))
+    async loadUserData () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/users`)
+        this.users = response.data
+        this.isLoaded = true
+      } catch (error) {
+        console.log(error)
+      }
     }
   },
 
@@ -34,14 +37,7 @@ export default {
   data () {
     return {
       isLoaded: false,
-      users: [
-        {
-          userName: 'jDoe',
-          firstName: 'John',
-          lastName: 'Doe',
-          emailAddress: 'jDoe@foo.com'
-        }
-      ]
+      users: []
     }
   }
 }

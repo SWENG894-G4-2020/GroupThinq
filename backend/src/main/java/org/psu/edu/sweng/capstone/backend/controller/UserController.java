@@ -1,5 +1,8 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
+import java.util.List;
+
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
@@ -48,5 +51,10 @@ public class UserController {
 	@PostMapping("/{username}")
 	public ResponseEntity<UserDTO> createUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.createUser(userName, user);
+	}
+	
+	@GetMapping("/{username}/decision")
+	public List<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName) {
+		return userService.getDecisions(userName);
 	}
 }

@@ -90,7 +90,6 @@ export default {
 
   mounted () {
     this.storedUserName = auth.getTokenData().sub
-    console.log(this.storedUserName)
     this.getData()
   },
 
@@ -117,7 +116,6 @@ export default {
     getData () {
       this.$axios.get(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
         .then((response) => {
-          console.log(response.data)
           this.userInfo = response.data
         })
         .catch(error => (console.log(error)))

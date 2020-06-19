@@ -5,15 +5,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseError;
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -34,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private RoleDAO roleDao;
+	
+	@Autowired
+	private DecisionDAO decisionDao;
 	
 	@Autowired
 	private UserRoleDAO userRoleDao;
@@ -209,5 +215,22 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		return response;
+	}
+
+	@Override
+	public List<DecisionDTO> getDecisions(String userName) {
+		List<DecisionDTO> decisionDTOList = new ArrayList<>();
+		
+		Optional<User> user = userDao.findByUserName(userName);
+		
+		if (user.isPresent()) {
+			ArrayList<Decision> decisions = decisionDao.findAllByOwnerId(user.get());
+			
+			for (Decision d : decisions) {
+				decisionDTOList.add(DecisionDTO.buildDTO(d));
+			}
+		}
+		
+		return decisionDTOList;
 	}
 }

@@ -224,7 +224,7 @@ class UserServiceImplTest {
 		ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
 
 		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-		Decision newDecision = new Decision(2L, "New Decision", new Date(), testUser);
+		Decision newDecision = new Decision("New Decision", "Description of Decision", new Date(), testUser);
 		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
 		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
 		
