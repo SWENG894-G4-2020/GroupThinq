@@ -16,12 +16,12 @@ import org.psu.edu.sweng.capstone.backend.model.id.UserRoleId;
 public class UserRole {
 	
 	@Id
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "USER_ID")
 	private User user;
 	
 	@Id
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "ROLE_ID")
 	private Role role;
 	
