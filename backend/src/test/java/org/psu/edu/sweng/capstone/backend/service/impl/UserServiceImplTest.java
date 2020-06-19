@@ -17,10 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
@@ -53,6 +55,9 @@ class UserServiceImplTest {
 	
 	@Mock
 	private RoleDAO roleDao;
+	
+	@Mock
+	private DecisionDAO decisionDao;
 	
 	@Mock
 	private UserRoleDAO userRoleDao;
@@ -284,7 +289,7 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	public void getUsers_handlesExceptionProperly() {
+	void getUsers_handlesExceptionProperly() {
 	    when(userDao.findAll()).thenThrow(RuntimeException.class);
 		ResponseEntity<UserDTO> response = userServiceImpl.getUsers();
 	    
@@ -293,7 +298,7 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	public void getUser_handlesExceptionProperly() {
+	void getUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
 		ResponseEntity<UserDTO> response = userServiceImpl.getUser(userName);
 	    
@@ -302,7 +307,7 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	public void deleteUser_handlesExceptionProperly() {
+	void deleteUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
 		ResponseEntity<UserDTO> response = userServiceImpl.deleteUser(userName);
 	    
@@ -311,7 +316,7 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	public void updateUser_handlesExceptionProperly() {
+	void updateUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
 		ResponseEntity<UserDTO> response = userServiceImpl.updateUser(userName, userDto);
 	    
@@ -320,12 +325,42 @@ class UserServiceImplTest {
 	}
 	
 	@Test
-	public void createUser_handlesExceptionProperly() {
+	void createUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
 		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userName, userDto);
 	    
 		assertExceptionThrown(response);
 		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void getDecisions_hasNoUser() {
+	    when(userDao.findByUserName(userName)).thenReturn(Optional.empty());
+	    List<DecisionDTO> decisions = userServiceImpl.getDecisions(userName);
+	    
+	    assertEquals(0, decisions.size());
+	}
+	
+	@Test
+	void getDecisions_hasUser() {
+		// given
+		Decision decisionOne = new Decision("New Decision #1", "Description of Decision #1", new Date(), user);
+		Decision decisionTwo  = new Decision("New Decision #2", "Description of Decision #2", new Date(), user);
+		
+		ArrayList<Decision> decisionList = new ArrayList<>();
+		
+		decisionList.add(decisionOne);
+		decisionList.add(decisionTwo);
+
+		Optional<User> userOptional = Optional.of(user);
+
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(userOptional);
+		when(decisionDao.findAllByOwnerId(userOptional.get())).thenReturn(decisionList);
+	    List<DecisionDTO> decisions = userServiceImpl.getDecisions(userName);
+		
+		// then
+	    assertEquals(2, decisions.size());
 	}
 	
 	private void assertExceptionThrown(ResponseEntity<UserDTO> response) {
@@ -342,7 +377,7 @@ class UserServiceImplTest {
 	
 	private void assertResourceConflictIssues(ResponseEntity<UserDTO> response) {
 		assertEquals(1, response.getErrors().size());
-		assertEquals(204, response.getStatus());
+		assertEquals(404, response.getStatus());
 		assertEquals(false, response.getSuccess());
 	}
 }

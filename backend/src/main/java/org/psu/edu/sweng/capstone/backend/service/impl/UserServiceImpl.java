@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
 				response.getErrors().add(new ResponseError
 						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
 				
-				response.setStatus(HttpStatus.NO_CONTENT.value());
+				response.setStatus(HttpStatus.NOT_FOUND.value());
 				response.setSuccess(false);
 			}
 		}
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
 				response.getErrors().add(new ResponseError
 						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
 				
-				response.setStatus(HttpStatus.NO_CONTENT.value());
+				response.setStatus(HttpStatus.NOT_FOUND.value());
 				response.setSuccess(false);
 			}
 		}
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
 				response.getErrors().add(new ResponseError
 						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
 				
-				response.setStatus(HttpStatus.NO_CONTENT.value());
+				response.setStatus(HttpStatus.NOT_FOUND.value());
 				response.setSuccess(false);
 			}
 		}
@@ -227,7 +227,7 @@ public class UserServiceImpl implements UserService {
 			ArrayList<Decision> decisions = decisionDao.findAllByOwnerId(user.get());
 			
 			for (Decision d : decisions) {
-				decisionDTOList.add(DecisionDTO.buildDTO(d));
+				decisionDTOList.add(DecisionDTO.build(d));
 			}
 		}
 		

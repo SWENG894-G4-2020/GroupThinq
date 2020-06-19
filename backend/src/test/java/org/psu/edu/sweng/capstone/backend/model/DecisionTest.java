@@ -30,9 +30,14 @@ class DecisionTest {
 		decisionUsers.add(testUser2);
 		decisionUsers.add(testUser3);
 		
+		testDecision.setId(1L);
 		testDecision.setName("Test Decision");
-		testDecision.setDecisionUsers(decisionUsers);
+		testDecision.setDescription("The Leetest Decision Description");
 		testDecision.setOwnerId(testUser);
+		testDecision.setExpirationDate(new Date(7859L));
+		testDecision.setCreatedDate(new Date(1111L));
+		testDecision.setUpdatedDate(new Date(2222L));
+		testDecision.setDecisionUsers(decisionUsers);
 	}
 	
 	@Test
@@ -40,21 +45,28 @@ class DecisionTest {
 		// given
 		String name = "Leetest Decision";
 		String description = "The description of this Decision";
-		Date expiration = new Date();
+		Date expiration = new Date(7859L);
 		
 		// when
 		Decision newDecision = new Decision(name, description, expiration, testUser);
 		
 		// then
 		assertEquals("Leetest Decision", newDecision.getName());
+		assertEquals("The description of this Decision", description);
+		assertEquals(new Date(7859L), expiration);
 		assertEquals(testUser, newDecision.getOwnerId());
 	}
 	
 	@Test
 	void getters_workProperly() {
+		assertEquals(1L, testDecision.getId());
 		assertEquals("Test Decision", testDecision.getName());
-		assertEquals(3, testDecision.getDecisionUsers().size());
+		assertEquals("The Leetest Decision Description", testDecision.getDescription());
 		assertEquals(testUser, testDecision.getOwnerId());
+		assertEquals(new Date(7859L), testDecision.getExpirationDate());
+		assertEquals(new Date(1111L), testDecision.getCreatedDate());
+		assertEquals(new Date(2222L), testDecision.getUpdatedDate());
+		assertEquals(3, testDecision.getDecisionUsers().size());
 	}
 	
 	@Test
@@ -64,13 +76,21 @@ class DecisionTest {
 				new Date(1337L)));
 		decisionUsers.add(newUser);
 		
-		testDecision.setName("New Test Decision");	
-		testDecision.setDecisionUsers(decisionUsers);
+		testDecision.setName("New Test Decision");
 		testDecision.setOwnerId(testUser);
+		testDecision.setDescription("New Test Description");
+		testDecision.setExpirationDate(new Date(3333L));
+		testDecision.setCreatedDate(new Date(4444L));
+		testDecision.setUpdatedDate(new Date(5555L));
+		testDecision.setDecisionUsers(decisionUsers);
 		
 		// then
 		assertEquals("New Test Decision", testDecision.getName());
-		assertEquals(4, testDecision.getDecisionUsers().size());
+		assertEquals("New Test Description", testDecision.getDescription());
 		assertEquals(testUser, testDecision.getOwnerId());
+		assertEquals(new Date(3333L), testDecision.getExpirationDate());
+		assertEquals(new Date(4444L), testDecision.getCreatedDate());
+		assertEquals(new Date(5555L), testDecision.getUpdatedDate());
+		assertEquals(4, testDecision.getDecisionUsers().size());
 	}
 }

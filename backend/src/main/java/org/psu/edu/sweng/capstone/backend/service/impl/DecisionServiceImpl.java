@@ -93,7 +93,6 @@ public class DecisionServiceImpl implements DecisionService {
 			builder.append(DECISION_STRING).append("could not be created.");
 		}
 		
-
 		return builder.toString();
 	}
 
@@ -125,7 +124,6 @@ public class DecisionServiceImpl implements DecisionService {
 	public DecisionDTO getDecision(Long id) {
 		Optional<Decision> decisionOpt = decisionDao.findById(id);
 
-		return decisionOpt.map(DecisionDTO::buildDTO).orElse(null);
+		return decisionOpt.map(DecisionDTO::build).orElse(null);
 	}
-
 }

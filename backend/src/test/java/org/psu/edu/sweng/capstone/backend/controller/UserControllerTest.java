@@ -96,4 +96,13 @@ class UserControllerTest {
 		// then
 		verify(userServiceImpl, times(1)).updateUser(Mockito.anyString(), Mockito.any(UserDTO.class));
 	}
+	
+	@Test
+	void getUserDecisions_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(get("/users/{username}/decision", userName)).andExpect(status().isOk());
+		
+		// then
+		verify(userServiceImpl, times(1)).getDecisions(userName);	
+	}
 }
