@@ -4,10 +4,10 @@
       <div class="text-h4">Sign Up for GroupThinq!</div>
     </q-card-section>
     <q-card-section>
-      <q-input filled class="q-my-md" v-model="newUser.firstName" label="First Name" />
-      <q-input filled class="q-my-md" v-model="newUser.lastName" label="Last Name" />
-      <q-input filled class="q-my-md" v-model="newUser.emailAddress" label="Email Address" />
-      <q-input filled class="q-my-md" v-model="newUser.birthDate" mask="date" :rules="['date']" label="Birth Date">
+      <q-input filled class="q-my-sm" v-model="newUser.firstName" label="First Name" :rules="[val => !!val || '*Required']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.lastName" label="Last Name" :rules="[val => !!val || '*Required']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.emailAddress" label="Email Address" :rules="[val => !!val || '*Required']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.birthDate" mask="date" :rules="['date']" label="Birth Date (YYYY/MM/DD)">
         <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
@@ -16,8 +16,8 @@
           </q-icon>
         </template>
       </q-input>
-      <q-input filled class="q-my-md" v-model="newUser.userName" label="Username" />
-      <q-input filled class="q-my-md" v-model="newUser.password" type="password" label="Password" />
+      <q-input filled class="q-my-sm" v-model="newUser.userName" label="Username" :rules="[val => val.length > 3 || '*Required (>3 characters)']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.password" type="password" :rules="[val => val.length > 3 || '*Required (>3 characters)']" label="Password" />
     </q-card-section>
     <q-card-actions align="right">
       <div class='row items-end'>
@@ -57,12 +57,24 @@ export default {
   props: {
   },
 
+  computed: {
+    validInputs: function () {
+      if (this.newUser.firstName.length < 1) { return false }
+      if (this.newUser.lastName.length < 1) { return false }
+      if (this.newUser.emailAddress.length < 1) { return false }
+      if (this.newUser.userName.length < 3) { return false }
+      if (this.newUser.password.length < 3) { return false }
+      return true
+    }
+  },
+
   methods: {
     cancel () {
       this.$router.push('/')
     },
     async signUp () {
       const isoDate = new Date(this.newUser.birthDate).toISOString()
+      if (!this.validInputs) { return }
       try {
         await this.$axios.post(`${process.env.BACKEND_URL}/users/${this.newUser.userName}`,
           {

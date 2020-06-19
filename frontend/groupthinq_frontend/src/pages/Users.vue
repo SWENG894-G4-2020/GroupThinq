@@ -22,7 +22,7 @@ export default {
     async loadUserData () {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/users`)
-        this.users = response.data
+        this.users = response.data.data
         this.isLoaded = true
       } catch (error) {
         console.log(error)
