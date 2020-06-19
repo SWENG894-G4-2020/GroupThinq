@@ -42,6 +42,11 @@ describe('SignUp Card tests', () => {
     const wrapper = shallowMount(SignUpCard, { localVue, router})
     const vm = wrapper.vm
 
+    vm.$data.newUser.firstName = 'test'
+    vm.$data.newUser.lastName = 'test'
+    vm.$data.newUser.emailAddress = 'test@test.com'
+    vm.$data.newUser.userName = 'test'
+    vm.$data.newUser.password = 'test'
     vm.$data.newUser.birthDate = new Date()
     await vm.signUp()
     await localVue.nextTick()
@@ -59,12 +64,65 @@ describe('SignUp Card tests', () => {
     const wrapper = shallowMount(SignUpCard, { localVue, router})
     const vm = wrapper.vm
 
+    vm.$data.newUser.firstName = 'test'
+    vm.$data.newUser.lastName = 'test'
+    vm.$data.newUser.emailAddress = 'test@test.com'
+    vm.$data.newUser.userName = 'test'
+    vm.$data.newUser.password = 'test'
     vm.$data.newUser.birthDate = new Date()
     await vm.signUp()
     await localVue.nextTick()
     
     expect(console.log).toHaveBeenCalledWith('Test Error')
     expect(auth.storeToken).toHaveBeenCalledTimes(0)
-    expect(vm.$route.path).toBe('/login')
+    expect(vm.$route.path).toBe('/')
+  })
+
+  it('catches validation errors', async () => {
+    jest.clearAllMocks()
+    axios.post= jest.fn(() => Promise.resolve({headers: {authorization: 'test'}}))
+    auth.storeToken = jest.fn()
+
+    const wrapper = shallowMount(SignUpCard, { localVue, router})
+    const vm = wrapper.vm
+
+    vm.$data.newUser.firstName = ''
+    vm.$data.newUser.lastName = 'test'
+    vm.$data.newUser.emailAddress = 'test@test.com'
+    vm.$data.newUser.userName = 'test'
+    vm.$data.newUser.password = 'test'
+    vm.$data.newUser.birthDate = new Date()
+    await vm.signUp()
+    vm.$data.newUser.firstName = 'test'
+    vm.$data.newUser.lastName = ''
+    vm.$data.newUser.emailAddress = 'test@test.com'
+    vm.$data.newUser.userName = 'test'
+    vm.$data.newUser.password = 'test'
+    vm.$data.newUser.birthDate = new Date()
+    await vm.signUp()
+    vm.$data.newUser.firstName = 'test'
+    vm.$data.newUser.lastName = 'test'
+    vm.$data.newUser.emailAddress = ''
+    vm.$data.newUser.userName = 'test'
+    vm.$data.newUser.password = 'test'
+    vm.$data.newUser.birthDate = new Date()
+    await vm.signUp()
+    vm.$data.newUser.firstName = 'test'
+    vm.$data.newUser.lastName = 'test'
+    vm.$data.newUser.emailAddress = 'test@test.com'
+    vm.$data.newUser.userName = ''
+    vm.$data.newUser.password = 'test'
+    vm.$data.newUser.birthDate = new Date()
+    await vm.signUp()
+    vm.$data.newUser.firstName = 'test'
+    vm.$data.newUser.lastName = 'test'
+    vm.$data.newUser.emailAddress = 'test@test.com'
+    vm.$data.newUser.userName = 'test'
+    vm.$data.newUser.password = ''
+    vm.$data.newUser.birthDate = new Date()
+    await vm.signUp()
+    
+    expect(axios.post).toHaveBeenCalledTimes(0)
+    expect(auth.storeToken).toHaveBeenCalledTimes(0)
   }) 
 })

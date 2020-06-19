@@ -25,9 +25,9 @@
         </q-btn>
       </q-card-actions>
       <q-card-section>
-        <q-input filled dense class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.firstName" label="First Name" />
-        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.lastName" label="Last Name" />
-        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.emailAddress" label="Email Address" />
+        <q-input filled dense class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.firstName" :rules="[val => !!val || '*Required']" label="First Name" />
+        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.lastName" :rules="[val => !!val || '*Required']" label="Last Name" />
+        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.emailAddress" :rules="[val => !!val || '*Required']" label="Email Address" />
         <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.birthDate" label="Birthdate" />
         <q-input filled dense class="q-my-md" readonly v-model="userInfo.userName" label="Username" />
         <q-input filled dense class="q-mt-md" readonly v-model="userInfo.password" type="password" label="Password" />
@@ -85,6 +85,12 @@ export default {
   computed: {
     fieldColor: function () {
       return this.editEnabled ? 'blue-1' : ''
+    },
+    validInputs: function () {
+      if (this.userInfo.firstName.length < 1) { return false }
+      if (this.userInfo.lastName.length < 1) { return false }
+      if (this.userInfo.emailAddress.length < 1) { return false }
+      return true
     }
   },
 
@@ -100,6 +106,7 @@ export default {
       this.getData()
     },
     onConfirm () {
+      if (!this.validInputs) { return }
       this.updatedDate = Date.now()
       this.$axios.put(`${process.env.BACKEND_URL}/users/${this.storedUserName}`,
         this.userInfo)
@@ -116,7 +123,7 @@ export default {
     getData () {
       this.$axios.get(`${process.env.BACKEND_URL}/users/${this.storedUserName}`)
         .then((response) => {
-          this.userInfo = response.data
+          this.userInfo = response.data.data[0]
         })
         .catch(error => (console.log(error)))
     }

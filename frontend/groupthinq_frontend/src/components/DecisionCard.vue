@@ -240,16 +240,20 @@ export default {
           expirationDate: (new Date(this.editDetails.expirationDate)).toISOString()
         })
       } catch (error) {
-        console.print(error)
+        console.log(error)
       }
       this.editDecisionDialog = false
       this.$emit('needReload')
     },
 
     async onConfirmDelete () {
-      await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editDetails)
-      this.deleteDecisionDialog = false
-      this.$emit('needReload')
+      try {
+        await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editDetails)
+        this.deleteDecisionDialog = false
+        this.$emit('needReload')
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }

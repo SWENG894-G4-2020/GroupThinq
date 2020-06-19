@@ -22,23 +22,21 @@ const components = Object.keys(All).reduce((object, key) => {
 
 const testData = { data: [
   {
-    title: "Title",
+    id: 4,
+    name: "Title",
     description: "Description",
-    expiration: new Date(),
-    owner: "test",
+    expirationDate: '2020-09-01T09:26:00-04:00',
+    ownerUsername: "test",
     users: []
   }
 ]}
 
 const resetData = {
-  title: '',
+  name: '',
   // eslint-disable-next-line no-multi-str
-  description: 'Decision description. Dolorem numquam nor nesciunt and adipisci, explicabo ratione. \
-                Architecto aut. Ab esse ad. Esse. Accusantium quo. Id rem dolorem nor \
-                sequi dolor yet adipisci. Quam do et anim dolorem. Dolore officia labore \
-                anim pariatur architecto, cillum. Aut anim so do. Vel. Si nostrud quia, \
-                for iure so lorem. Veritatis nostrum yet nisi yet ullamco.',
-  expiration: '',
+  description: '',
+  expirationDate: '',
+  ownerUsername: 'test',
   users: []
 }
 
@@ -46,8 +44,12 @@ describe('Decisions page tests', () => {
   const localVue = createLocalVue()
   localVue.use(Quasar, { components }) // , lang: langEn
 
+  beforeEach( () => {
+    jest.clearAllMocks()
+    auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
+  })
+
   it('contains a Decision card after initial data fetch', async () => {
-    
     // set up the Axios mock
     axios.get = jest.fn(() => Promise.resolve(testData))
     localVue.prototype.$axios = axios
@@ -66,11 +68,27 @@ describe('Decisions page tests', () => {
     console.log = jest.fn()
     axios.get = jest.fn(() => Promise.reject("Test Error"))
     localVue.prototype.$axios = axios
+
     const wrapper = shallowMount(Decisions, { localVue })
     const vm = wrapper.vm
     expect(vm.isError).toBe(false)
     await localVue.nextTick() // wait for the mounted function to finish
     //expect(console.log).toHaveBeenCalledWith('Test Error')
+    expect(vm.isError).toBe(true)
+  })
+
+  it('catches axios post errors', async () => {
+    console.log = jest.fn()
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    axios.post = jest.fn(() => Promise.reject("Test Error"))
+    localVue.prototype.$axios = axios
+
+    const wrapper = shallowMount(Decisions, { localVue })
+    const vm = wrapper.vm
+    expect(vm.isError).toBe(false)
+    vm.$data.newDecision = testData.data[0]
+    await vm.onCreate() // wait for the mounted function to finish
+    expect(console.log).toHaveBeenCalledWith('Test Error')
     expect(vm.isError).toBe(true)
   })
 
@@ -84,16 +102,17 @@ describe('Decisions page tests', () => {
     expect(vm.createDecisionDialog).toBe(false)
   })
 
-  it('opens and cancels the create decision dialog', async () => {
-    auth.getTokenData = jest.fn(() => ({sub: 'testOwner'}))
-
+  it('creates a decision', async () => {
+    axios.post = jest.fn()
+    axios.get = jest.fn(() => Promise.resolve(testData))
     const wrapper = shallowMount(Decisions, { localVue })
     const vm = wrapper.vm
-    await localVue.nextTick()
-    expect(vm.decisionList.length).toBe(1)
-    vm.$data.newDecision = testData.data
+    
+    vm.$data.newDecision = testData.data[0]
     await vm.onCreate()
-    expect(vm.decisionList.length).toBe(2)
+    expect(axios.post).toHaveBeenCalledTimes(1)
+    // get will be called twice because of the inital mount
+    expect(axios.get).toHaveBeenCalledTimes(2)
   })
 
 })

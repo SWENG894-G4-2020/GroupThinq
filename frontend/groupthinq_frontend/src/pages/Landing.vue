@@ -1,18 +1,21 @@
 <template>
   <q-page class="column items-center justify-center bg-primary">
-    <h3 class="text-grey-3">Welcome to GroupThinq!</h3>
+    <div class="text-h2 text-grey-3 text-center">Welcome to GroupThinq</div>
+    <div class="text-h4 text-grey-3 text-weight-thin text-center q-mb-md">Make better decisions. Together!</div>
+    <div class="row justify-around">
     <q-btn
       to="/signup"
-      label="Sign Up!"
+      label="Sign Up"
       color="primary"
       size="xl"
-      class="q-ma-xl bg-secondary" />
+      class="bg-secondary q-mx-md" />
     <q-btn
       to="/login"
-      label="Login!"
+      label="Login"
       color="primary"
-      size="m"
-      class="q-ma-xl bg-secondary" />
+      size="xl"
+      class="bg-secondary q-mx-md" />
+    </div>
   </q-page>
 </template>
 

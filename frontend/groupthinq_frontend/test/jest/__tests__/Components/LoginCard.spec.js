@@ -27,6 +27,11 @@ describe('Login Card tests', () => {
   localVue.use(VueRouter)
   localVue.prototype.$axios = axios
 
+  beforeEach( () => {
+    jest.clearAllMocks()
+    auth.removeTokens = jest.fn()
+  })
+
   it('can cancel a login', async () => {
     const wrapper = shallowMount(LoginCard, { localVue, router})
     const vm = wrapper.vm
@@ -38,7 +43,6 @@ describe('Login Card tests', () => {
   })
   
   it('can login when authenticated correctly', async () => {
-    jest.clearAllMocks()
     axios.post= jest.fn(() => Promise.resolve({headers: {authorization: 'test'}}))
     auth.storeToken = jest.fn()
 
@@ -50,11 +54,12 @@ describe('Login Card tests', () => {
 
     expect(axios.post).toHaveBeenCalledTimes(1)
     expect(auth.storeToken).toHaveBeenCalledTimes(1)
+    expect(vm.$data.isError).toBe(false)
+    expect(wrapper.find("#LoginError").exists()).toBe(false)
     expect(vm.$route.path).toBe('/main')
   })
   
   it('catches axios errors', async () => {
-    jest.clearAllMocks()
     axios.post= jest.fn(() => Promise.reject('Test Axios Error'))
     console.log = jest.fn()
 
@@ -66,11 +71,11 @@ describe('Login Card tests', () => {
     
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
     expect(auth.storeToken).toHaveBeenCalledTimes(0)
-    expect(vm.$route.path).toBe('/login')
+    expect(vm.$data.isError).toBe(true)
+    expect(wrapper.find("#LoginError").exists()).toBe(true)
   })
 
   it('catches vue router errors', async () => {
-    jest.clearAllMocks()
     axios.post= jest.fn(() => Promise.resolve({headers: {authorization: 'test'}}))
     auth.storeToken = jest.fn()
     router.push = jest.fn(() => Promise.reject('Test Router Error'))

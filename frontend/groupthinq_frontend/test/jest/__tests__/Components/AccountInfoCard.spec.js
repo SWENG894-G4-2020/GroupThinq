@@ -20,8 +20,8 @@ const components = Object.keys(All).reduce((object, key) => {
   return object
 }, {})
 
-const testData = { 
-  data: {
+const testData = {data: { 
+  data: [{
     birthDate: '',
     createdDate: '',
     emailAddress: '',
@@ -31,7 +31,7 @@ const testData = {
     password: '',
     updatedDate: '',
     userName: ''
-  }
+  }]}
 }
 
 describe('Account Info Card tests', () => {
@@ -67,9 +67,31 @@ describe('Account Info Card tests', () => {
     axios.put = jest.fn(() => Promise.resolve())
     const wrapper = shallowMount(AccountInfoCard, { localVue, router})
     const vm = wrapper.vm
+    vm.$data.userInfo.firstName = "test"
+    vm.$data.userInfo.lastName = "test"
+    vm.$data.userInfo.emailAddress = "test@test.com"
     await vm.onConfirm()
     expect(axios.put).toHaveBeenCalledTimes(1)
     expect(vm.$route.path).toBe('/main/account')
+  })
+
+  it('catches validation errors', async () => {
+    axios.put = jest.fn(() => Promise.resolve())
+    const wrapper = shallowMount(AccountInfoCard, { localVue, router})
+    const vm = wrapper.vm
+    vm.$data.userInfo.firstName = ""
+    vm.$data.userInfo.lastName = "test"
+    vm.$data.userInfo.emailAddress = "test"
+    await vm.onConfirm()
+    vm.$data.userInfo.firstName = "test"
+    vm.$data.userInfo.lastName = ""
+    vm.$data.userInfo.emailAddress = "test"
+    await vm.onConfirm()
+    vm.$data.userInfo.firstName = "test"
+    vm.$data.userInfo.lastName = "test"
+    vm.$data.userInfo.emailAddress = ""
+    await vm.onConfirm()
+    expect(axios.put).toHaveBeenCalledTimes(0)
   })
 
   it('catches axios errors', async () => {
@@ -80,6 +102,9 @@ describe('Account Info Card tests', () => {
 
     const wrapper = shallowMount(AccountInfoCard, { localVue, router})
     const vm = wrapper.vm
+    vm.$data.userInfo.firstName = "test"
+    vm.$data.userInfo.lastName = "test"
+    vm.$data.userInfo.emailAddress = "test@test.com"
     await vm.onConfirm()
     await vm.onDelete()
     await localVue.nextTick()
