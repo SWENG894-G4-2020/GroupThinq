@@ -8,7 +8,7 @@
       <q-input filled class="q-mt-md" v-model="password" type="password" label="Password" />
     </q-card-section>
     <q-card-section v-if="isError">
-      <div class="text-body text-negative text-center"> An invalid login has been provided. Please try again. </div>
+      <div id="LoginError" class="text-body text-negative text-center"> An invalid login has been provided. Please try again. </div>
     </q-card-section>
     <q-card-actions align="right">
       <div class="row items-end">

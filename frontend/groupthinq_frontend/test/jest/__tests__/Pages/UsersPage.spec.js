@@ -26,14 +26,14 @@ describe('Users page tests', () => {
   localVue.use(Quasar, { components }) // , lang: langEn
 
   it('contains a User card after initial data fetch', async () => {
-    const testData = { data: [
+    const testData = { data: {data: [
       {
         userName: "jDoe",
         firstName: "John",
         lastName: "Doe",
         emailAddress: "jDoe@foo.com"
       }
-    ]}
+    ]}}
     axios.get.mockImplementation(() => Promise.resolve(testData))
     localVue.prototype.$axios = axios
     const wrapper = shallowMount(Users, { localVue })

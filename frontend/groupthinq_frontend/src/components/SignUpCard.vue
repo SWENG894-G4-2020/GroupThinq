@@ -72,6 +72,7 @@ export default {
     cancel () {
       this.$router.push('/')
     },
+
     async signUp () {
       const isoDate = new Date(this.newUser.birthDate).toISOString()
       if (!this.validInputs) { return }
@@ -94,7 +95,7 @@ export default {
         this.$router.push('/main')
       } catch (error) {
         console.log(error)
-        this.$router.push('/login')
+        this.$router.push('/')
       }
     }
   }
