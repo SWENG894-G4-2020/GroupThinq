@@ -78,7 +78,7 @@ class UserControllerTest {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDto)))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 		
 		// then
 		verify(userServiceImpl, times(1)).createUser(Mockito.anyString(), Mockito.any(UserDTO.class));
@@ -95,5 +95,14 @@ class UserControllerTest {
 		
 		// then
 		verify(userServiceImpl, times(1)).updateUser(Mockito.anyString(), Mockito.any(UserDTO.class));
+	}
+	
+	@Test
+	void getUserDecisions_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(get("/users/{username}/decision", userName)).andExpect(status().isOk());
+		
+		// then
+		verify(userServiceImpl, times(1)).getDecisions(userName);	
 	}
 }

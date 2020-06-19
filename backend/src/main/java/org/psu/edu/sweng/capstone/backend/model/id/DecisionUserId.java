@@ -26,7 +26,7 @@ public class DecisionUserId implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(this);
+		return Objects.hash(this.getDecision(), this.getUser());
 	}
 	
 	@Override

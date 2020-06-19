@@ -16,7 +16,7 @@ public class DecisionDTO {
     private Date expirationDate;
     private Date updatedDate;
     private String ownerUsername;
-    private ArrayList<String> includedUsers;
+    private ArrayList<String> includedUsers = new ArrayList<>();
     
     public Long getId() {
         return id;
@@ -78,16 +78,16 @@ public class DecisionDTO {
         return includedUsers;
     }
 
-    public static DecisionDTO buildDTO(Decision d) {
+    public static DecisionDTO build(Decision d) {
         DecisionDTO dto = new DecisionDTO();
 
-        if(d.getId() != null) { dto.setId(d.getId());}
+        if (d.getId() != null) { dto.setId(d.getId()); }
         if (d.getName() != null) { dto.setName(d.getName()); }
         if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
         if (d.getExpirationDate() != null) { dto.setExpirationDate(d.getExpirationDate()); }
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
-        if (d.getOwnerId().getUserName() != null) {dto.setOwnerUsername(d.getOwnerId().getUserName());}
+        if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
             dto.getIncludedUsers().add(decisionUser.getUser().getUserName());

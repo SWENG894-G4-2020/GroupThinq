@@ -23,7 +23,7 @@ class UserDTOTest {
 		user.setLastLoggedIn(new Date(11111L));
 		user.getUserRoles().add(new UserRole(user, new Role()));
 		
-		testUser = UserDTO.buildDTO(user);
+		testUser = UserDTO.build(user);
 		testUser.setPassword("fakepw");
 	}
 	
@@ -72,7 +72,7 @@ class UserDTOTest {
 		User user = new User(null, null, null, null, null, null);
 		
 		// when
-		UserDTO dto = UserDTO.buildDTO(user);
+		UserDTO dto = UserDTO.build(user);
 		
 		// then
 		assertNull(dto.getUserName());

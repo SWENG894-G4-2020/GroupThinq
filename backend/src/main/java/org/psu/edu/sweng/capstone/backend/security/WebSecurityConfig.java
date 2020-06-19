@@ -62,6 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+        
         config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
@@ -72,6 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedMethod("DELETE");
         config.setExposedHeaders(Arrays.asList("Authorization"));
         source.registerCorsConfiguration("/**", config);
+        
         return source;
     }
 }
