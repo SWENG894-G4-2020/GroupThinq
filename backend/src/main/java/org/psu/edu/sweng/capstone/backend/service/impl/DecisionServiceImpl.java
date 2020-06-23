@@ -49,7 +49,7 @@ public class DecisionServiceImpl implements DecisionService {
 	}
 
 	@Override
-	public String updateDecision(Long id, DecisionDTO decisionDTO) {
+	public String updateDecision(Long id, DecisionDTO decisionDto) {
 		Optional<Decision> decisionOpt = decisionDao.findById(id);
 
 		if (!decisionOpt.isPresent()) {
@@ -58,14 +58,14 @@ public class DecisionServiceImpl implements DecisionService {
 
 		Decision decision = decisionOpt.get();
 
-		if (decisionDTO.getName() != null) { decision.setName(decisionDTO.getName()); }
-		if (decisionDTO.getDescription() != null) { decision.setDescription(decisionDTO.getDescription()); }
-		if (decisionDTO.getExpirationDate() != null) { decision.setExpirationDate(decisionDTO.getExpirationDate()); }
+		if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
+		if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
+		if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
 		
-		if (decisionDTO.getIncludedUsers() != null) {
+		if (decisionDto.getIncludedUsers() != null) {
 			decisionUserDao.deleteAllByDecision(decision);
 			
-			for (UserDTO usrDTO : decisionDTO.getIncludedUsers()) {
+			for (UserDTO usrDTO : decisionDto.getIncludedUsers()) {
 				Optional<User> user = userDao.findByUserName(usrDTO.getUserName());
 				
 				if (user.isPresent()) {
