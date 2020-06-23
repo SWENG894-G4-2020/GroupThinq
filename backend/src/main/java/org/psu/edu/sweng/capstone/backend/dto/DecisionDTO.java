@@ -96,14 +96,14 @@ public class DecisionDTO {
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
-        	UserDTO usrDto = new UserDTO();
+        	UserDTO userDTO = new UserDTO();
         	final User user = decisionUser.getUser();
         	
-        	usrDto.setUserName(user.getUserName());
-        	usrDto.setFirstName(user.getFirstName());
-        	usrDto.setLastName(user.getLastName());
+        	userDTO.setUserName(user.getUserName());
+        	userDTO.setFirstName(user.getFirstName());
+        	userDTO.setLastName(user.getLastName());
         	
-            dto.getIncludedUsers().add(usrDto);
+            dto.getIncludedUsers().add(userDTO);
         }
 
         return dto;
