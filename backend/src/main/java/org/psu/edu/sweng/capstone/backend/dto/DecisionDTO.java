@@ -85,15 +85,15 @@ public class DecisionDTO {
 	}
 
 	public static DecisionDTO build(Decision d) {
-        DecisionDTO decDto = new DecisionDTO();
+        DecisionDTO dto = new DecisionDTO();
 
-        if (d.getId() != null) { decDto.setId(d.getId()); }
-        if (d.getName() != null) { decDto.setName(d.getName()); }
-        if (d.getDescription() != null) { decDto.setDescription(d.getDescription()); }
-        if (d.getExpirationDate() != null) { decDto.setExpirationDate(d.getExpirationDate()); }
-        if (d.getCreatedDate() != null) { decDto.setCreatedDate(d.getCreatedDate()); }
-        if (d.getUpdatedDate() != null) { decDto.setUpdatedDate(d.getUpdatedDate()); }
-        if (d.getOwnerId() != null) { decDto.setOwnerUsername(d.getOwnerId().getUserName()); }
+        if (d.getId() != null) { dto.setId(d.getId()); }
+        if (d.getName() != null) { dto.setName(d.getName()); }
+        if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
+        if (d.getExpirationDate() != null) { dto.setExpirationDate(d.getExpirationDate()); }
+        if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
+        if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
+        if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
         	UserDTO usrDto = new UserDTO();
@@ -103,9 +103,9 @@ public class DecisionDTO {
         	usrDto.setFirstName(user.getFirstName());
         	usrDto.setLastName(user.getLastName());
         	
-            decDto.getIncludedUsers().add(usrDto);
+            dto.getIncludedUsers().add(usrDto);
         }
 
-        return decDto;
+        return dto;
     }
 }
