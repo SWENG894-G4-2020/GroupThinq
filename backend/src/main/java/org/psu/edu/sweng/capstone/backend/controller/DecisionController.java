@@ -27,17 +27,17 @@ public class DecisionController {
 	}
 
 	@DeleteMapping("/{id}")
-	public String deleteDecision(@PathVariable(value = "id") Long id){
+	public String deleteDecision(@PathVariable(value = "id") Long id) {
 		return decisionService.deleteDecision(id);
 	}
 
 	@GetMapping("/{id}")
-	public DecisionDTO getDecision(@PathVariable(value = "id") Long id){
+	public DecisionDTO getDecision(@PathVariable(value = "id") Long id) {
 		return decisionService.getDecision(id);
 	}
 
 	@PutMapping("/{id}")
-	public String updateDecision(@PathVariable(value = "id") Long id, @RequestBody final DecisionDTO decision){
+	public String updateDecision(@PathVariable(value = "id") Long id, @RequestBody final DecisionDTO decision) {
 		return decisionService.updateDecision(id, decision);
 	}
 

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +36,7 @@ class DecisionServiceImplTest {
 	
 	@Mock
 	private DecisionUserDAO decisionUserDao;
-	
+		
 	@InjectMocks
 	private DecisionServiceImpl decisionServiceImpl;
 
@@ -103,14 +102,38 @@ class DecisionServiceImplTest {
 	}
 	
 	@Test
-	void updateDecision_decisionExists_hasNullValues() {
+	void updateDecision_decisionExists_hasNullValues_includedUsers() {
 		// given
+		UserDTO userDTO = UserDTO.build(testUser);
 		Decision decision = new Decision(null, null, null, null);
-		decision.setId(1L);
+		DecisionDTO decisionDTO = DecisionDTO.build(decision);
+		
+		decisionDTO.setId(1L);
+		decisionDTO.getIncludedUsers().add(userDTO);
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
-		String returnValue = decisionServiceImpl.updateDecision(decisionId, DecisionDTO.build(decision));
+		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		String returnValue = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
+		
+		// then
+		assertEquals("Decision 1337 has been updated.", returnValue);
+	}
+	
+	@Test
+	void updateDecision_decisionExists_hasNullValues_includedUserNotFound() {
+		// given
+		UserDTO userDTO = UserDTO.build(testUser);
+		Decision decision = new Decision(null, null, null, null);
+		DecisionDTO decisionDTO = DecisionDTO.build(decision);
+		
+		decisionDTO.setId(1L);
+		decisionDTO.getIncludedUsers().add(userDTO);
+		
+		// when
+		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
+		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.empty());
+		String returnValue = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
 		assertEquals("Decision 1337 has been updated.", returnValue);
@@ -122,9 +145,12 @@ class DecisionServiceImplTest {
 		Decision decision = new Decision("Test Decision", "Test Description", new Date(1337L), testUser);
 		decision.setId(1L);
 		
+		DecisionDTO decisionDTO = DecisionDTO.build(decision);
+		decisionDTO.setIncludedUsers(null);
+		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
-		String returnValue = decisionServiceImpl.updateDecision(decisionId, DecisionDTO.build(decision));
+		String returnValue = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
 		assertEquals("Decision 1337 has been updated.", returnValue);
@@ -137,12 +163,17 @@ class DecisionServiceImplTest {
 		
 		assertEquals("Decision could not be created.", returnValue);
 	}
-	
+		
 	@Test
-	void createDecision_hasUser() {
+	void createDecision_hasUser_addsDecisionUsers() {
+		// given
+		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
+		
+		// when
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
 		String returnValue = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
 		
+		// then
 		assertEquals("Decision has been created.", returnValue);
 	}
 	
@@ -157,24 +188,16 @@ class DecisionServiceImplTest {
 	@Test
 	void deleteDecision_decisionExists_noUserDecisions() {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		when(decisionUserDao.findAllByDecision(dec)).thenReturn(new ArrayList<DecisionUser>());
 		String returnValue = decisionServiceImpl.deleteDecision(dec.getId());
 
 		assertEquals("Decision 1337 has been deleted.", returnValue);
 	}
 		
 	@Test
-	void deleteDecision_decisionExists_withUserDecisions() {
-		// given
-		ArrayList<DecisionUser> decisionUserList = new ArrayList<>();
-		decisionUserList.add(new DecisionUser(dec, testUser));
-				
-		// when
+	void deleteDecision_decisionExists_withUserDecisions() {		
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		when(decisionUserDao.findAllByDecision(dec)).thenReturn(decisionUserList);
 		String returnValue = decisionServiceImpl.deleteDecision(dec.getId());
 
-		// then
 		assertEquals("Decision 1337 has been deleted.", returnValue);
 	}
 }

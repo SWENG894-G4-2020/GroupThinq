@@ -2,6 +2,7 @@ package org.psu.edu.sweng.capstone.backend.dto;
 
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
+import org.psu.edu.sweng.capstone.backend.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +17,8 @@ public class DecisionDTO {
     private Date expirationDate;
     private Date updatedDate;
     private String ownerUsername;
-    private ArrayList<String> includedUsers = new ArrayList<>();
+    
+    private List<UserDTO> includedUsers = new ArrayList<>();
     
     public Long getId() {
         return id;
@@ -74,26 +76,36 @@ public class DecisionDTO {
         this.ownerUsername = ownerUsername;
     }
 	
-    public List<String> getIncludedUsers() {
+    public List<UserDTO> getIncludedUsers() {
         return includedUsers;
     }
 
-    public static DecisionDTO build(Decision d) {
-        DecisionDTO dto = new DecisionDTO();
+    public void setIncludedUsers(List<UserDTO> includedUsers) {
+		this.includedUsers = includedUsers;
+	}
 
-        if (d.getId() != null) { dto.setId(d.getId()); }
-        if (d.getName() != null) { dto.setName(d.getName()); }
-        if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
-        if (d.getExpirationDate() != null) { dto.setExpirationDate(d.getExpirationDate()); }
-        if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
-        if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
-        if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
+	public static DecisionDTO build(Decision d) {
+        DecisionDTO decDto = new DecisionDTO();
+
+        if (d.getId() != null) { decDto.setId(d.getId()); }
+        if (d.getName() != null) { decDto.setName(d.getName()); }
+        if (d.getDescription() != null) { decDto.setDescription(d.getDescription()); }
+        if (d.getExpirationDate() != null) { decDto.setExpirationDate(d.getExpirationDate()); }
+        if (d.getCreatedDate() != null) { decDto.setCreatedDate(d.getCreatedDate()); }
+        if (d.getUpdatedDate() != null) { decDto.setUpdatedDate(d.getUpdatedDate()); }
+        if (d.getOwnerId() != null) { decDto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
-            dto.getIncludedUsers().add(decisionUser.getUser().getUserName());
+        	UserDTO usrDto = new UserDTO();
+        	final User user = decisionUser.getUser();
+        	
+        	usrDto.setUserName(user.getUserName());
+        	usrDto.setFirstName(user.getFirstName());
+        	usrDto.setLastName(user.getLastName());
+        	
+            decDto.getIncludedUsers().add(usrDto);
         }
 
-        return dto;
+        return decDto;
     }
-
 }

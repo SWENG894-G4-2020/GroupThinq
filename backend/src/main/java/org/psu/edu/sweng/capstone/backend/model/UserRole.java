@@ -1,6 +1,5 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
