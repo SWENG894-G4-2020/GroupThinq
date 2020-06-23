@@ -85,21 +85,21 @@ public class DecisionServiceImpl implements DecisionService {
 	}
 
 	@Override
-	public String createDecision(DecisionDTO decisionDTO) {
-		Optional<User> user = userDao.findByUserName(decisionDTO.getOwnerUsername());
+	public String createDecision(DecisionDTO decisionDto) {
+		Optional<User> user = userDao.findByUserName(decisionDto.getOwnerUsername());
 
 		StringBuilder builder = new StringBuilder();
 		if (user.isPresent()) {
 			Decision newDecision = new Decision(
-					decisionDTO.getName(),
-					decisionDTO.getDescription(),
-					decisionDTO.getExpirationDate(),
+					decisionDto.getName(),
+					decisionDto.getDescription(),
+					decisionDto.getExpirationDate(),
 					user.get()
 			);
 			
 			Set<DecisionUser> decisionUsers = new HashSet<>();
 			
-			for (UserDTO dto : decisionDTO.getIncludedUsers()) {
+			for (UserDTO dto : decisionDto.getIncludedUsers()) {
 				Optional<User> includedUser = userDao.findByUserName(dto.getUserName());
 				
 				if (includedUser.isPresent()) {
