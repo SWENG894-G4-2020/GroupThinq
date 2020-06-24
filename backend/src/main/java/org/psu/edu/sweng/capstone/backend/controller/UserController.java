@@ -1,7 +1,5 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
-import java.util.List;
-
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
@@ -14,47 +12,45 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/users")
 public class UserController {
 
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("")
+	@GetMapping("/users")
 	public ResponseEntity<UserDTO> getUsers() {
 		return userService.getUsers();
 	}
 	
-	@GetMapping("/{username}")
+	@GetMapping("/user/{username}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") String userName) {
 		return userService.getUser(userName);
 	}
 	
-	@DeleteMapping("/{username}")
+	@DeleteMapping("/user/{username}")
 	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") String userName) {
 		return userService.deleteUser(userName);
 	}
 	
-	@PutMapping("/{username}")
+	@PutMapping("/user/{username}")
 	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
 		return userService.updateUser(userName, user);
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
-	@PostMapping("/{username}")
-	public ResponseEntity<UserDTO> createUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
-		return userService.createUser(userName, user);
+	@PostMapping("/user")
+	public ResponseEntity<UserDTO> createUser(@RequestBody final UserDTO user) {
+		return userService.createUser(user);
 	}
 	
-	@GetMapping("/{username}/decision")
-	public List<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName) {
+	@GetMapping("/user/{username}/decisions")
+	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName) {
 		return userService.getDecisions(userName);
 	}
 }

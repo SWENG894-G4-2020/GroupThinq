@@ -11,10 +11,8 @@ import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
-import org.psu.edu.sweng.capstone.backend.dto.ResponseError;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
@@ -23,7 +21,6 @@ import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,15 +77,10 @@ public class UserServiceImpl implements UserService {
 			
 			if (user.isPresent()) {
 				response.getData().add(UserDTO.build(user.get()));
-				
 				response.attachGenericSuccess();
 			}
 			else {
-				response.getErrors().add(new ResponseError
-						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
-				
-				response.setStatus(HttpStatus.NOT_FOUND.value());
-				response.setSuccess(false);
+				response.attachEntityNotFound(userName);
 			}
 		}
 		catch (Exception e) {
@@ -124,11 +116,7 @@ public class UserServiceImpl implements UserService {
 				response.attachGenericSuccess();
 			}
 			else {
-				response.getErrors().add(new ResponseError
-						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
-				
-				response.setStatus(HttpStatus.NOT_FOUND.value());
-				response.setSuccess(false);
+				response.attachEntityNotFound(userName);
 			}
 		}
 		catch (Exception e) {
@@ -160,11 +148,7 @@ public class UserServiceImpl implements UserService {
 				response.attachGenericSuccess();
 			}
 			else {
-				response.getErrors().add(new ResponseError
-						(ErrorEnum.RESOURCE_CONFLICT, response.writeUserWasNotFoundMessage(userName)));
-				
-				response.setStatus(HttpStatus.NOT_FOUND.value());
-				response.setSuccess(false);
+				response.attachEntityNotFound(userName);
 			}
 		}
 		catch (Exception e) {
@@ -175,20 +159,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseEntity<UserDTO> createUser(String userName, UserDTO userDto) {
+	public ResponseEntity<UserDTO> createUser(UserDTO userDto) {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+		
+		final String username = userDto.getUserName();
 
 		try {
-			Optional<User> user = userDao.findByUserName(userName);
+			Optional<User> user = userDao.findByUserName(username);
 			
 			if (user.isPresent()) {
-				response.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, userName + " already exists."));
-				
-				response.setSuccess(false);
-				response.setStatus(HttpStatus.CONFLICT.value());
+				response.attachEntityConflictError(username);
 			}
 			else {			
-				User newUser = new User(userName,
+				User newUser = new User(username,
 						bCryptPasswordEncoder.encode(userDto.getPassword()),
 						userDto.getLastName(),
 						userDto.getFirstName(),
@@ -206,8 +189,7 @@ public class UserServiceImpl implements UserService {
 				
 				userDao.save(newUser);
 				
-				response.setSuccess(true);
-				response.setStatus(HttpStatus.CREATED.value());
+				response.attachCreatedSuccess();
 			}
 		}
 		catch (Exception e) {
@@ -218,19 +200,29 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<DecisionDTO> getDecisions(String userName) {
-		List<DecisionDTO> decisionDTOList = new ArrayList<>();
+	public ResponseEntity<DecisionDTO> getDecisions(String userName) {
+		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		Optional<User> user = userDao.findByUserName(userName);
-		
-		if (user.isPresent()) {
-			ArrayList<Decision> decisions = decisionDao.findAllByOwnerId(user.get());
+		try {
+			Optional<User> user = userDao.findByUserName(userName);
 			
-			for (Decision d : decisions) {
-				decisionDTOList.add(DecisionDTO.build(d));
+			if (user.isPresent()) {
+				ArrayList<Decision> decisions = decisionDao.findAllByOwnerId(user.get());
+				
+				for (Decision d : decisions) {
+					response.getData().add(DecisionDTO.build(d));
+				}
+				
+				response.attachGenericSuccess();
+			}
+			else {
+				response.attachEntityNotFound(userName);
 			}
 		}
+		catch (Exception e) {
+			response.attachExceptionError(e);
+		}
 		
-		return decisionDTOList;
+		return response;
 	}
 }
