@@ -68,7 +68,7 @@ public class DecisionServiceImpl implements DecisionService {
 		try {
 			Optional<Decision> decisionOpt = decisionDao.findById(id);
 			
-			if (decisionOpt.isEmpty()) {
+			if (!decisionOpt.isPresent()) {
 				response.attachEntityNotFound(DECISION_STRING + id.toString());
 			}
 			else {
@@ -100,7 +100,7 @@ public class DecisionServiceImpl implements DecisionService {
 		try {
 			Optional<User> user = userDao.findByUserName(decisionDto.getOwnerUsername());
 			
-			if (user.isEmpty()) {
+			if (!user.isPresent()) {
 				response.attachEntityNotFound(decisionDto.getOwnerUsername());
 			}
 			else {
@@ -143,7 +143,7 @@ public class DecisionServiceImpl implements DecisionService {
 		try {
 			Optional<Decision> decisionOpt = decisionDao.findById(id);
 	
-			if (decisionOpt.isEmpty()) {
+			if (!decisionOpt.isPresent()) {
 				response.attachEntityNotFound(DECISION_STRING + id.toString());
 			}
 			else {
@@ -170,7 +170,7 @@ public class DecisionServiceImpl implements DecisionService {
 		try {
 			Optional<Decision> decisionOpt = decisionDao.findById(id);
 			
-			if (decisionOpt.isEmpty()) {
+			if (!decisionOpt.isPresent()) {
 				response.attachEntityNotFound(DECISION_STRING + id.toString());
 			}
 			else {
