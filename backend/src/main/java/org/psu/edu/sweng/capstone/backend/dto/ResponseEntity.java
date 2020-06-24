@@ -65,7 +65,7 @@ public class ResponseEntity<T> {
 		this.setStatus(HttpStatus.CREATED.value());
 	}
 	
-	String writeEntityNotFound(String entity) {
+	private String writeEntityNotFound(String entity) {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append(entity).append(" was not found.");
