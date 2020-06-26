@@ -44,6 +44,10 @@ public class Ballot {
 		return id;
 	}
 	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public Decision getDecision() {
 		return decision;
 	}
