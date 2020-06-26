@@ -76,7 +76,6 @@ public class DecisionServiceImpl implements DecisionService {
 
 				if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
 				if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
-				if (decisionDto.getExpirationDate() != null) { decision.setExpirationDate(decisionDto.getExpirationDate()); }
 				if (decisionDto.getIncludedUsers() != null) { wipeAndAddNewDecisionUsers(decision, decisionDto.getIncludedUsers()); }
 
 				decision.setUpdatedDate(new Date());
@@ -107,7 +106,6 @@ public class DecisionServiceImpl implements DecisionService {
 				Decision newDecision = new Decision(
 						decisionDto.getName(),
 						decisionDto.getDescription(),
-						decisionDto.getExpirationDate(),
 						user.get()
 				);
 				
