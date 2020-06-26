@@ -120,7 +120,6 @@ public class DecisionServiceImpl implements DecisionService {
 				}
 				
 				newDecision.setDecisionUsers(decisionUsers);
-				newDecision.setCreatedDate(new Date());
 		
 				decisionDao.save(newDecision);
 				

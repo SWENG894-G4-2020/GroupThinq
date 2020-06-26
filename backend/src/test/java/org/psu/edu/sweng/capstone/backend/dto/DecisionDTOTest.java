@@ -71,7 +71,6 @@ public class DecisionDTOTest {
         // then
         assertNull(dto.getId());
         assertNull(dto.getName());
-        assertNull(dto.getCreatedDate());
         assertNull(dto.getUpdatedDate());
         assertNull(dto.getOwnerUsername());
     }

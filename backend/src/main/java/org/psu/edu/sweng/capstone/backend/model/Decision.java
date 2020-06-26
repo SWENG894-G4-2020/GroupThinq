@@ -53,6 +53,8 @@ public class Decision {
 		this.name = name;
 		this.description = description;
 		this.ownerId = ownerId;
+		
+		this.setCreatedDate(new Date());
 	}
 
 	public Long getId() {
