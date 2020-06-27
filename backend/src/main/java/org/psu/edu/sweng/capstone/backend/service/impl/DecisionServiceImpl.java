@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -25,9 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class DecisionServiceImpl implements DecisionService {
 
 	private static final String DECISION_STRING = "Decision ";
-	
+		
 	@Autowired
 	private UserDAO userDao;
+	
+	@Autowired
+	private BallotDAO ballotDao;
 	
 	@Autowired
 	private DecisionDAO decisionDao;
@@ -103,14 +109,16 @@ public class DecisionServiceImpl implements DecisionService {
 				response.attachEntityNotFound(decisionDto.getOwnerUsername());
 			}
 			else {
+				
+				// Create new decision
 				Decision newDecision = new Decision(
 						decisionDto.getName(),
 						decisionDto.getDescription(),
 						user.get()
 				);
 				
+				// Add users to Decision
 				Set<DecisionUser> decisionUsers = new HashSet<>();
-				
 				for (UserDTO dto : decisionDto.getIncludedUsers()) {
 					Optional<User> includedUser = userDao.findByUserName(dto.getUserName());
 					
@@ -118,10 +126,17 @@ public class DecisionServiceImpl implements DecisionService {
 						decisionUsers.add(new DecisionUser(newDecision, includedUser.get()));
 					}
 				}
-				
 				newDecision.setDecisionUsers(decisionUsers);
 		
 				decisionDao.save(newDecision);
+				
+				// Attach Ballots to Decision
+				if (!decisionDto.getBallots().isEmpty()) {
+					for (BallotDTO bDTO : decisionDto.getBallots()) {
+						Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate());
+						ballotDao.save(ballot);
+					}
+				}
 				
 				response.attachCreatedSuccess();
 			}
