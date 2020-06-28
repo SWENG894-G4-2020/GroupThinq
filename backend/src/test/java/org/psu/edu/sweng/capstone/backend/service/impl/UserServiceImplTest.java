@@ -229,7 +229,7 @@ class UserServiceImplTest extends ServiceImplTest {
 		ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
 
 		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-		Decision newDecision = new Decision("New Decision", "Description of Decision", new Date(), testUser);
+		Decision newDecision = new Decision("New Decision", "Description of Decision", testUser);
 		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
 		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
 		
@@ -353,8 +353,8 @@ class UserServiceImplTest extends ServiceImplTest {
 	@Test
 	void getDecisions_hasUser() {
 		// given
-		Decision decisionOne = new Decision("New Decision #1", "Description of Decision #1", new Date(), user);
-		Decision decisionTwo  = new Decision("New Decision #2", "Description of Decision #2", new Date(), user);
+		Decision decisionOne = new Decision("New Decision #1", "Description of Decision #1", user);
+		Decision decisionTwo  = new Decision("New Decision #2", "Description of Decision #2", user);
 		
 		ArrayList<Decision> decisionList = new ArrayList<>();
 		

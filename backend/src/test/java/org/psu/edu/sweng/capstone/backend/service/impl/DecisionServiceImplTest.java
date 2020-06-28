@@ -42,7 +42,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 
 	private Long decisionId = 1337L;
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-	private Decision dec = new Decision("Test Decision", "Test Description", new Date(), testUser);
+	private Decision dec = new Decision("Test Decision", "Test Description", testUser);
 	private DecisionUser decUser = new DecisionUser(dec, new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 		
@@ -105,7 +105,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasNullValues_includedUsers() {
 		// given
 		UserDTO userDTO = UserDTO.build(testUser);
-		Decision decision = new Decision(null, null, null, null);
+		Decision decision = new Decision(null, null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
 		decisionDTO.setId(1L);
@@ -125,7 +125,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasNullValues_includedUserNotFound() {
 		// given
 		UserDTO userDTO = UserDTO.build(testUser);
-		Decision decision = new Decision(null, null, null, null);
+		Decision decision = new Decision(null, null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
 		decisionDTO.setId(1L);
@@ -144,7 +144,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void updateDecision_decisionExists_hasActualValues() {
 		// given
-		Decision decision = new Decision("Test Decision", "Test Description", new Date(1337L), testUser);
+		Decision decision = new Decision("Test Decision", "Test Description", testUser);
 		decision.setId(1L);
 		
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
