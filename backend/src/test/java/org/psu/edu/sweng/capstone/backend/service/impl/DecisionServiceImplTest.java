@@ -1,9 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -15,13 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
-import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
@@ -169,8 +165,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 	
 	@Test
@@ -178,8 +173,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.empty());
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
 		
-		assertEquals(404, response.getStatus());
-		assertEquals(1, response.getErrors().size());
+		assertEntityNotFound(response);
 	}
 		
 	@Test
@@ -195,8 +189,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
 		
 		// then
-		assertEquals(201, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertCreatedSuccess(response);
 	}
 	
 	@Test
@@ -209,8 +202,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
 		
 		// then
-		assertEquals(201, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertCreatedSuccess(response);
 	}
 	
 	@Test
@@ -218,7 +210,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.empty());
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals(1, response.getErrors().size());
+		assertEntityNotFound(response);
 	}
 	
 	@Test
@@ -226,8 +218,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 		
 	@Test
@@ -235,8 +226,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 	
 	@Test

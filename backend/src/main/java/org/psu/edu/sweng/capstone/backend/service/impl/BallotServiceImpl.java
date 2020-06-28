@@ -41,6 +41,8 @@ public class BallotServiceImpl implements BallotService {
 			}
 			else if (ballotDTO.getExpirationDate() == null) {
 				response.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, "Expiration Date missing to create Ballot"));
+				response.setStatus(500);
+				response.setSuccess(false);
 			}
 			else {
 				Ballot ballot = new Ballot(decision.get(), ballotDTO.getExpirationDate());
@@ -122,6 +124,8 @@ public class BallotServiceImpl implements BallotService {
 				if (ballotDTO.getExpirationDate() != null) { b.setExpirationDate(ballotDTO.getExpirationDate()); }
 				
 				b.setUpdatedDate(new Date());
+				
+				ballotDao.save(b);
 				
 				response.attachGenericSuccess();
 			}

@@ -119,7 +119,6 @@ public class DecisionServiceImpl implements DecisionService {
 				response.attachEntityNotFound(decisionDto.getOwnerUsername());
 			}
 			else {
-				
 				// Create new decision
 				Decision newDecision = new Decision(
 						decisionDto.getName(),

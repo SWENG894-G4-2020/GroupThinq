@@ -104,9 +104,7 @@ class UserServiceImplTest extends ServiceImplTest {
 		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
 
 		// then
-		assertEquals(true, response.getSuccess());
-		assertEquals(201, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertCreatedSuccess(response);
 		verify(userDao, times(1)).save(Mockito.any());
 	}
 	
@@ -123,9 +121,7 @@ class UserServiceImplTest extends ServiceImplTest {
 		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
 
 		// then
-		assertEquals(true, response.getSuccess());
-		assertEquals(201, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertCreatedSuccess(response);
 		verify(userDao, times(1)).save(Mockito.any());
 	}
 	
