@@ -64,6 +64,7 @@ public class DecisionDTOTest {
     void buildDTO_returnsNullValues() {
         // given
         Decision decision = new Decision(null, null, null);
+        decision.setCreatedDate(null);
 
         // when
         DecisionDTO dto = DecisionDTO.build(decision);
@@ -71,6 +72,7 @@ public class DecisionDTOTest {
         // then
         assertNull(dto.getId());
         assertNull(dto.getName());
+        assertNull(dto.getCreatedDate());
         assertNull(dto.getUpdatedDate());
         assertNull(dto.getOwnerUsername());
     }
