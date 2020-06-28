@@ -46,6 +46,9 @@ public class Decision {
 	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
 	@Fetch(FetchMode.SELECT)
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
+	
+	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Ballot.class)
+	private Set<Ballot> ballots = new HashSet<>();
 
 	protected Decision() {}
 
@@ -103,6 +106,14 @@ public class Decision {
 
 	public void setDecisionUsers(Set<DecisionUser> users) {
 		this.decisionUsers = users;
+	}
+
+	public Set<Ballot> getBallots() {
+		return ballots;
+	}
+
+	public void setBallots(Set<Ballot> ballots) {
+		this.ballots = ballots;
 	}
 
 	public Date getUpdatedDate() {

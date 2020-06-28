@@ -1,13 +1,17 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DecisionDTO {
 
     private Long id;
@@ -17,6 +21,7 @@ public class DecisionDTO {
     private Date updatedDate;
     private String ownerUsername;
     
+    private List<BallotDTO> ballots = new ArrayList<>();
     private List<UserDTO> includedUsers = new ArrayList<>();
     
     public Long getId() {
@@ -75,6 +80,14 @@ public class DecisionDTO {
 		this.includedUsers = includedUsers;
 	}
 
+	public List<BallotDTO> getBallots() {
+		return ballots;
+	}
+
+	public void setBallots(List<BallotDTO> ballots) {
+		this.ballots = ballots;
+	}
+
 	public static DecisionDTO build(Decision d) {
         DecisionDTO dto = new DecisionDTO();
 
@@ -94,6 +107,11 @@ public class DecisionDTO {
         	userDTO.setLastName(user.getLastName());
         	
             dto.getIncludedUsers().add(userDTO);
+        }
+        
+        for (Ballot b : d.getBallots()) {
+        	BallotDTO bDTO = BallotDTO.build(b);
+        	dto.getBallots().add(bDTO);
         }
 
         return dto;
