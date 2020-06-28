@@ -24,47 +24,22 @@
         </div>
       </div>
       <q-dialog v-model="createDecisionDialog" persistent>
-        <q-card>
-          <q-card-section class='column items-center'>
-            <div class="text-h5 q-pa-md"> Create A New Decision </div>
-            <q-input filled class="q-mb-md" style="width: 100%" v-model="newDecision.name" label="Title" />
-            <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="newDecision.description" label="Description" />
-            <q-input filled v-model="newDecision.expirationDate">
-              <template v-slot:prepend>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-date v-model="newDecision.expirationDate" mask="YYYY-MM-DD HH:mm" />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-
-              <template v-slot:append>
-                <q-icon name="access_time" class="cursor-pointer">
-                  <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-time v-model="newDecision.expirationDate" mask="YYYY-MM-DD HH:mm" />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn label="cancel" @click="onCancel()" />
-            <q-btn color="green-8" @click="onCreate()" label="Create Decision" />
-          </q-card-actions>
-        </q-card>
+        <CreateDecisionCard @createClose="closeCreateModal()"/>
       </q-dialog>
     </q-page>
 </template>
 
 <script>
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 import DecisionCard from 'src/components/DecisionCard'
+import CreateDecisionCard from 'src/components/CreateDecisionCard'
 
 export default {
   name: 'PageDecisions',
 
   components: {
-    DecisionCard
+    DecisionCard,
+    CreateDecisionCard
   },
 
   data () {
@@ -72,59 +47,34 @@ export default {
       isLoaded: false,
       isError: false,
       createDecisionDialog: false,
-      decisionList: [],
-      newDecision: {}
+      decisionList: []
     }
   },
 
   methods: {
+    createDecision () {
+      this.createDecisionDialog = true
+    },
+
+    closeCreateModal () {
+      this.createDecisionDialog = false
+      this.getData()
+    },
+
     async getData () {
       try {
         const userName = auth.getTokenData().sub
-        const response = await this.$axios.get(`${process.env.BACKEND_URL}/users/${userName}/decision`)
-        this.decisionList = response.data
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/user/${userName}/decisions`)
+        this.decisionList = response.data.data
         this.isLoaded = true
       } catch (error) {
         console.log(error)
         this.isError = true
       }
-    },
-
-    createDecision () {
-      this.resetNewDecision()
-      this.createDecisionDialog = true
-    },
-
-    onCancel () {
-      this.resetNewDecision()
-      this.createDecisionDialog = false
-    },
-
-    async onCreate () {
-      this.newDecision.expirationDate = new Date(this.newDecision.expirationDate).toISOString()
-      try {
-        await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
-        this.resetNewDecision()
-        this.createDecisionDialog = false
-        this.getData()
-      } catch (error) {
-        console.log(error)
-        this.isError = true
-      }
-    },
-
-    resetNewDecision () {
-      this.newDecision = {
-        name: '',
-        description: '',
-        expirationDate: '',
-        ownerUsername: auth.getTokenData().sub
-      }
     }
   },
 
   mounted () {
-    // this.isLoaded = true
     this.getData()
   }
 }

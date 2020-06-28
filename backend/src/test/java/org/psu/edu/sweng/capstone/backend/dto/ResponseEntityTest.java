@@ -36,8 +36,8 @@ class ResponseEntityTest {
 	}
 	
 	@Test
-	void writeUserWasNotFoundMessage_writesAppropriateMessage() {
-		assertEquals("testuser was not found.", re.writeUserWasNotFoundMessage("testuser"));
+	void writeEntityNotFound_writesAppropriateMessage() {
+		assertEquals("testuser was not found.", re.writeEntityNotFound("testuser"));
 	}
 	
 	@Test

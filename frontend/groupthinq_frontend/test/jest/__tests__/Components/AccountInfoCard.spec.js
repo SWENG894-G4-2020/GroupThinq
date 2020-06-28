@@ -112,4 +112,14 @@ describe('Account Info Card tests', () => {
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
     expect(console.log).toHaveBeenCalledTimes(3)
   })
+
+  it('modifies the field color when editing', () => {
+    const wrapper = shallowMount(AccountInfoCard, { localVue, router})
+    const vm = wrapper.vm
+    
+    let context = { editEnabled: false }
+    expect(AccountInfoCard.computed.fieldColor.call(context)).toBe('')
+    context = { editEnabled: true }
+    expect(AccountInfoCard.computed.fieldColor.call(context)).toBe('blue-1')
+  })
 })

@@ -1,6 +1,5 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -16,12 +15,12 @@ import org.psu.edu.sweng.capstone.backend.model.id.DecisionUserId;
 public class DecisionUser {
 	
 	@Id
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "DECISION_ID")
 	private Decision decision;
 	
 	@Id
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "USER_ID")
 	private User user;
 

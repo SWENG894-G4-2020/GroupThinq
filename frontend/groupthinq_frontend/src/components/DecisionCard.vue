@@ -21,7 +21,6 @@
       <div class="text-negative" v-if="!expired">Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
       <div class="text-negative" v-else>Voting has closed.</div>
     </q-card-section>
-    <q-separator />
     <q-card-actions class="row justify-between">
       <div class="col">
         <q-btn
@@ -64,8 +63,7 @@
                 <div class="text-h7">{{ ownerUsername }}</div>
             <q-separator class="q-my-md" />
                 <div class="text-overline">Members</div>
-                <div class="text-h7 row"> not implemented. </div>
-                <!-- <div class="text-h7 row" v-for="user in users" :key="user">{{ user }}</div> -->
+                <div class="text-h7 row" v-for="(user,idx) in includedUsers" :key="idx">{{ user.userName }}</div>
             </q-card-section>
             <q-card-section>
                 <div class="text-overline">Voting Deadline</div>
@@ -186,10 +184,12 @@ export default {
       default: ''
     },
 
-    users: {
+    includedUsers: {
       type: Array,
       default: function () {
-        return []
+        return [
+          { userName: this.ownerUsername }
+        ]
       }
     }
   },

@@ -35,7 +35,7 @@ import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceImplTest {
+class UserServiceImplTest extends ServiceImplTest {
 	
 	private String userName;
 	private String password; 
@@ -101,7 +101,7 @@ class UserServiceImplTest {
 		when(userDao.findByUserName(userName)).thenReturn(noUser);
 		when(roleDao.findByName(RoleEnum.USER.getDescription())).thenReturn(Optional.of(new Role()));
 		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
-		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userName, userDto);
+		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
 
 		// then
 		assertEquals(true, response.getSuccess());
@@ -120,7 +120,7 @@ class UserServiceImplTest {
 		when(userDao.findByUserName(userName)).thenReturn(noUser);
 		when(roleDao.findByName(RoleEnum.USER.getDescription())).thenReturn(noRole);
 		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
-		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userName, userDto);
+		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
 
 		// then
 		assertEquals(true, response.getSuccess());
@@ -133,7 +133,7 @@ class UserServiceImplTest {
 	void createUser_worksProperly_withUserAlreadyInSystem() {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
-		ResponseEntity<UserDTO> response = userServiceImpl.createUser("JUnitTestUser", userDto);
+		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
 		
 		// then
 		assertEquals(1, response.getErrors().size());
@@ -327,7 +327,16 @@ class UserServiceImplTest {
 	@Test
 	void createUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userName, userDto);
+		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
+	    
+		assertExceptionThrown(response);
+		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void getDecisions_handlesExceptionProperly() {
+	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
+		ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userDto.getUserName());
 	    
 		assertExceptionThrown(response);
 		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
@@ -336,9 +345,9 @@ class UserServiceImplTest {
 	@Test
 	void getDecisions_hasNoUser() {
 	    when(userDao.findByUserName(userName)).thenReturn(Optional.empty());
-	    List<DecisionDTO> decisions = userServiceImpl.getDecisions(userName);
+	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
 	    
-	    assertEquals(0, decisions.size());
+	    assertEquals(0, response.getData().size());
 	}
 	
 	@Test
@@ -357,27 +366,9 @@ class UserServiceImplTest {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(userOptional);
 		when(decisionDao.findAllByOwnerId(userOptional.get())).thenReturn(decisionList);
-	    List<DecisionDTO> decisions = userServiceImpl.getDecisions(userName);
+	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
 		
 		// then
-	    assertEquals(2, decisions.size());
-	}
-	
-	private void assertExceptionThrown(ResponseEntity<UserDTO> response) {
-		assertEquals(1, response.getErrors().size());
-		assertEquals(500, response.getStatus());
-		assertEquals(false, response.getSuccess());
-	}
-
-	private void assertGenericSuccess(ResponseEntity<UserDTO> response) {
-		assertEquals(true, response.getSuccess());
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
-	}
-	
-	private void assertResourceConflictIssues(ResponseEntity<UserDTO> response) {
-		assertEquals(1, response.getErrors().size());
-		assertEquals(404, response.getStatus());
-		assertEquals(false, response.getSuccess());
+	    assertEquals(2, response.getData().size());
 	}
 }

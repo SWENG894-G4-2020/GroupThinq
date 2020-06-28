@@ -2,6 +2,7 @@ package org.psu.edu.sweng.capstone.backend.dto;
 
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
+import org.psu.edu.sweng.capstone.backend.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +17,8 @@ public class DecisionDTO {
     private Date expirationDate;
     private Date updatedDate;
     private String ownerUsername;
-    private ArrayList<String> includedUsers = new ArrayList<>();
+    
+    private List<UserDTO> includedUsers = new ArrayList<>();
     
     public Long getId() {
         return id;
@@ -74,11 +76,15 @@ public class DecisionDTO {
         this.ownerUsername = ownerUsername;
     }
 	
-    public List<String> getIncludedUsers() {
+    public List<UserDTO> getIncludedUsers() {
         return includedUsers;
     }
 
-    public static DecisionDTO build(Decision d) {
+    public void setIncludedUsers(List<UserDTO> includedUsers) {
+		this.includedUsers = includedUsers;
+	}
+
+	public static DecisionDTO build(Decision d) {
         DecisionDTO dto = new DecisionDTO();
 
         if (d.getId() != null) { dto.setId(d.getId()); }
@@ -90,10 +96,16 @@ public class DecisionDTO {
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
-            dto.getIncludedUsers().add(decisionUser.getUser().getUserName());
+        	UserDTO userDTO = new UserDTO();
+        	final User user = decisionUser.getUser();
+        	
+        	userDTO.setUserName(user.getUserName());
+        	userDTO.setFirstName(user.getFirstName());
+        	userDTO.setLastName(user.getLastName());
+        	
+            dto.getIncludedUsers().add(userDTO);
         }
 
         return dto;
     }
-
 }
