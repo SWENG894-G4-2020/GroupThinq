@@ -79,7 +79,7 @@ class DecisionControllerTest {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(decisionDto)))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 
 		// then
 		verify(decisionServiceImpl, times(1)).createDecision(Mockito.any(DecisionDTO.class));
@@ -98,5 +98,4 @@ class DecisionControllerTest {
 		// then
 		verify(decisionServiceImpl, times(1)).updateDecision(Mockito.anyLong(), Mockito.any(DecisionDTO.class));
 	}
-
 }
