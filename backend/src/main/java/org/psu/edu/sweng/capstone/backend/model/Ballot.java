@@ -33,6 +33,8 @@ public class Ballot {
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
 	
+	protected Ballot() {}
+	
 	public Ballot(Decision decision, Date expirationDate) {
 		this.decision = decision;
 		this.expirationDate = expirationDate;

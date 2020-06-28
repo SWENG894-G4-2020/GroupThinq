@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -21,9 +22,11 @@ import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.service.BallotService;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionServiceImplTest extends ServiceImplTest {
@@ -32,7 +35,13 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	private UserDAO userDao;
 	
 	@Mock
+	private BallotDAO ballotDao;
+	
+	@Mock
 	private DecisionDAO decisionDao;
+	
+	@Mock
+	private BallotService ballotService;
 	
 	@Mock
 	private DecisionUserDAO decisionUserDao;
@@ -145,6 +154,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasActualValues() {
 		// given
 		Decision decision = new Decision("Test Decision", "Test Description", testUser);
+		decision.getBallots().add(new Ballot(decision, new Date()));
 		decision.setId(1L);
 		
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
@@ -155,8 +165,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 	
 	@Test
@@ -164,22 +173,36 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.empty());
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
 		
-		assertEquals(404, response.getStatus());
-		assertEquals(1, response.getErrors().size());
+		assertEntityNotFound(response);
 	}
 		
 	@Test
-	void createDecision_hasUser_addsDecisionUsers() {
+	void createDecision_hasUser_addsDecisionUsersAndBallot() {
 		// given
 		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
+		dec.getBallots().add(new Ballot(dec, new Date()));
+		
+		DecisionDTO dto = DecisionDTO.build(dec);
 		
 		// when
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
-		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
 		
 		// then
-		assertEquals(201, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertCreatedSuccess(response);
+	}
+	
+	@Test
+	void createDecision_hasUser_noBallot() {
+		// given
+		DecisionDTO dto = DecisionDTO.build(dec);
+		
+		// when
+		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
+		
+		// then
+		assertCreatedSuccess(response);
 	}
 	
 	@Test
@@ -187,7 +210,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.empty());
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals(1, response.getErrors().size());
+		assertEntityNotFound(response);
 	}
 	
 	@Test
@@ -195,8 +218,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 		
 	@Test
@@ -204,8 +226,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 	
 	@Test

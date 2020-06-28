@@ -14,11 +14,13 @@ class BallotTest {
 	private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
 	private static final Decision DECISION = new Decision("Test Decision", "This is used for testing", USER);
 	
-	private Ballot testBallot = new Ballot(DECISION, new Date(1337));
+	private Ballot testBallot = new Ballot();
 	
 	@BeforeEach
 	void setUp() {
 		testBallot.setId(1L);
+		testBallot.setDecision(DECISION);
+		testBallot.setExpirationDate(new Date(1337L));
 		testBallot.setCreatedDate(new Date(1111L));
 		testBallot.setUpdatedDate(new Date(2222L));
 	}

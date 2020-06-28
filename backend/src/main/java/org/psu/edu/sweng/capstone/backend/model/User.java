@@ -143,6 +143,10 @@ public class User {
 		return userRoles;
 	}
 
+	public void setUserRoles(Set<UserRole> userRoles) {
+		this.userRoles = userRoles;
+	}
+
 	public String getFullName() {
 		StringBuilder builder = new StringBuilder();
 		
