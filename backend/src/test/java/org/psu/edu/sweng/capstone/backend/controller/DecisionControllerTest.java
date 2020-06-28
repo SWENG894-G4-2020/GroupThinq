@@ -45,7 +45,7 @@ class DecisionControllerTest {
 	void getUsers_callsRightServiceFunction() throws Exception {
 		
 		// when
-		mockMvc.perform(get("/decision/users/{id}", decisionId)).andExpect(status().isOk());
+		mockMvc.perform(get("/decision/{id}/users", decisionId)).andExpect(status().isOk());
 		
 		// then
 		verify(decisionServiceImpl, times(1)).getUsers(decisionId);

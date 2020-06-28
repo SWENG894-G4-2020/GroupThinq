@@ -1,12 +1,10 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,13 +18,15 @@ import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
+import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
 
 @ExtendWith(MockitoExtension.class)
-class DecisionServiceImplTest {
+class DecisionServiceImplTest extends ServiceImplTest {
 	
 	@Mock
 	private UserDAO userDao;
@@ -59,46 +59,46 @@ class DecisionServiceImplTest {
 	void getUsers_returnsUsers_whenUsersExist() {
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		List<UserDTO> userList = decisionServiceImpl.getUsers(1337L);
+		ResponseEntity<UserDTO> response = decisionServiceImpl.getUsers(1337L);
 		
 		// then
-		assertEquals(1, userList.size());
-		assertEquals("TestUser", userList.get(0).getUserName());
+		assertEquals(1, response.getData().size());
+		assertEquals("TestUser", response.getData().get(0).getUserName());
 	}
 	
 	@Test
 	void getUsers_returnsEmptyList_whenNoUsersExist() {
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(null));
-		List<UserDTO> userList = decisionServiceImpl.getUsers(1337L);
+		ResponseEntity<UserDTO> response = decisionServiceImpl.getUsers(1337L);
 		
 		// then
-		assertEquals(0, userList.size());
+		assertEquals(0, response.getData().size());
 	}
 	
 	@Test
 	void getDecision_noDecisionExists() {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(null));
-		DecisionDTO dto = decisionServiceImpl.getDecision(decisionId);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.getDecision(decisionId);
 		
 		// then
-		assertNull(dto);
+		assertEquals(0, response.getData().size());
 	}
 	
 	@Test
 	void getDecision_decisionExists() {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		DecisionDTO dto = decisionServiceImpl.getDecision(decisionId);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.getDecision(decisionId);
 
-		assertEquals("Test Decision", dto.getName());
+		assertEquals("Test Decision", response.getData().get(0).getName());
 	}
 	
 	@Test
 	void updateDecision_noDecisionExists() {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.empty());
-		String returnValue = decisionServiceImpl.updateDecision(decisionId, DecisionDTO.build(dec));
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, DecisionDTO.build(dec));
 		
-		assertEquals("Decision does not exist", returnValue);
+		assertEquals(1, response.getErrors().size());
 	}
 	
 	@Test
@@ -114,10 +114,11 @@ class DecisionServiceImplTest {
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
 		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.ofNullable(testUser));
-		String returnValue = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals("Decision 1337 has been updated.", returnValue);
+		assertEquals(200, response.getStatus());
+		assertEquals(0, response.getErrors().size());
 	}
 	
 	@Test
@@ -133,10 +134,11 @@ class DecisionServiceImplTest {
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
 		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.empty());
-		String returnValue = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals("Decision 1337 has been updated.", returnValue);
+		assertEquals(200, response.getStatus());
+		assertEquals(0, response.getErrors().size());
 	}
 	
 	@Test
@@ -150,18 +152,20 @@ class DecisionServiceImplTest {
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
-		String returnValue = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals("Decision 1337 has been updated.", returnValue);
+		assertEquals(200, response.getStatus());
+		assertEquals(0, response.getErrors().size());
 	}
 	
 	@Test
 	void createDecision_hasNoUser() {
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.empty());
-		String returnValue = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
 		
-		assertEquals("Decision could not be created.", returnValue);
+		assertEquals(404, response.getStatus());
+		assertEquals(1, response.getErrors().size());
 	}
 		
 	@Test
@@ -171,33 +175,81 @@ class DecisionServiceImplTest {
 		
 		// when
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
-		String returnValue = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
 		
 		// then
-		assertEquals("Decision has been created.", returnValue);
+		assertEquals(201, response.getStatus());
+		assertEquals(0, response.getErrors().size());
 	}
 	
 	@Test
 	void deleteDecision_hasNoDecision() {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.empty());
-		String returnValue = decisionServiceImpl.deleteDecision(dec.getId());
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals("Decision does not exist", returnValue);
+		assertEquals(1, response.getErrors().size());
 	}
 	
 	@Test
 	void deleteDecision_decisionExists_noUserDecisions() {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		String returnValue = decisionServiceImpl.deleteDecision(dec.getId());
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals("Decision 1337 has been deleted.", returnValue);
+		assertEquals(200, response.getStatus());
+		assertEquals(0, response.getErrors().size());
 	}
 		
 	@Test
 	void deleteDecision_decisionExists_withUserDecisions() {		
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		String returnValue = decisionServiceImpl.deleteDecision(dec.getId());
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
-		assertEquals("Decision 1337 has been deleted.", returnValue);
+		assertEquals(200, response.getStatus());
+		assertEquals(0, response.getErrors().size());
+	}
+	
+	@Test
+	void createDecision_handlesExceptionProperly() {
+	    when(userDao.findByUserName(testUser.getUserName())).thenThrow(RuntimeException.class);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
+	    
+		assertExceptionThrown(response);
+		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void getDecision_handlesExceptionProperly() {
+	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.getDecision(dec.getId());
+	    
+		assertExceptionThrown(response);
+		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void deleteDecision_handlesExceptionProperly() {
+	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
+	    
+		assertExceptionThrown(response);
+		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void updateDecision_handlesExceptionProperly() {
+	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(dec.getId(), DecisionDTO.build(dec));
+	    
+		assertExceptionThrown(response);
+		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void getUsers_handlesExceptionProperly() {
+	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
+		ResponseEntity<UserDTO> response = decisionServiceImpl.getUsers(dec.getId());
+	    
+		assertExceptionThrown(response);
+		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
 	}
 }

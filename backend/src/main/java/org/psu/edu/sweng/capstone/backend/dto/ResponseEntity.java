@@ -52,12 +52,31 @@ public class ResponseEntity<T> {
 		this.setSuccess(true);
 		this.setStatus(HttpStatus.OK.value());
 	}
+		
+	public void attachEntityNotFound(String entity) {
+		this.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, this.writeEntityNotFound(entity)));
+		
+		this.setStatus(HttpStatus.NOT_FOUND.value());
+		this.setSuccess(false);
+	}
 	
-	public String writeUserWasNotFoundMessage(String userName) {
+	public void attachCreatedSuccess() {
+		this.setSuccess(true);
+		this.setStatus(HttpStatus.CREATED.value());
+	}
+	
+	protected String writeEntityNotFound(String entity) {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append(userName).append(" was not found.");
+		builder.append(entity).append(" was not found.");
 		
 		return builder.toString();
+	}
+
+	public void attachEntityConflictError(String entity) {
+		this.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, entity + " already exists."));
+		
+		this.setSuccess(false);
+		this.setStatus(HttpStatus.CONFLICT.value());
 	}
 }
