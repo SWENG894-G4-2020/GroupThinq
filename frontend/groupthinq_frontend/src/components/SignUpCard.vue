@@ -77,7 +77,7 @@ export default {
       const isoDate = new Date(this.newUser.birthDate).toISOString()
       if (!this.validInputs) { return }
       try {
-        await this.$axios.post(`${process.env.BACKEND_URL}/users/${this.newUser.userName}`,
+        await this.$axios.post(`${process.env.BACKEND_URL}/user`,
           {
             firstName: this.newUser.firstName,
             lastName: this.newUser.lastName,

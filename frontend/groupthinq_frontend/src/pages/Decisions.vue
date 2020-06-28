@@ -64,8 +64,8 @@ export default {
     async getData () {
       try {
         const userName = auth.getTokenData().sub
-        const response = await this.$axios.get(`${process.env.BACKEND_URL}/users/${userName}/decision`)
-        this.decisionList = response.data
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/user/${userName}/decisions`)
+        this.decisionList = response.data.data
         this.isLoaded = true
       } catch (error) {
         console.log(error)

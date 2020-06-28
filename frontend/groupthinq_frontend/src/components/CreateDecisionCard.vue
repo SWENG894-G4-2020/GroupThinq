@@ -44,7 +44,10 @@
           <q-btn round dense color="green-8" icon="add" @click="addIncludedUser()" />
         </template>
       </q-select>
-      {{addedUsers}}
+      <q-chip v-for="(addedUser,idx) in addedUsers" :key="idx"
+        removable
+        :label="addedUser"
+        @remove="removeUser(addedUser)" />
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
@@ -59,6 +62,7 @@ export default {
   name: 'CreateDecisionModal',
   data () {
     return {
+      currentUserName: '',
       newDecision: {},
       allUsersList: [],
       filteredUsersList: [],
@@ -68,6 +72,7 @@ export default {
   },
 
   mounted () {
+    this.currentUserName = auth.getTokenData().sub
     this.resetNewDecision()
     this.getAllUsers()
   },
@@ -79,7 +84,8 @@ export default {
 
     async onCreate () {
       this.newDecision.expirationDate = new Date(this.newDecision.expirationDate).toISOString()
-      this.newDecision.includedUsers.push({ userName: 'foofoo' })
+      this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
+
       try {
         await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
         this.$emit('createClose')
@@ -95,23 +101,29 @@ export default {
     },
 
     resetNewDecision () {
-      const currentUserName = auth.getTokenData().sub
       this.newDecision = {
         name: '',
         description: '',
         expirationDate: '',
-        ownerUsername: currentUserName,
+        ownerUsername: this.currentUserName,
         includedUsers: [
-          { userName: currentUserName }
+          { userName: this.currentUserName }
         ]
       }
       this.addedUsers = []
     },
 
     addIncludedUser () {
-      if (this.newIncludedUser) {
+      if (this.newIncludedUser &&
+          !this.addedUsers.includes(this.newIncludedUser) &&
+          this.newIncludedUser !== this.currentUserName) {
         this.addedUsers.push(this.newIncludedUser)
       }
+    },
+
+    removeUser (user) {
+      const pos = this.addedUsers.indexOf(user)
+      this.addedUsers.splice(pos, 1)
     },
 
     filterFn (val, update, abort) {
