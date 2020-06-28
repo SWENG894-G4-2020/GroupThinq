@@ -14,7 +14,6 @@ public class DecisionDTO {
     private String name;
     private String description;
     private Date createdDate;
-    private Date expirationDate;
     private Date updatedDate;
     private String ownerUsername;
     
@@ -52,14 +51,6 @@ public class DecisionDTO {
         this.createdDate = createdDate;
     }
 
-    public Date getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
     public Date getUpdatedDate() {
         return updatedDate;
     }
@@ -90,7 +81,6 @@ public class DecisionDTO {
         if (d.getId() != null) { dto.setId(d.getId()); }
         if (d.getName() != null) { dto.setName(d.getName()); }
         if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
-        if (d.getExpirationDate() != null) { dto.setExpirationDate(d.getExpirationDate()); }
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }

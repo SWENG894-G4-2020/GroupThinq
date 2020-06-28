@@ -36,9 +36,6 @@ public class Decision {
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 
-	@Column(name = "EXPIRATION_DATE")
-	private Date expirationDate;
-
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
 
@@ -52,11 +49,12 @@ public class Decision {
 
 	protected Decision() {}
 
-	public Decision(String name, String description, Date expirationDate, User ownerId) {
+	public Decision(String name, String description, User ownerId) {
 		this.name = name;
 		this.description = description;
-		this.expirationDate = expirationDate;
 		this.ownerId = ownerId;
+		
+		this.setCreatedDate(new Date());
 	}
 
 	public Long getId() {
@@ -89,14 +87,6 @@ public class Decision {
 
 	public void setOwnerId(User ownerId) {
 		this.ownerId = ownerId;
-	}
-
-	public Date getExpirationDate() {
-		return expirationDate;
-	}
-
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
 	}
 
 	public Date getCreatedDate() {

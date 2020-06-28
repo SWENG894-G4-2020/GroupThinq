@@ -34,7 +34,6 @@ class DecisionTest {
 		testDecision.setName("Test Decision");
 		testDecision.setDescription("The Leetest Decision Description");
 		testDecision.setOwnerId(testUser);
-		testDecision.setExpirationDate(new Date(7859L));
 		testDecision.setCreatedDate(new Date(1111L));
 		testDecision.setUpdatedDate(new Date(2222L));
 		testDecision.setDecisionUsers(decisionUsers);
@@ -45,15 +44,13 @@ class DecisionTest {
 		// given
 		String name = "Leetest Decision";
 		String description = "The description of this Decision";
-		Date expiration = new Date(7859L);
 		
 		// when
-		Decision newDecision = new Decision(name, description, expiration, testUser);
+		Decision newDecision = new Decision(name, description, testUser);
 		
 		// then
 		assertEquals("Leetest Decision", newDecision.getName());
 		assertEquals("The description of this Decision", description);
-		assertEquals(new Date(7859L), expiration);
 		assertEquals(testUser, newDecision.getOwnerId());
 	}
 	
@@ -63,7 +60,6 @@ class DecisionTest {
 		assertEquals("Test Decision", testDecision.getName());
 		assertEquals("The Leetest Decision Description", testDecision.getDescription());
 		assertEquals(testUser, testDecision.getOwnerId());
-		assertEquals(new Date(7859L), testDecision.getExpirationDate());
 		assertEquals(new Date(1111L), testDecision.getCreatedDate());
 		assertEquals(new Date(2222L), testDecision.getUpdatedDate());
 		assertEquals(3, testDecision.getDecisionUsers().size());
@@ -79,7 +75,6 @@ class DecisionTest {
 		testDecision.setName("New Test Decision");
 		testDecision.setOwnerId(testUser);
 		testDecision.setDescription("New Test Description");
-		testDecision.setExpirationDate(new Date(3333L));
 		testDecision.setCreatedDate(new Date(4444L));
 		testDecision.setUpdatedDate(new Date(5555L));
 		testDecision.setDecisionUsers(decisionUsers);
@@ -88,7 +83,6 @@ class DecisionTest {
 		assertEquals("New Test Decision", testDecision.getName());
 		assertEquals("New Test Description", testDecision.getDescription());
 		assertEquals(testUser, testDecision.getOwnerId());
-		assertEquals(new Date(3333L), testDecision.getExpirationDate());
 		assertEquals(new Date(4444L), testDecision.getCreatedDate());
 		assertEquals(new Date(5555L), testDecision.getUpdatedDate());
 		assertEquals(4, testDecision.getDecisionUsers().size());

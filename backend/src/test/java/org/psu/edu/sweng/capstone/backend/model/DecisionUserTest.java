@@ -14,14 +14,14 @@ class DecisionUserTest {
 
 	@BeforeEach
 	void setUp() {
-		decisionUser.setDecision(new Decision("Test Decision", "Test Description", new Date(), testUser));
+		decisionUser.setDecision(new Decision("Test Decision", "Test Description", testUser));
 		decisionUser.setUser(new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
 	}
 	
 	@Test
 	void constructor_worksProperly() {
 		// given
-		Decision newDecision = new Decision("New Decision", "Test Description", new Date(), testUser);
+		Decision newDecision = new Decision("New Decision", "Test Description", testUser);
 		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
 		
 		// when
@@ -47,7 +47,7 @@ class DecisionUserTest {
 	@Test
 	void setters_workProperly() {
 		// given
-		Decision newTestDecision = new Decision("New Test Decision", "Test Decision Description", new Date(), testUser);
+		Decision newTestDecision = new Decision("New Test Decision", "Test Decision Description", testUser);
 		User newTestUser = new User("jsmith", "fakepw", "Smith", "John", "JohnSmith@gmail.com", new Date(1337L));
 		
 		// when
