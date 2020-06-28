@@ -10,6 +10,24 @@ import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 
 class ServiceImplTest {
 	
+	protected void assertExceptionThrown(ResponseEntity<?> response) {
+		assertEquals(1, response.getErrors().size());
+		assertEquals(500, response.getStatus());
+		assertEquals(false, response.getSuccess());
+	}
+
+	protected void assertGenericSuccess(ResponseEntity<UserDTO> response) {
+		assertEquals(true, response.getSuccess());
+		assertEquals(200, response.getStatus());
+		assertEquals(0, response.getErrors().size());
+	}
+	
+	protected void assertResourceConflictIssues(ResponseEntity<UserDTO> response) {
+		assertEquals(1, response.getErrors().size());
+		assertEquals(404, response.getStatus());
+		assertEquals(false, response.getSuccess());
+	}
+	
 	@Test
 	void assertExceptionThrown_returnsTrue() {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
@@ -40,23 +58,5 @@ class ServiceImplTest {
 		response.setSuccess(false);
 		
 		assertResourceConflictIssues(response);
-	}
-	
-	protected void assertExceptionThrown(ResponseEntity<?> response) {
-		assertEquals(1, response.getErrors().size());
-		assertEquals(500, response.getStatus());
-		assertEquals(false, response.getSuccess());
-	}
-
-	protected void assertGenericSuccess(ResponseEntity<UserDTO> response) {
-		assertEquals(true, response.getSuccess());
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
-	}
-	
-	protected void assertResourceConflictIssues(ResponseEntity<UserDTO> response) {
-		assertEquals(1, response.getErrors().size());
-		assertEquals(404, response.getStatus());
-		assertEquals(false, response.getSuccess());
 	}
 }
