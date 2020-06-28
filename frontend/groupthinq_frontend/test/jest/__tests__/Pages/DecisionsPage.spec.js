@@ -20,16 +20,15 @@ const components = Object.keys(All).reduce((object, key) => {
   return object
 }, {})
 
-const testData = { data: [
+const testData = { data: { data: [
   {
     id: 4,
     name: "Title",
     description: "Description",
     expirationDate: '2020-09-01T09:26:00-04:00',
-    ownerUsername: "test",
-    users: []
+    ownerUsername: "test"
   }
-]}
+]}}
 
 const resetData = {
   name: '',
@@ -77,42 +76,14 @@ describe('Decisions page tests', () => {
     expect(vm.isError).toBe(true)
   })
 
-  it('catches axios post errors', async () => {
-    console.log = jest.fn()
-    axios.get = jest.fn(() => Promise.resolve(testData))
-    axios.post = jest.fn(() => Promise.reject("Test Error"))
-    localVue.prototype.$axios = axios
-
-    const wrapper = shallowMount(Decisions, { localVue })
-    const vm = wrapper.vm
-    expect(vm.isError).toBe(false)
-    vm.$data.newDecision = testData.data[0]
-    await vm.onCreate() // wait for the mounted function to finish
-    expect(console.log).toHaveBeenCalledWith('Test Error')
-    expect(vm.isError).toBe(true)
-  })
-
   it('opens and cancels the create decision dialog', async () => {
     const wrapper = shallowMount(Decisions, { localVue })
     const vm = wrapper.vm
     expect(vm.createDecisionDialog).toBe(false)
     await vm.createDecision()
     expect(vm.createDecisionDialog).toBe(true)
-    await vm.onCancel()
+    await vm.closeCreateModal()
     expect(vm.createDecisionDialog).toBe(false)
-  })
-
-  it('creates a decision', async () => {
-    axios.post = jest.fn()
-    axios.get = jest.fn(() => Promise.resolve(testData))
-    const wrapper = shallowMount(Decisions, { localVue })
-    const vm = wrapper.vm
-    
-    vm.$data.newDecision = testData.data[0]
-    await vm.onCreate()
-    expect(axios.post).toHaveBeenCalledTimes(1)
-    // get will be called twice because of the inital mount
-    expect(axios.get).toHaveBeenCalledTimes(2)
   })
 
 })

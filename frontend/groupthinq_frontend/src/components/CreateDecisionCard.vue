@@ -96,8 +96,13 @@ export default {
     },
 
     async getAllUsers () {
-      const response = await this.$axios.get(`${process.env.BACKEND_URL}/users`)
-      response.data.data.forEach((user) => this.allUsersList.push(user.userName))
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/users`)
+        response.data.data.forEach((user) => this.allUsersList.push(user.userName))
+      } catch (error) {
+        console.log(error)
+        this.$emit('error')
+      }
     },
 
     resetNewDecision () {

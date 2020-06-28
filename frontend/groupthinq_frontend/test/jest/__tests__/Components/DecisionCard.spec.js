@@ -65,11 +65,12 @@ describe('Decision Card tests', () => {
         id: 4,
         name: 'test',
         description: 'testDesc',
+        ownerUsername: 'test',
         expirationDate: '2020-09-02T09:26:00-04:00'
       }
     , localVue })
     const vm = wrapper.vm
-    expect(vm.$props.users).toStrictEqual([])
+    expect(vm.$props.includedUsers).toStrictEqual([{ userName: 'test'}])
   })
 
   it('deletes a decision', async () => {
