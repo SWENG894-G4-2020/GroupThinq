@@ -285,6 +285,50 @@ class UserServiceImplTest extends ServiceImplTest {
 	}
 	
 	@Test
+	void getDecisions_hasNoUser() {
+	    when(userDao.findByUserName(userName)).thenReturn(Optional.empty());
+	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
+	    
+	    assertEquals(0, response.getData().size());
+	}
+	
+	@Test
+	void getDecisions_hasUser_noDecisionUsers() {
+		// given
+		Optional<User> userOptional = Optional.of(user);
+
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(userOptional);
+		when(decisionUserDao.findAllByUser(user)).thenReturn(new ArrayList<>());
+	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
+		
+		// then
+	    assertEquals(0, response.getData().size());
+	}
+	
+	@Test
+	void getDecisions_hasUser_hasDecision() {
+		// given
+		Decision decisionOne = new Decision("New Decision #1", "Description of Decision #1", user);
+		Decision decisionTwo  = new Decision("New Decision #2", "Description of Decision #2", user);
+		
+		ArrayList<DecisionUser> decisionUserList = new ArrayList<>();
+		
+		decisionUserList.add(new DecisionUser(decisionOne, user));
+		decisionUserList.add(new DecisionUser(decisionTwo, user));
+
+		Optional<User> userOptional = Optional.of(user);
+
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(userOptional);
+		when(decisionUserDao.findAllByUser(user)).thenReturn(decisionUserList);
+	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
+		
+		// then
+	    assertEquals(2, response.getData().size());
+	}
+	
+	@Test
 	void getUsers_handlesExceptionProperly() {
 	    when(userDao.findAll()).thenThrow(RuntimeException.class);
 		ResponseEntity<UserDTO> response = userServiceImpl.getUsers();
@@ -336,35 +380,5 @@ class UserServiceImplTest extends ServiceImplTest {
 	    
 		assertExceptionThrown(response);
 		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
-	}
-	
-	@Test
-	void getDecisions_hasNoUser() {
-	    when(userDao.findByUserName(userName)).thenReturn(Optional.empty());
-	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
-	    
-	    assertEquals(0, response.getData().size());
-	}
-	
-	@Test
-	void getDecisions_hasUser() {
-		// given
-		Decision decisionOne = new Decision("New Decision #1", "Description of Decision #1", user);
-		Decision decisionTwo  = new Decision("New Decision #2", "Description of Decision #2", user);
-		
-		ArrayList<Decision> decisionList = new ArrayList<>();
-		
-		decisionList.add(decisionOne);
-		decisionList.add(decisionTwo);
-
-		Optional<User> userOptional = Optional.of(user);
-
-		// when
-		when(userDao.findByUserName(userName)).thenReturn(userOptional);
-		when(decisionDao.findAllByOwnerId(userOptional.get())).thenReturn(decisionList);
-	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
-		
-		// then
-	    assertEquals(2, response.getData().size());
 	}
 }
