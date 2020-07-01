@@ -3,6 +3,8 @@ package org.psu.edu.sweng.capstone.backend.controller;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.exception.EntityConflictException;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,28 +31,28 @@ public class UserController {
 	}
 	
 	@GetMapping("/user/{username}")
-	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") String userName) {
+	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
 		return userService.getUser(userName);
 	}
 	
 	@DeleteMapping("/user/{username}")
-	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") String userName) {
+	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
 		return userService.deleteUser(userName);
 	}
 	
 	@PutMapping("/user/{username}")
-	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") String userName, @RequestBody final UserDTO user) {
+	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") final String userName, @RequestBody final UserDTO user) throws EntityNotFoundException {
 		return userService.updateUser(userName, user);
 	}
 	
-	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/user")
-	public ResponseEntity<UserDTO> createUser(@RequestBody final UserDTO user) {
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<UserDTO> createUser(@RequestBody final UserDTO user) throws EntityConflictException {
 		return userService.createUser(user);
 	}
 	
 	@GetMapping("/user/{username}/decisions")
-	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") String userName) {
+	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
 		return userService.getDecisions(userName);
 	}
 }
