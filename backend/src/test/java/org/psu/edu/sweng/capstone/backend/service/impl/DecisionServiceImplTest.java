@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +22,14 @@ import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionServiceImplTest extends ServiceImplTest {
@@ -57,11 +60,21 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 	@BeforeEach
 	void setUp() {
+		// setup logger
+        Logger logger = (Logger) LoggerFactory.getLogger(DecisionServiceImpl.class);
+        logger.addAppender(mockAppender);
+        
 		// given
 		decisionUsers.add(decUser);
 		
 		dec.setId(decisionId);
 		dec.setDecisionUsers(decisionUsers);
+	}
+	
+	@AfterEach
+	void tearDown() {
+	    final Logger logger = (Logger) LoggerFactory.getLogger(DecisionServiceImpl.class);
+	    logger.detachAppender(mockAppender);
 	}
 	
 	@Test
@@ -232,45 +245,40 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void createDecision_handlesExceptionProperly() {
 	    when(userDao.findByUserName(testUser.getUserName())).thenThrow(RuntimeException.class);
-		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(DecisionDTO.build(dec));
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		decisionServiceImpl.createDecision(DecisionDTO.build(dec));
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void getDecision_handlesExceptionProperly() {
 	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<DecisionDTO> response = decisionServiceImpl.getDecision(dec.getId());
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		decisionServiceImpl.getDecision(dec.getId());
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void deleteDecision_handlesExceptionProperly() {
 	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		decisionServiceImpl.deleteDecision(dec.getId());
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void updateDecision_handlesExceptionProperly() {
 	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(dec.getId(), DecisionDTO.build(dec));
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		decisionServiceImpl.updateDecision(dec.getId(), DecisionDTO.build(dec));
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void getUsers_handlesExceptionProperly() {
 	    when(decisionDao.findById(dec.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = decisionServiceImpl.getUsers(dec.getId());
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		decisionServiceImpl.getUsers(dec.getId());
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 }

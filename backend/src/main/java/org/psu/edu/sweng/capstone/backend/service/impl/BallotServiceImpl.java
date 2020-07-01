@@ -14,6 +14,8 @@ import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class BallotServiceImpl implements BallotService {
 	private DecisionDAO decisionDao;
 	
 	private static final String BALLOT_NOT_FOUND_MESSAGE = "Ballot ";
+	private static final Logger LOGGER = LoggerFactory.getLogger(BallotServiceImpl.class);
 	
 	@Override
 	public ResponseEntity<BallotDTO> createBallot(BallotDTO ballotDTO) {
@@ -53,7 +56,7 @@ public class BallotServiceImpl implements BallotService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error creating Ballot on Decision {}", ballotDTO.getDecisionId(), e);
 		}
 		
 		return response;
@@ -76,7 +79,7 @@ public class BallotServiceImpl implements BallotService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error deleting Ballot {}", ballotId, e);
 		}
 		
 		return response;
@@ -98,7 +101,7 @@ public class BallotServiceImpl implements BallotService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error retrieving Ballot {}", ballotId, e);
 		}
 		
 		return response;
@@ -131,7 +134,7 @@ public class BallotServiceImpl implements BallotService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error updating Ballot {}", ballotId, e);
 		}
 		
 		return response;

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,31 +26,21 @@ import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
-import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
+import ch.qos.logback.classic.Logger;
+
+
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest extends ServiceImplTest {
-	
-	private String userName;
-	private String password; 
-	private String lastName;
-	private String firstName;
-	private String emailAddress;
-	private Date birthDate;
-	private Date createdDate;
-	private Date updatedDate;
-	private Date lastLoggedIn;
-	
-	private User user;
-	private UserDTO userDto;
-
+		
 	@Mock
 	private UserDAO userDao;
 	
@@ -71,8 +62,26 @@ class UserServiceImplTest extends ServiceImplTest {
 	@InjectMocks
 	private UserServiceImpl userServiceImpl;
 	
+	private String userName;
+	private String password; 
+	private String lastName;
+	private String firstName;
+	private String emailAddress;
+	private Date birthDate;
+	private Date createdDate;
+	private Date updatedDate;
+	private Date lastLoggedIn;
+	
+	private User user;
+	private UserDTO userDto;
+	
 	@BeforeEach
-	void setup() {
+	void setUp() {
+		// setup logger
+        Logger logger = (Logger) LoggerFactory.getLogger(UserServiceImpl.class);
+        logger.addAppender(mockAppender);
+        
+        // given
 		userName = "JUnitTestUser";
 		password = "fakepw";
 		lastName = "User";
@@ -91,7 +100,13 @@ class UserServiceImplTest extends ServiceImplTest {
 		userDto = UserDTO.build(user);
 		userDto.setPassword("fakepw");
 	}
-
+	
+	@AfterEach
+	void tearDown() {
+	    final Logger logger = (Logger) LoggerFactory.getLogger(UserServiceImpl.class);
+	    logger.detachAppender(mockAppender);
+	}
+	
 	@Test
 	void createUser_worksProperly_withUserNotAlreadyInSystemAndRoleData() {
 		// given
@@ -331,54 +346,48 @@ class UserServiceImplTest extends ServiceImplTest {
 	@Test
 	void getUsers_handlesExceptionProperly() {
 	    when(userDao.findAll()).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = userServiceImpl.getUsers();
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		userServiceImpl.getUsers();
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void getUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = userServiceImpl.getUser(userName);
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		userServiceImpl.getUser(userName);
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void deleteUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = userServiceImpl.deleteUser(userName);
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		userServiceImpl.deleteUser(userName);
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void updateUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = userServiceImpl.updateUser(userName, userDto);
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		userServiceImpl.updateUser(userName, userDto);
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void createUser_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
-		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		userServiceImpl.createUser(userDto);
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
-	
+
 	@Test
 	void getDecisions_handlesExceptionProperly() {
 	    when(userDao.findByUserName(userName)).thenThrow(RuntimeException.class);
-		ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userDto.getUserName());
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		userServiceImpl.getDecisions(userDto.getUserName());
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 }

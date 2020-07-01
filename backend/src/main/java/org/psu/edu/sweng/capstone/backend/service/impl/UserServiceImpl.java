@@ -18,6 +18,8 @@ import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,7 +43,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-		
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+	
 	@Override
 	public ResponseEntity<UserDTO> getUsers() {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
@@ -57,7 +61,7 @@ public class UserServiceImpl implements UserService {
 			response.attachGenericSuccess();
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error retrieving all Groupthinq Users.", e);
 		}
 		
 		return response;
@@ -79,7 +83,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error getting User {}.", userName, e);
 		}
 		
 		return response;
@@ -115,7 +119,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);	
+			LOGGER.error("Error deleting User {}.", userName, e);
 		}
 		
 		return response;
@@ -147,7 +151,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error updating User {}.", userName, e);
 		}
 				
 		return response;
@@ -165,7 +169,7 @@ public class UserServiceImpl implements UserService {
 			if (user.isPresent()) {
 				response.attachEntityConflictError(username);
 			}
-			else {			
+			else {
 				User newUser = new User(username,
 						bCryptPasswordEncoder.encode(userDto.getPassword()),
 						userDto.getLastName(),
@@ -188,7 +192,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error creating User {}.", userDto.getUserName(), e);
 		}
 		
 		return response;
@@ -215,7 +219,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error getting all User {}'s Decisions", userName, e);
 		}
 		
 		return response;

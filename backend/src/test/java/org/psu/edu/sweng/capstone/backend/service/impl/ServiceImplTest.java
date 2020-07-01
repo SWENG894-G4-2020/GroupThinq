@@ -2,16 +2,31 @@ package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseError;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.Appender;
+
 class ServiceImplTest {
 	
+    @Mock
+    protected Appender<ILoggingEvent> mockAppender;
+
+    @Captor
+    protected ArgumentCaptor<LoggingEvent> captorLoggingEvent;
+        
 	protected void assertExceptionThrown(ResponseEntity<?> response) {
 		assertEquals(1, response.getErrors().size());
 		assertEquals(500, response.getStatus());
@@ -93,5 +108,12 @@ class ServiceImplTest {
 		response.setSuccess(false);
 		
 		assertEntityNotFound(response);
+	}
+	
+	protected void assertLoggingOccurredOnException(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<LoggingEvent> captorLoggingEvent) {
+        verify(mockAppender).doAppend(captorLoggingEvent.capture());
+        final LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+        
+        assertNotNull(loggingEvent);
 	}
 }

@@ -20,6 +20,8 @@ import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class DecisionServiceImpl implements DecisionService {
-
-	private static final String DECISION_NOT_FOUND_MESSAGE = "Decision ";
-		
+	
 	@Autowired
 	private UserDAO userDao;
 	
@@ -44,7 +44,10 @@ public class DecisionServiceImpl implements DecisionService {
 	
 	@Autowired
 	private DecisionUserDAO decisionUserDao;
-		
+	
+	private static final String DECISION_NOT_FOUND_MESSAGE = "Decision ";
+	private static final Logger LOGGER = LoggerFactory.getLogger(DecisionServiceImpl.class);
+
 	@Override
 	public ResponseEntity<UserDTO> getUsers(Long id) {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
@@ -65,7 +68,7 @@ public class DecisionServiceImpl implements DecisionService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error retrieving all Users from Decision {}.", id, e);
 		}
 		
 		return response;
@@ -102,7 +105,7 @@ public class DecisionServiceImpl implements DecisionService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error updating Decision {}.", id, e);
 		}
 		
 		return response;
@@ -151,7 +154,7 @@ public class DecisionServiceImpl implements DecisionService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error creating Decision {}.", decisionDto.getName(), e);
 		}
 		
 		return response;
@@ -178,7 +181,7 @@ public class DecisionServiceImpl implements DecisionService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error creating Decision {}.", id, e);
 		}
 		
 		return response;
@@ -200,7 +203,7 @@ public class DecisionServiceImpl implements DecisionService {
 			}
 		}
 		catch (Exception e) {
-			response.attachExceptionError(e);
+			LOGGER.error("Error retrieving Decision {}.", id, e);
 		}
 		
 		return response;

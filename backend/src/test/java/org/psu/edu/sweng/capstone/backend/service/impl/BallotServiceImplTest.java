@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import java.util.Date;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,9 @@ import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 @ExtendWith(MockitoExtension.class)
 class BallotServiceImplTest extends ServiceImplTest {
@@ -45,8 +49,19 @@ class BallotServiceImplTest extends ServiceImplTest {
 	
 	@BeforeEach
 	void setUp() {
+		// setup logger
+        Logger logger = (Logger) LoggerFactory.getLogger(BallotServiceImpl.class);
+        logger.addAppender(mockAppender);
+		
+		// given
 		testBallotDTO.setId(1L);
 		testBallotDTO.setDecisionId(2L);
+	}
+	
+	@AfterEach
+	void tearDown() {
+	    final Logger logger = (Logger) LoggerFactory.getLogger(BallotServiceImpl.class);
+	    logger.detachAppender(mockAppender);
 	}
 	
 	@Test
@@ -185,36 +200,32 @@ class BallotServiceImplTest extends ServiceImplTest {
 	@Test
 	void createBallot_handlesExceptionProperly() {
 	    when(decisionDao.findById(testBallotDTO.getDecisionId())).thenThrow(RuntimeException.class);
-		ResponseEntity<BallotDTO> response = ballotServiceImpl.createBallot(testBallotDTO);
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		ballotServiceImpl.createBallot(testBallotDTO);
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void deleteBallot_handlesExceptionProperly() {
 	    when(ballotDao.findById(testBallotDTO.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<BallotDTO> response = ballotServiceImpl.deleteBallot(testBallotDTO.getId());
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		ballotServiceImpl.deleteBallot(testBallotDTO.getId());
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void retrieveBallot_handlesExceptionProperly() {
 	    when(ballotDao.findById(testBallotDTO.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<BallotDTO> response = ballotServiceImpl.retrieveBallot(testBallotDTO.getId());
+		ballotServiceImpl.retrieveBallot(testBallotDTO.getId());
 	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 	
 	@Test
 	void updateBallot_handlesExceptionProperly() {
 	    when(ballotDao.findById(testBallotDTO.getId())).thenThrow(RuntimeException.class);
-		ResponseEntity<BallotDTO> response = ballotServiceImpl.updateBallot(testBallotDTO.getId(), testBallotDTO);
-	    
-		assertExceptionThrown(response);
-		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+		ballotServiceImpl.updateBallot(testBallotDTO.getId(), testBallotDTO);
+		
+		assertLoggingOccurredOnException(mockAppender, captorLoggingEvent);
 	}
 }
