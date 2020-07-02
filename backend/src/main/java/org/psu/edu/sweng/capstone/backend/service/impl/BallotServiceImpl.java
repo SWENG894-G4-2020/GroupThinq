@@ -9,8 +9,6 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
-import org.psu.edu.sweng.capstone.backend.dto.ResponseError;
-import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
@@ -40,9 +38,7 @@ public class BallotServiceImpl implements BallotService {
 			throw new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString());
 		}
 		else if (ballotDTO.getExpirationDate() == null) {
-			response.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, "Expiration Date missing to create Ballot"));
-			response.setStatus(500);
-			response.setSuccess(false);
+			throw new EntityNotFoundException("Expiration Date");
 		}
 		else {
 			Ballot ballot = new Ballot(decision.get(), ballotDTO.getExpirationDate());
@@ -113,7 +109,7 @@ public class BallotServiceImpl implements BallotService {
 			ballotDao.save(b);
 			
 			response.attachGenericSuccess();
-			}
+		}
 		
 		return response;
 	}

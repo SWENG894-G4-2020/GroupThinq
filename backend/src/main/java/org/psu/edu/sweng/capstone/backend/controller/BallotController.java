@@ -23,8 +23,8 @@ public class BallotController {
 	@Autowired
 	private BallotService ballotService;
 	
-	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/ballot")
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<BallotDTO> createBallot(@RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.createBallot(ballot);
 	}

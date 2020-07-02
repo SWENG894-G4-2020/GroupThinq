@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService {
 			
 			newUser.setCreatedDate(new Date());
 			
-			Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+			final Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
 			
 			if (role.isPresent()) {
 				newUser.getUserRoles().add(new UserRole(newUser, role.get()));
