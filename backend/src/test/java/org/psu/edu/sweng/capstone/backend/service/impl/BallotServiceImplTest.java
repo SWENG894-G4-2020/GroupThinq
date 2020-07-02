@@ -1,7 +1,5 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -21,7 +19,6 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
-import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
@@ -80,13 +77,9 @@ class BallotServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.ofNullable(testDecision));
-		ResponseEntity<BallotDTO> response = ballotServiceImpl.createBallot(testBallotDTO);
 		
 		// then
-		assertFalse(response.getSuccess());
-		assertEquals(1, response.getErrors().size());
-		assertEquals(500, response.getStatus());
-		assertEquals(ErrorEnum.RESOURCE_CONFLICT, response.getErrors().get(0).getType());
+	    assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.createBallot(testBallotDTO); });
 		verify(ballotDao, times(0)).save(Mockito.any(Ballot.class));
 	}
 	

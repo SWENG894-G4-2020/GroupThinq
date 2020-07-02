@@ -24,8 +24,8 @@ public class DecisionController {
 	@Autowired
 	private DecisionService decisionService;
 	
-	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/decision")
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<DecisionDTO> createDecision(@RequestBody final DecisionDTO decision) throws EntityNotFoundException {
 		return decisionService.createDecision(decision);
 	}
