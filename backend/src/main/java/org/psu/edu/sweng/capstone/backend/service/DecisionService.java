@@ -3,13 +3,14 @@ package org.psu.edu.sweng.capstone.backend.service;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 
 public interface DecisionService {
 
-	ResponseEntity<DecisionDTO> updateDecision(Long id, DecisionDTO decision);
-	ResponseEntity<DecisionDTO> createDecision(DecisionDTO decision);
-	ResponseEntity<DecisionDTO> deleteDecision(Long id);
-	ResponseEntity<DecisionDTO> getDecision(Long id);
+	ResponseEntity<DecisionDTO> updateDecision(final Long id, final DecisionDTO decision) throws EntityNotFoundException;
+	ResponseEntity<DecisionDTO> createDecision(final DecisionDTO decision) throws EntityNotFoundException;
+	ResponseEntity<DecisionDTO> deleteDecision(final Long id) throws EntityNotFoundException;
+	ResponseEntity<DecisionDTO> getDecision(final Long id) throws EntityNotFoundException;
 	
-	ResponseEntity<UserDTO> getUsers(Long id);
+	ResponseEntity<UserDTO> getUsers(final Long id) throws EntityNotFoundException;
 }

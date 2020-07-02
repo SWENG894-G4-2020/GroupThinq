@@ -2,11 +2,12 @@ package org.psu.edu.sweng.capstone.backend.service;
 
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 
 public interface BallotService {
 
-	ResponseEntity<BallotDTO> createBallot(BallotDTO ballot);
-	ResponseEntity<BallotDTO> deleteBallot(Long ballotId);
-	ResponseEntity<BallotDTO> retrieveBallot(Long ballotId);
-	ResponseEntity<BallotDTO> updateBallot(Long ballotId, BallotDTO ballot);
+	ResponseEntity<BallotDTO> createBallot(final BallotDTO ballot) throws EntityNotFoundException;
+	ResponseEntity<BallotDTO> deleteBallot(final Long ballotId) throws EntityNotFoundException;
+	ResponseEntity<BallotDTO> retrieveBallot(final Long ballotId) throws EntityNotFoundException;
+	ResponseEntity<BallotDTO> updateBallot(final Long ballotId, final BallotDTO ballot) throws EntityNotFoundException;
 }

@@ -11,6 +11,7 @@ import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseError;
 import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
@@ -27,112 +28,92 @@ public class BallotServiceImpl implements BallotService {
 	@Autowired
 	private DecisionDAO decisionDao;
 	
-	private static final String BALLOT_NOT_FOUND_MESSAGE = "Ballot ";
+	private static final String ERROR_HEADER = "Ballot ";
 	
 	@Override
-	public ResponseEntity<BallotDTO> createBallot(BallotDTO ballotDTO) {
+	public ResponseEntity<BallotDTO> createBallot(final BallotDTO ballotDTO) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Decision> decision = decisionDao.findById(ballotDTO.getDecisionId());
+		final Optional<Decision> decision = decisionDao.findById(ballotDTO.getDecisionId());
 
-			if (!decision.isPresent()) {
-				response.attachEntityNotFound("Decision " + ballotDTO.getDecisionId().toString());
-			}
-			else if (ballotDTO.getExpirationDate() == null) {
-				response.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, "Expiration Date missing to create Ballot"));
-				response.setStatus(500);
-				response.setSuccess(false);
-			}
-			else {
-				Ballot ballot = new Ballot(decision.get(), ballotDTO.getExpirationDate());
-				
-				ballotDao.save(ballot);
-				
-				response.attachCreatedSuccess();
-			}
+		if (!decision.isPresent()) {
+			throw new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else if (ballotDTO.getExpirationDate() == null) {
+			response.getErrors().add(new ResponseError(ErrorEnum.RESOURCE_CONFLICT, "Expiration Date missing to create Ballot"));
+			response.setStatus(500);
+			response.setSuccess(false);
+		}
+		else {
+			Ballot ballot = new Ballot(decision.get(), ballotDTO.getExpirationDate());
+			
+			ballotDao.save(ballot);
+			
+			response.attachCreatedSuccess();
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<BallotDTO> deleteBallot(Long ballotId) {
+	public ResponseEntity<BallotDTO> deleteBallot(final Long ballotId) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Ballot> ballot = ballotDao.findById(ballotId);
+		final Optional<Ballot> ballot = ballotDao.findById(ballotId);
 			
-			if (!ballot.isPresent()) {
-				response.attachEntityNotFound(BALLOT_NOT_FOUND_MESSAGE + ballotId.toString());
-			}
-			else {
-				ballotDao.delete(ballot.get());
-				
-				response.attachGenericSuccess();
-			}
+		if (!ballot.isPresent()) {
+			throw new EntityNotFoundException(ERROR_HEADER + ballotId.toString());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			ballotDao.delete(ballot.get());
+			
+			response.attachGenericSuccess();
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<BallotDTO> retrieveBallot(Long ballotId) {
+	public ResponseEntity<BallotDTO> retrieveBallot(final Long ballotId) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Ballot> ballot = ballotDao.findById(ballotId);
-			
-			if (!ballot.isPresent()) {
-				response.attachEntityNotFound(BALLOT_NOT_FOUND_MESSAGE + ballotId.toString());
-			}
-			else {
-				response.getData().add(BallotDTO.build(ballot.get()));
-				response.attachGenericSuccess();
-			}
+		final Optional<Ballot> ballot = ballotDao.findById(ballotId);
+		
+		if (!ballot.isPresent()) {
+			throw new EntityNotFoundException(ERROR_HEADER + ballotId.toString());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			response.getData().add(BallotDTO.build(ballot.get()));
+			response.attachGenericSuccess();
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<BallotDTO> updateBallot(Long ballotId, BallotDTO ballotDTO) {
+	public ResponseEntity<BallotDTO> updateBallot(final Long ballotId, final BallotDTO ballotDTO) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Ballot> ballot = ballotDao.findById(ballotId);
-			Optional<Decision> decision = decisionDao.findById(ballotDTO.getDecisionId());
+		final Optional<Ballot> ballot = ballotDao.findById(ballotId);
+		final Optional<Decision> decision = decisionDao.findById(ballotDTO.getDecisionId());
+		
+		if (!ballot.isPresent()) {
+			throw new EntityNotFoundException(ERROR_HEADER + ballotId.toString());
+		}
+		else if (!decision.isPresent()) {
+			throw new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString());
+		}
+		else {
+			Ballot b = ballot.get();
 			
-			if (!ballot.isPresent()) {
-				response.attachEntityNotFound(BALLOT_NOT_FOUND_MESSAGE + ballotId.toString());
+			if (ballotDTO.getExpirationDate() != null) { b.setExpirationDate(ballotDTO.getExpirationDate()); }
+			
+			b.setUpdatedDate(new Date());
+			
+			ballotDao.save(b);
+			
+			response.attachGenericSuccess();
 			}
-			else if (!decision.isPresent()) {
-				response.attachEntityNotFound("Decision " + ballotDTO.getDecisionId().toString());
-			}
-			else {
-				Ballot b = ballot.get();
-				
-				if (ballotDTO.getExpirationDate() != null) { b.setExpirationDate(ballotDTO.getExpirationDate()); }
-				
-				b.setUpdatedDate(new Date());
-				
-				ballotDao.save(b);
-				
-				response.attachGenericSuccess();
-			}
-		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
-		}
 		
 		return response;
 	}

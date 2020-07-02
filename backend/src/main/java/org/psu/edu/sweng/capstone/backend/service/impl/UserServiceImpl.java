@@ -13,6 +13,8 @@ import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.exception.EntityConflictException;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -41,181 +43,153 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-		
+	
+	private static final String ERROR_HEADER = "User ";
+	
 	@Override
 	public ResponseEntity<UserDTO> getUsers() {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
-		try {
-			List<User> users = userDao.findAll();
+		List<User> users = userDao.findAll();
+		
+		for (User u : users) {
+			UserDTO userDto = UserDTO.build(u);
+			response.getData().add(userDto);
+		}
+		
+		response.attachGenericSuccess();
+		
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<UserDTO> getUser(final String username) throws EntityNotFoundException {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+
+		final Optional<User> user = userDao.findByUserName(username);
+		
+		if (user.isPresent()) {
+			response.getData().add(UserDTO.build(user.get()));
+			response.attachGenericSuccess();
+		}
+		else {
+			throw new EntityNotFoundException(ERROR_HEADER + username);
+		}
+		
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<UserDTO> deleteUser(final String username) throws EntityNotFoundException {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+
+		final Optional<User> user = userDao.findByUserName(username);
+
+		if (user.isPresent()) {
+			User u = user.get();
 			
-			for (User u : users) {
-				UserDTO userDto = UserDTO.build(u);
-				response.getData().add(userDto);
+			ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(u);
+			ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(u);
+			
+			if (!userRoles.isEmpty()) {
+				userRoleDao.deleteAll(userRoles);
 			}
+			
+			if (!userDecisions.isEmpty()) {
+				decisionUserDao.deleteAll(userDecisions);
+			}
+			
+			userDao.delete(user.get());
 			
 			response.attachGenericSuccess();
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			throw new EntityNotFoundException(ERROR_HEADER + username);
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<UserDTO> getUser(String userName) {
+	public ResponseEntity<UserDTO> updateUser(final String username, final UserDTO userDto) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
-
-		try {
-			Optional<User> user = userDao.findByUserName(userName);
+		
+		final Optional<User> user = userDao.findByUserName(username);
 			
-			if (user.isPresent()) {
-				response.getData().add(UserDTO.build(user.get()));
-				response.attachGenericSuccess();
-			}
-			else {
-				response.attachEntityNotFound(userName);
-			}
-		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
-		}
-		
-		return response;
-	}
-
-	@Override
-	public ResponseEntity<UserDTO> deleteUser(String userName) {
-		ResponseEntity<UserDTO> response = new ResponseEntity<>();
-
-		try {
-			Optional<User> user = userDao.findByUserName(userName);
-
-			if (user.isPresent()) {
-				User u = user.get();
-				
-				ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(u);
-				ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(u);
-				
-				if (!userRoles.isEmpty()) {
-					userRoleDao.deleteAll(userRoles);
-				}
-				
-				if (!userDecisions.isEmpty()) {
-					decisionUserDao.deleteAll(userDecisions);
-				}
-				
-				userDao.delete(user.get());
-				
-				response.attachGenericSuccess();
-			}
-			else {
-				response.attachEntityNotFound(userName);
-			}
-		}
-		catch (Exception e) {
-			response.attachExceptionError(e);	
-		}
-		
-		return response;
-	}
-
-	@Override
-	public ResponseEntity<UserDTO> updateUser(String userName, UserDTO userDto) {
-		ResponseEntity<UserDTO> response = new ResponseEntity<>();
-		
-		try {
-			Optional<User> user = userDao.findByUserName(userName);
+		if (user.isPresent()) {
+			User u = user.get();
 			
-			if (user.isPresent()) {
-				User u = user.get();
-				
-				if (userDto.getLastName() != null) { u.setLastName(userDto.getLastName()); }
-				if (userDto.getFirstName() != null) { u.setFirstName(userDto.getFirstName()); }
-				if (userDto.getEmailAddress() != null) { u.setEmailAddress(userDto.getEmailAddress()); }
-				if (userDto.getBirthDate() != null) { u.setBirthDate(userDto.getBirthDate()); }
+			if (userDto.getLastName() != null) { u.setLastName(userDto.getLastName()); }
+			if (userDto.getFirstName() != null) { u.setFirstName(userDto.getFirstName()); }
+			if (userDto.getEmailAddress() != null) { u.setEmailAddress(userDto.getEmailAddress()); }
+			if (userDto.getBirthDate() != null) { u.setBirthDate(userDto.getBirthDate()); }
 
-				u.setUpdatedDate(new Date());
-				
-				userDao.save(u);
-				
-				response.attachGenericSuccess();
-			}
-			else {
-				response.attachEntityNotFound(userName);
-			}
+			u.setUpdatedDate(new Date());
+			
+			userDao.save(u);
+			
+			response.attachGenericSuccess();
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			throw new EntityNotFoundException(ERROR_HEADER + username);
 		}
 				
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<UserDTO> createUser(UserDTO userDto) {
+	public ResponseEntity<UserDTO> createUser(final UserDTO userDto) throws EntityConflictException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
 		final String username = userDto.getUserName();
 
-		try {
-			Optional<User> user = userDao.findByUserName(username);
-			
-			if (user.isPresent()) {
-				response.attachEntityConflictError(username);
-			}
-			else {			
-				User newUser = new User(username,
-						bCryptPasswordEncoder.encode(userDto.getPassword()),
-						userDto.getLastName(),
-						userDto.getFirstName(),
-						userDto.getEmailAddress(),
-						userDto.getBirthDate()
-				);
-				
-				newUser.setCreatedDate(new Date());
-				
-				Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
-				
-				if (role.isPresent()) {
-					newUser.getUserRoles().add(new UserRole(newUser, role.get()));
-				}
-				
-				userDao.save(newUser);
-				
-				response.attachCreatedSuccess();
-			}
+		Optional<User> user = userDao.findByUserName(username);
+		
+		if (user.isPresent()) {
+			throw new EntityConflictException(ERROR_HEADER + user.get().getUserName());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			User newUser = new User(username,
+					bCryptPasswordEncoder.encode(userDto.getPassword()),
+					userDto.getLastName(),
+					userDto.getFirstName(),
+					userDto.getEmailAddress(),
+					userDto.getBirthDate()
+			);
+			
+			newUser.setCreatedDate(new Date());
+			
+			Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+			
+			if (role.isPresent()) {
+				newUser.getUserRoles().add(new UserRole(newUser, role.get()));
+			}
+			
+			userDao.save(newUser);
+			
+			response.attachCreatedSuccess();
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<DecisionDTO> getDecisions(String userName) {
+	public ResponseEntity<DecisionDTO> getDecisions(final String username) throws EntityNotFoundException {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<User> user = userDao.findByUserName(userName);
+		final Optional<User> user = userDao.findByUserName(username);
+		
+		if (user.isPresent()) {
+			ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByUser(user.get());
 			
-			if (user.isPresent()) {
-				ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByUser(user.get());
-				
-				for (DecisionUser du : decisionUsers) {
-					response.getData().add(DecisionDTO.build(du.getDecision()));
-				}
-				
-				response.attachGenericSuccess();
+			for (DecisionUser du : decisionUsers) {
+				response.getData().add(DecisionDTO.build(du.getDecision()));
 			}
-			else {
-				response.attachEntityNotFound(userName);
-			}
+			
+			response.attachGenericSuccess();
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			throw new EntityNotFoundException(ERROR_HEADER + username);
 		}
 		
 		return response;

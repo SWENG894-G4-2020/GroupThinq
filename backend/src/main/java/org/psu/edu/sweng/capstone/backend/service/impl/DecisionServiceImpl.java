@@ -14,6 +14,7 @@ import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
@@ -27,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class DecisionServiceImpl implements DecisionService {
-
-	private static final String DECISION_NOT_FOUND_MESSAGE = "Decision ";
-		
+	
 	@Autowired
 	private UserDAO userDao;
 	
@@ -44,169 +43,146 @@ public class DecisionServiceImpl implements DecisionService {
 	
 	@Autowired
 	private DecisionUserDAO decisionUserDao;
-		
+	
+	private static final String ERROR_HEADER = "Decision ";
+
 	@Override
-	public ResponseEntity<UserDTO> getUsers(Long id) {
+	public ResponseEntity<UserDTO> getUsers(final Long id) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Decision> dec = decisionDao.findById(id);
+		final Optional<Decision> dec = decisionDao.findById(id);
+		
+		if (dec.isPresent()) {			
+			for (DecisionUser du : dec.get().getDecisionUsers()) {
+				UserDTO dto = UserDTO.build(du.getUser());
+				response.getData().add(dto);
+			}
 			
-			if (dec.isPresent()) {			
-				for (DecisionUser du : dec.get().getDecisionUsers()) {
-					UserDTO dto = UserDTO.build(du.getUser());
-					response.getData().add(dto);
-				}
-				
-				response.attachGenericSuccess();
-			}
-			else {
-				response.attachEntityNotFound(DECISION_NOT_FOUND_MESSAGE + id.toString());
-			}
+			response.attachGenericSuccess();
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			throw new EntityNotFoundException(ERROR_HEADER + id.toString());
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<DecisionDTO> updateDecision(Long id, DecisionDTO decisionDto) {
+	public ResponseEntity<DecisionDTO> updateDecision(final Long id, final DecisionDTO decisionDto) throws EntityNotFoundException {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Decision> decisionOpt = decisionDao.findById(id);
-			
-			if (!decisionOpt.isPresent()) {
-				response.attachEntityNotFound(DECISION_NOT_FOUND_MESSAGE + id.toString());
-			}
-			else {
-				final Decision decision = decisionOpt.get();
-
-				if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
-				if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
-				if (decisionDto.getIncludedUsers() != null) { wipeAndAddNewDecisionUsers(decision, decisionDto.getIncludedUsers()); }
-				
-				if (!decisionDto.getBallots().isEmpty()) {
-					for (BallotDTO ballotDTO : decisionDto.getBallots()) {
-						ballotService.updateBallot(ballotDTO.getId(), ballotDTO);
-					}
-				}
-
-				decision.setUpdatedDate(new Date());
-
-				decisionDao.save(decision);
-				
-				response.attachGenericSuccess();
-			}
-		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
-		}
+		final Optional<Decision> decisionOpt = decisionDao.findById(id);
 		
+		if (!decisionOpt.isPresent()) {
+			throw new EntityNotFoundException(ERROR_HEADER + id.toString());
+		}
+		else {
+			final Decision decision = decisionOpt.get();
+
+			if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
+			if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
+			if (decisionDto.getIncludedUsers() != null) { wipeAndAddNewDecisionUsers(decision, decisionDto.getIncludedUsers()); }
+			
+			if (!decisionDto.getBallots().isEmpty()) {
+				for (BallotDTO ballotDTO : decisionDto.getBallots()) {
+					ballotService.updateBallot(ballotDTO.getId(), ballotDTO);
+				}
+			}
+
+			decision.setUpdatedDate(new Date());
+
+			decisionDao.save(decision);
+			
+			response.attachGenericSuccess();
+		}
+
 		return response;
 	}
 	
 	@Override
-	public ResponseEntity<DecisionDTO> createDecision(DecisionDTO decisionDto) {
+	public ResponseEntity<DecisionDTO> createDecision(final DecisionDTO decisionDto) throws EntityNotFoundException {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<User> user = userDao.findByUserName(decisionDto.getOwnerUsername());
+		final Optional<User> user = userDao.findByUserName(decisionDto.getOwnerUsername());
 			
-			if (!user.isPresent()) {
-				response.attachEntityNotFound(decisionDto.getOwnerUsername());
-			}
-			else {
-				// Create new decision
-				Decision newDecision = new Decision(
-						decisionDto.getName(),
-						decisionDto.getDescription(),
-						user.get()
-				);
-				
-				// Add users to Decision
-				Set<DecisionUser> decisionUsers = new HashSet<>();
-				for (UserDTO dto : decisionDto.getIncludedUsers()) {
-					Optional<User> includedUser = userDao.findByUserName(dto.getUserName());
-					
-					if (includedUser.isPresent()) {
-						decisionUsers.add(new DecisionUser(newDecision, includedUser.get()));
-					}
-				}
-				newDecision.setDecisionUsers(decisionUsers);
-		
-				decisionDao.save(newDecision);
-				
-				// Attach Ballots to Decision
-				if (!decisionDto.getBallots().isEmpty()) {
-					for (BallotDTO bDTO : decisionDto.getBallots()) {
-						Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate());
-						ballotDao.save(ballot);
-					}
-				}
-				
-				response.attachCreatedSuccess();
-			}
+		if (!user.isPresent()) {
+			throw new EntityNotFoundException("User " + decisionDto.getOwnerUsername());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			// Create new decision
+			Decision newDecision = new Decision(
+					decisionDto.getName(),
+					decisionDto.getDescription(),
+					user.get()
+			);
+			
+			// Add users to Decision
+			Set<DecisionUser> decisionUsers = new HashSet<>();
+			for (UserDTO dto : decisionDto.getIncludedUsers()) {
+				Optional<User> includedUser = userDao.findByUserName(dto.getUserName());
+				
+				if (includedUser.isPresent()) {
+					decisionUsers.add(new DecisionUser(newDecision, includedUser.get()));
+				}
+			}
+			newDecision.setDecisionUsers(decisionUsers);
+	
+			decisionDao.save(newDecision);
+			
+			// Attach Ballots to Decision
+			if (!decisionDto.getBallots().isEmpty()) {
+				for (BallotDTO bDTO : decisionDto.getBallots()) {
+					Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate());
+					ballotDao.save(ballot);
+				}
+			}
+			
+			response.attachCreatedSuccess();
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<DecisionDTO> deleteDecision(Long id) {
+	public ResponseEntity<DecisionDTO> deleteDecision(final Long id) throws EntityNotFoundException {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Decision> decisionOpt = decisionDao.findById(id);
-	
-			if (!decisionOpt.isPresent()) {
-				response.attachEntityNotFound(DECISION_NOT_FOUND_MESSAGE + id.toString());
-			}
-			else {
-				final Decision decision = decisionOpt.get();
-	
-				decision.getDecisionUsers().clear();
-	
-				decisionDao.delete(decision);
-				
-				response.attachGenericSuccess();
-			}
+		final Optional<Decision> decisionOpt = decisionDao.findById(id);
+
+		if (!decisionOpt.isPresent()) {
+			throw new EntityNotFoundException(ERROR_HEADER + id.toString());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			final Decision decision = decisionOpt.get();
+
+			decision.getDecisionUsers().clear();
+
+			decisionDao.delete(decision);
+			
+			response.attachGenericSuccess();
 		}
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity<DecisionDTO> getDecision(Long id) {
+	public ResponseEntity<DecisionDTO> getDecision(final Long id) throws EntityNotFoundException {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		try {
-			Optional<Decision> decisionOpt = decisionDao.findById(id);
-			
-			if (!decisionOpt.isPresent()) {
-				response.attachEntityNotFound(DECISION_NOT_FOUND_MESSAGE + id.toString());
-			}
-			else {
-				response.getData().add(DecisionDTO.build(decisionOpt.get()));
-				response.attachGenericSuccess();
-			}
+		final Optional<Decision> decisionOpt = decisionDao.findById(id);
+		
+		if (!decisionOpt.isPresent()) {
+			throw new EntityNotFoundException(ERROR_HEADER + id.toString());
 		}
-		catch (Exception e) {
-			response.attachExceptionError(e);
+		else {
+			response.getData().add(DecisionDTO.build(decisionOpt.get()));
+			response.attachGenericSuccess();
 		}
 		
 		return response;
 	}
 	
-	private void wipeAndAddNewDecisionUsers(Decision decision, List<UserDTO> includedUsers) {
+	private void wipeAndAddNewDecisionUsers(Decision decision, final List<UserDTO> includedUsers) {
 		decisionUserDao.deleteAllByDecision(decision);
 		
 		for (UserDTO usrDTO : includedUsers) {

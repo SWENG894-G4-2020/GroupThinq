@@ -3,6 +3,7 @@ package org.psu.edu.sweng.capstone.backend.controller;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,27 +26,27 @@ public class DecisionController {
 	
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping("/decision")
-	public ResponseEntity<DecisionDTO> createDecision(@RequestBody final DecisionDTO decision) {
+	public ResponseEntity<DecisionDTO> createDecision(@RequestBody final DecisionDTO decision) throws EntityNotFoundException {
 		return decisionService.createDecision(decision);
 	}
 
 	@DeleteMapping("/decision/{id}")
-	public ResponseEntity<DecisionDTO> deleteDecision(@PathVariable(value = "id") Long id) {
+	public ResponseEntity<DecisionDTO> deleteDecision(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.deleteDecision(id);
 	}
 
 	@GetMapping("/decision/{id}")
-	public ResponseEntity<DecisionDTO> getDecision(@PathVariable(value = "id") Long id) {
+	public ResponseEntity<DecisionDTO> getDecision(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.getDecision(id);
 	}
 
 	@PutMapping("/decision/{id}")
-	public ResponseEntity<DecisionDTO> updateDecision(@PathVariable(value = "id") Long id, @RequestBody final DecisionDTO decision) {
+	public ResponseEntity<DecisionDTO> updateDecision(@PathVariable(value = "id") final Long id, @RequestBody final DecisionDTO decision) throws EntityNotFoundException {
 		return decisionService.updateDecision(id, decision);
 	}
 	
 	@GetMapping("/decision/{id}/users")
-	public ResponseEntity<UserDTO> getUsers(@PathVariable(value = "id") Long id) {
+	public ResponseEntity<UserDTO> getUsers(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.getUsers(id);
 	}
 }
