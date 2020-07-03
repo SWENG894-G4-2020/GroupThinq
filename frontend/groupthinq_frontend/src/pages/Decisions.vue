@@ -4,7 +4,7 @@
         <q-btn color="green-8" label="New Decision" icon-right="add"  class="self-start" @click="createDecision()"/>
         <div class="text-h5 text-primary" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
         <DecisionCard
-          v-for="decision in decisionList.slice().sort((a,b) => new Date(a.expirationDate) - new Date(b.expirationDate))"
+          v-for="decision in decisionList.slice().sort((a,b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))"
           :key="decision.name"
           v-bind="decision"
           @needReload="getData()"
