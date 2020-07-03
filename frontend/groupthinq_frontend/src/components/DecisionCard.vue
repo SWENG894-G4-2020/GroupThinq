@@ -129,16 +129,20 @@ export default {
       }
     },
     prettyDate: function () {
-      return new Date(this.ballots[0].expirationDate)
+      return new Date(this.editableDecision.ballots[0].expirationDate)
     },
 
     editableDecision: function () {
+      let tempBallots = [{ expirationDate: '1970-01-01T00:01:00-00:00' }]
+      if (this.ballots.length !== 0) {
+        tempBallots = this.ballots
+      }
       return {
         id: this.id,
         name: this.name,
         description: this.description,
         includedUsers: this.includedUsers,
-        ballots: this.ballots
+        ballots: tempBallots
       }
     }
   },
@@ -186,13 +190,8 @@ export default {
 
   methods: {
     calculateRemainingTime () {
-      if (this.ballots.length === 0) {
-        this.$emit('error')
-        return
-      }
-
       const secondsTiemr = setInterval(() => {
-        const diff = (new Date(this.ballots[0].expirationDate) - Date.now()) / 1000
+        const diff = (new Date(this.editableDecision.ballots[0].expirationDate) - Date.now()) / 1000
 
         if (diff < 0) {
           clearInterval(secondsTiemr)
@@ -216,20 +215,6 @@ export default {
     },
 
     closeEditModal () {
-      this.editDecisionDialog = false
-      this.$emit('needReload')
-    },
-
-    async onConfirmEdit () {
-      try {
-        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, {
-          name: this.editDetails.name,
-          description: this.editDetails.description,
-          expirationDate: (new Date(this.editDetails.expirationDate)).toISOString()
-        })
-      } catch (error) {
-        console.log(error)
-      }
       this.editDecisionDialog = false
       this.$emit('needReload')
     },

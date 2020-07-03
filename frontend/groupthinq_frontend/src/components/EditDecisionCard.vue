@@ -156,16 +156,16 @@ export default {
 
     addIncludedUser () {
       if (this.newIncludedUser &&
-          !this.includedUsers.includes({ userName: this.newIncludedUser }) &&
+          !this.editableDecision.includedUsers.includes({ userName: this.newIncludedUser }) &&
           this.newIncludedUser !== this.currentUserName) {
-        this.includedUsers.push({ userName: this.newIncludedUser })
+        this.editableDecision.includedUsers.push({ userName: this.newIncludedUser })
       }
     },
 
     removeUser (user) {
       if (user !== this.currentUserName) {
-        const pos = this.includedUsers.findIndex((element) => element.userName === user)
-        this.includedUsers.splice(pos, 1)
+        const pos = this.editableDecision.includedUsers.findIndex((element) => element.userName === user)
+        this.editableDecision.includedUsers.splice(pos, 1)
       }
     },
 

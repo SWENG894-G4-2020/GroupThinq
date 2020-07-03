@@ -5,7 +5,8 @@
 
 import { mount, createLocalVue, shallowMount } from '@vue/test-utils'
 import DecisionCard from 'src/components/DecisionCard'
-import axios from 'axios';
+import axios from 'axios'
+import auth from 'src/store/auth'
 import * as All from 'quasar'
 
 // add all of the Quasar objects to the test harness
@@ -24,6 +25,11 @@ describe('Decision Card tests', () => {
   localVue.directive('close-popup', All.ClosePopup)
   localVue.prototype.$axios = axios
 
+  beforeEach( () => {
+    jest.clearAllMocks()
+    auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
+  })
+
   it('calculates expiration time correctly', async () => {
     jest.useFakeTimers()
     Date.now = jest.fn(() => new Date('2020-09-01T09:26:00-04:00'))
@@ -32,8 +38,8 @@ describe('Decision Card tests', () => {
         id: 4,
         name: 'test',
         description: 'testDesc',
-        expirationDate: '2020-09-02T09:26:00-04:00',
-        users: []
+        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+        includedUsers: [{userName: 'test'}]
       }
     , localVue })
     const vm = wrapper.vm
@@ -50,8 +56,8 @@ describe('Decision Card tests', () => {
         id: 4,
         name: 'test',
         description: 'testDesc',
-        expirationDate: '2020-09-01T09:26:00-04:00',
-        users: []
+        ballots: [{expirationDate: '2020-09-01T09:26:00-04:00'}],
+        includedUsers: [{userName: 'test'}]
       }
     , localVue })
     const vm = wrapper.vm
@@ -66,7 +72,8 @@ describe('Decision Card tests', () => {
         name: 'test',
         description: 'testDesc',
         ownerUsername: 'test',
-        expirationDate: '2020-09-02T09:26:00-04:00'
+        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+        includedUsers: [{userName: 'test'}]
       }
     , localVue })
     const vm = wrapper.vm
@@ -80,8 +87,8 @@ describe('Decision Card tests', () => {
         id: 4,
         name: 'test',
         description: 'testDesc',
-        expirationDate: '2020-09-02T09:26:00-04:00',
-        users: []
+        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+        includedUsers: [{userName: 'test'}]
       }
     , localVue })
     const vm = wrapper.vm
@@ -91,45 +98,26 @@ describe('Decision Card tests', () => {
     expect(vm.$data.deleteDecisionDialog).toBe(false)
   })
 
-  it('edits a decision', async () => {
-    axios.put = jest.fn((data) => Promise.resolve())
+  it('opens and closes the edit modal', async () => {
     const wrapper = shallowMount(DecisionCard, {
       propsData: {
         id: 4,
         name: 'test',
         description: 'testDesc',
-        expirationDate: '2020-09-02T09:26:00-04:00',
-        users: []
+        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+        includedUsers: [{userName: 'test'}]
       }
     , localVue })
     const vm = wrapper.vm
-    
-    await vm.onEdit()
-    await vm.onConfirmEdit()
-    expect(axios.put).toHaveBeenCalledTimes(1)
-    expect(vm.$data.editDecisionDialog).toBe(false)
-  })
 
-  it('cancels an edit', async () => {
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        expirationDate: '2020-09-02T09:26:00-04:00',
-        users: []
-      }
-    , localVue })
-    const vm = wrapper.vm
-    
-    await vm.onEdit()
-    expect(vm.$data.editDecisionDialog).toBe(true)
-    await vm.onEditCancel()
-    expect(vm.$data.editDecisionDialog).toBe(false)
+    await vm.openEditModal()
+    expect(vm.editDecisionDialog).toBeTruthy()
+    await vm.closeEditModal()
+    expect(vm.editDecisionDialog).toBeFalsy()
+
   })
 
   it('catches axios errors', async () => {
-    axios.put= jest.fn(() => Promise.reject('Test Axios Error'))
     axios.delete= jest.fn(() => Promise.reject('Test Axios Error'))
     console.log = jest.fn()
 
@@ -138,17 +126,27 @@ describe('Decision Card tests', () => {
         id: 4,
         name: 'test',
         description: 'testDesc',
-        expirationDate: '2020-09-02T09:26:00-04:00',
-        users: []
+        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+        includedUsers: [{userName: 'test'}]
       }
     , localVue })
     const vm = wrapper.vm
 
-    await vm.onEdit()
-    await vm.onConfirmEdit()
     await vm.onConfirmDelete()
     
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
-    expect(console.log).toHaveBeenCalledTimes(2)
+    expect(console.log).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles zero length prop inputs', async () => {
+    const wrapper = shallowMount(DecisionCard, {
+      propsData: {
+        id: 4,
+        name: 'test',
+        description: 'testDesc',
+        ballots: []
+      }
+    , localVue })
+    const vm = wrapper.vm
   })
 })
