@@ -82,8 +82,8 @@ public class UserServiceImpl implements UserService {
 		ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
 		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
 		
-		if (!userRoles.isEmpty()) userRoleDao.deleteAll(userRoles);
-		if (!userDecisions.isEmpty()) decisionUserDao.deleteAll(userDecisions);
+		if (!userRoles.isEmpty()) { userRoleDao.deleteAll(userRoles); }
+		if (!userDecisions.isEmpty()) { decisionUserDao.deleteAll(userDecisions); }
 		
 		userDao.delete(user);
 		
@@ -98,10 +98,10 @@ public class UserServiceImpl implements UserService {
 		
 		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		if (userDto.getLastName() != null) user.setLastName(userDto.getLastName());
-		if (userDto.getFirstName() != null) user.setFirstName(userDto.getFirstName());
-		if (userDto.getEmailAddress() != null) user.setEmailAddress(userDto.getEmailAddress());
-		if (userDto.getBirthDate() != null) user.setBirthDate(userDto.getBirthDate());
+		if (userDto.getLastName() != null) { user.setLastName(userDto.getLastName()); }
+		if (userDto.getFirstName() != null) { user.setFirstName(userDto.getFirstName()); }
+		if (userDto.getEmailAddress() != null) { user.setEmailAddress(userDto.getEmailAddress()); }
+		if (userDto.getBirthDate() != null) { user.setBirthDate(userDto.getBirthDate()); }
 
 		user.setUpdatedDate(new Date());
 		
@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService {
 		
 		final Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
 		
-		if (role.isPresent()) newUser.getUserRoles().add(new UserRole(newUser, role.get()));
+		if (role.isPresent()) { newUser.getUserRoles().add(new UserRole(newUser, role.get())); }
 		
 		userDao.save(newUser);
 	}
