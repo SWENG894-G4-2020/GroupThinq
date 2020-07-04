@@ -25,8 +25,9 @@ const testData = { data: { data: [
     id: 4,
     name: "Title",
     description: "Description",
-    expirationDate: '2020-09-01T09:26:00-04:00',
-    ownerUsername: "test"
+    ownerUsername: "test",
+    ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+    includedUsers: [{userName: 'test'}]
   }
 ]}}
 
@@ -34,9 +35,9 @@ const resetData = {
   name: '',
   // eslint-disable-next-line no-multi-str
   description: '',
-  expirationDate: '',
   ownerUsername: 'test',
-  users: []
+  ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+  includedUsers: [{userName: 'test'}]
 }
 
 describe('Decisions page tests', () => {

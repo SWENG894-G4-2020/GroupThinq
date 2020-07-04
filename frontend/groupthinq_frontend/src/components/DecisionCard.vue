@@ -4,10 +4,10 @@
     <q-card-section>
       <div class="text-h5 row items-center">
         <div class="col q-my-md">{{name}}</div>
-        <q-btn round icon="edit" class="col-auto">
+        <q-btn round icon="edit" class="col-auto" v-if="ownerUsername === this.currentUserName">
           <q-menu>
             <q-list>
-              <q-item clickable v-close-popup @click="onEdit()">
+              <q-item clickable v-close-popup @click="openEditModal()">
                 <q-item-section>Edit</q-item-section>
               </q-item>
               <q-item clickable v-close-popup @click="deleteDecisionDialog = true">
@@ -77,34 +77,7 @@
     </q-slide-transition>
   </q-card>
   <q-dialog v-model="editDecisionDialog" persistent style="width: 500px">
-    <q-card style="min-width: 400px">
-      <q-card-section class='column items-center'>
-        <div class="text-h5 q-pa-md"> Editing decision... </div>
-        <q-input filled class="q-mb-md" style="width: 100%" v-model="editDetails.name" label="name" />
-        <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="editDetails.description" label="Description" />
-        <q-input filled v-model="editDetails.expirationDate" style= "width: 100%" label="Expiration">
-          <template v-slot:prepend>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy transition-show="scale" transition-hide="scale">
-                <q-date v-model="editDetails.expirationDate" mask="YYYY-MM-DD HH:mm" />
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-
-          <template v-slot:append>
-            <q-icon name="access_time" class="cursor-pointer">
-              <q-popup-proxy transition-show="scale" transition-hide="scale">
-                <q-time v-model="editDetails.expirationDate" mask="YYYY-MM-DD HH:mm" />
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn label="cancel" @click="onEditCancel()" />
-        <q-btn color="green-8" @click="onConfirmEdit()" label="Confirm" />
-      </q-card-actions>
-    </q-card>
+    <EditDecisionCard v-bind="editableDecision" @editClose="closeEditModal()"/>
   </q-dialog>
   <q-dialog v-model="deleteDecisionDialog" persistent>
     <q-card>
@@ -122,26 +95,28 @@
 </template>
 
 <script>
+import auth from 'src/store/auth'
+import EditDecisionCard from 'src/components/EditDecisionCard'
+
 export default {
   name: 'DecisionCard',
 
+  components: {
+    EditDecisionCard
+  },
+
   data () {
     return {
+      currentUserName: '',
       editDecisionDialog: false,
       deleteDecisionDialog: false,
+      expirationDate: '',
       expanded: false,
       expired: false,
       daysRemaining: '',
       hoursRemaining: '',
       minutesRemaining: '',
-      secondsRemaining: '',
-      editDetails: {
-        id: '',
-        name: '',
-        description: '',
-        expirationDate: '',
-        ownerUsername: ''
-      }
+      secondsRemaining: ''
     }
   },
 
@@ -154,7 +129,21 @@ export default {
       }
     },
     prettyDate: function () {
-      return new Date(this.expirationDate)
+      return new Date(this.editableDecision.ballots[0].expirationDate)
+    },
+
+    editableDecision: function () {
+      let tempBallots = [{ expirationDate: '1970-01-01T00:01:00-00:00' }]
+      if (this.ballots.length !== 0) {
+        tempBallots = this.ballots
+      }
+      return {
+        id: this.id,
+        name: this.name,
+        description: this.description,
+        includedUsers: this.includedUsers,
+        ballots: tempBallots
+      }
     }
   },
 
@@ -174,8 +163,8 @@ export default {
       default: ''
     },
 
-    expirationDate: {
-      type: String,
+    ballots: {
+      type: Array,
       required: true
     },
 
@@ -195,13 +184,14 @@ export default {
   },
 
   mounted () {
+    this.currentUserName = auth.getTokenData().sub
     this.calculateRemainingTime()
   },
 
   methods: {
     calculateRemainingTime () {
       const secondsTiemr = setInterval(() => {
-        const diff = (new Date(this.expirationDate) - Date.now()) / 1000
+        const diff = (new Date(this.editableDecision.ballots[0].expirationDate) - Date.now()) / 1000
 
         if (diff < 0) {
           clearInterval(secondsTiemr)
@@ -220,28 +210,11 @@ export default {
       }, 1000)
     },
 
-    onEdit () {
+    openEditModal () {
       this.editDecisionDialog = true
-
-      this.editDetails.name = this.name
-      this.editDetails.description = this.description
-      this.editDetails.expirationDate = this.expirationDate
     },
 
-    onEditCancel () {
-      this.editDecisionDialog = false
-    },
-
-    async onConfirmEdit () {
-      try {
-        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, {
-          name: this.editDetails.name,
-          description: this.editDetails.description,
-          expirationDate: (new Date(this.editDetails.expirationDate)).toISOString()
-        })
-      } catch (error) {
-        console.log(error)
-      }
+    closeEditModal () {
       this.editDecisionDialog = false
       this.$emit('needReload')
     },
