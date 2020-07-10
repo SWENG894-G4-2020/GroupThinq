@@ -13,7 +13,7 @@
       </div>
       <q-slide-transition>
         <div v-show="detailsExpanded" style="width:100%">
-          <q-input filled class="q-mb-md" style="width: 100%" v-model="newDecision.name" label="Title" />
+          <q-input filled class="q-my-md" style="width: 100%" v-model="newDecision.name" label="Title" />
           <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description" />
           <q-input filled v-model="newDecision.ballots[0].expirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" style="width: 100%">
             <template v-slot:prepend>
@@ -65,9 +65,7 @@
               </template>
             </q-select>
           </div>
-          <div class="col-shrink q-px-sm">
-            <q-btn round dense color="green-8" icon="add" @click="addIncludedUser()" />
-          </div>
+          <q-btn round dense color="green-8" icon="add" class="col-shrink q-mx-md" @click="addIncludedUser()" />
         </div>
         <div class="row items-center" style="width: 100%">
           <q-chip v-for="(addedUser,idx) in addedUsers" :key="idx"
@@ -80,7 +78,7 @@
       </q-slide-transition>
     </q-card-section>
     <q-separator />
-    <q-card-section class='column items-center'>
+    <q-card-section class='column items-center q-pa-md'>
       <div class="text-subtitle2"> Add Decision Options
         <q-btn
           color="grey"
@@ -94,7 +92,7 @@
         <div v-show="optionsExpanded" style="width:100%">
           <div class="row items-center">
             <div class="col">
-              <q-input filled class="q-mb-md" style="width: 100%" v-model="newOption.title" label="Option Title" />
+              <q-input filled class="q-my-md" style="width: 100%" v-model="newOption.title" label="Option Title" />
               <q-input filled class="q-mb-md" style="width: 100%" v-model="newOption.description" label="Option Description" />
             </div>
             <q-btn round dense class="col-shrink q-mx-md" color="green-8" icon="add" @click="addDecisionOption()" />
