@@ -50,7 +50,8 @@
             class="q-mx-xs"
             :outline="!status.vote"
             :disable="!status.vote"
-            color="primary" />
+            color="primary"
+            @click="votingDialog = true" />
         </div>
     </q-card-actions>
 
@@ -91,18 +92,27 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+  <q-dialog v-model="votingDialog" persistent style="width: 500px">
+    <VotingCard
+      v-bind:ballotOptions="ballotOptions"
+      v-bind:title="name"
+      v-bind:description="description"
+      @votingClose="closeVotingModal" />
+  </q-dialog>
 </div>
 </template>
 
 <script>
 import auth from 'src/store/auth'
 import EditDecisionCard from 'src/components/EditDecisionCard'
+import VotingCard from 'src/components/VotingCard'
 
 export default {
   name: 'DecisionCard',
 
   components: {
-    EditDecisionCard
+    EditDecisionCard,
+    VotingCard
   },
 
   data () {
@@ -110,6 +120,7 @@ export default {
       currentUserName: '',
       editDecisionDialog: false,
       deleteDecisionDialog: false,
+      votingDialog: false,
       expirationDate: '',
       expanded: false,
       expired: false,
@@ -144,6 +155,17 @@ export default {
         includedUsers: this.includedUsers,
         ballots: tempBallots
       }
+    },
+
+    ballotOptions: function () {
+      // this is a placeholder for test ballot options in the VotingCard component
+      // TODO: after API endpoint representation is created, extract ballot options using the computed property
+      return [
+        { title: 'Ballot Option 1', description: 'This is a description for ballot option 1.' },
+        { title: 'Ballot Option 2', description: 'This is a longer description for ballot option 2.' },
+        { title: 'Ballot Option 3', description: 'Short option 3.' },
+        { title: 'Ballot Option 4', description: 'This is an extremely long descriptpion for ball option 4 for testing.' }
+      ]
     }
   },
 
@@ -216,6 +238,11 @@ export default {
 
     closeEditModal () {
       this.editDecisionDialog = false
+      this.$emit('needReload')
+    },
+
+    closeVotingModal () {
+      this.votingDialog = false
       this.$emit('needReload')
     },
 
