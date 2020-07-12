@@ -1,8 +1,12 @@
 package org.psu.edu.sweng.capstone.backend.service;
 
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.exception.BallotExpiredException;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 public interface BallotService {
 
@@ -10,4 +14,8 @@ public interface BallotService {
 	ResponseEntity<BallotDTO> deleteBallot(final Long ballotId) throws EntityNotFoundException;
 	ResponseEntity<BallotDTO> retrieveBallot(final Long ballotId) throws EntityNotFoundException;
 	ResponseEntity<BallotDTO> updateBallot(final Long ballotId, final BallotDTO ballot) throws EntityNotFoundException;
-}
+	ResponseEntity<BallotOptionDTO> retrieveBallotOptions(final Long ballotId) throws EntityNotFoundException;
+	ResponseEntity<BallotOptionDTO> addBallotOptions(final Long ballotId, final BallotOptionDTO ballotOption) throws EntityNotFoundException, BallotExpiredException;
+	ResponseEntity<BallotDTO> addVote(final Long ballotId, final Long ballotOptionId, final String userName) throws EntityNotFoundException, BallotExpiredException;
+
+	}

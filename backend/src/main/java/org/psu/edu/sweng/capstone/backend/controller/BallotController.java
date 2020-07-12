@@ -1,7 +1,9 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.exception.BallotExpiredException;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +44,20 @@ public class BallotController {
 	@PutMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> updateBallot(@PathVariable(value = "id") final Long ballotId, @RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.updateBallot(ballotId, ballot);
+	}
+
+	@GetMapping("/ballot/{id}/ballotoptions")
+	public ResponseEntity<BallotOptionDTO> retrieveBallotOptions(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
+		return ballotService.retrieveBallotOptions(ballotId);
+	}
+
+	@PostMapping("/ballot/{id}/ballotoptions")
+	public ResponseEntity<BallotOptionDTO> addBallotOptions(@PathVariable(value = "id") final Long ballotId, @RequestBody final BallotOptionDTO ballotOption) throws EntityNotFoundException, BallotExpiredException {
+		return ballotService.addBallotOptions(ballotId, ballotOption);
+	}
+
+	@PostMapping("/ballot/{id}/vote")
+	public ResponseEntity<BallotDTO> addVote(@PathVariable(value = "id") final Long ballotId, @RequestBody final Long ballotOptionId, @RequestBody final String userName) throws EntityNotFoundException, BallotExpiredException {
+		return ballotService.addVote(ballotId, ballotOptionId, userName);
 	}
 }

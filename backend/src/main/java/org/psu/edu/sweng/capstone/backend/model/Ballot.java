@@ -1,16 +1,8 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
-import java.util.Date;
+import java.util.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "BALLOT")
@@ -32,7 +24,13 @@ public class Ballot {
 
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
-	
+
+	@OneToMany(mappedBy = "ballot", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
+	private Set<BallotOption> ballotOptions = new HashSet<>();
+
+	@Column(name = "VOTES")
+	private HashMap<String, LinkedList<Long>> ballotVotes = new HashMap<>();
+
 	protected Ballot() {}
 	
 	public Ballot(Decision decision, Date expirationDate) {
@@ -80,5 +78,21 @@ public class Ballot {
 
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public Set<BallotOption> getBallotOptions() {
+		return ballotOptions;
+	}
+
+	public void setBallotOptions(Set<BallotOption> ballotOptions) {
+		this.ballotOptions = ballotOptions;
+	}
+
+	public HashMap<String, LinkedList<Long>> getBallotVotes() {
+		return ballotVotes;
+	}
+
+	public void setBallotVotes(HashMap<String, LinkedList<Long>> ballotVotes) {
+		this.ballotVotes = ballotVotes;
 	}
 }
