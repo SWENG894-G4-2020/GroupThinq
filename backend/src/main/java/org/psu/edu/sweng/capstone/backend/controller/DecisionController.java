@@ -7,6 +7,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class DecisionController {
 	@Autowired
 	private DecisionService decisionService;
 	
+	@PreAuthorize("#decision.getOwnerUsername() == authentication.getName()")
 	@PostMapping("/decision")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<DecisionDTO> createDecision(@RequestBody final DecisionDTO decision) throws EntityNotFoundException {

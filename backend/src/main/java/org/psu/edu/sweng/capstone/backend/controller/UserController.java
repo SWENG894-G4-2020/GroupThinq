@@ -8,6 +8,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +31,10 @@ public class UserController {
 		return userService.getUsers();
 	}
 	
+	@PreAuthorize("#username == authentication.getName()")
 	@GetMapping("/user/{username}")
-	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
-		return userService.getUser(userName);
+	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
+		return userService.getUser(username);
 	}
 	
 	@DeleteMapping("/user/{username}")
