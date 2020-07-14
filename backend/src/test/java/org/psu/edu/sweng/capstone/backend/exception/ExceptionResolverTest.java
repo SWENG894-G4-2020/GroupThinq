@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.enumeration.ErrorEnum;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 
 class ExceptionResolverTest {
 	
@@ -61,5 +62,22 @@ class ExceptionResolverTest {
 		assertEquals(1, response.getErrors().size());
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
 		assertEquals(ErrorEnum.EXCEPTION_THROWN, response.getErrors().get(0).getType());
+	}
+	
+	@Test
+	void handleAccessDeniedException_properlySetsResponse() {
+		// given
+		AccessDeniedException e = new AccessDeniedException("ERROR");
+		
+		// when
+		ResponseEntity<String> response = resolver.handleUnauthorizedAccess(e);
+		
+		// then
+		assertFalse(response.getSuccess());
+		
+		assertEquals(0, response.getData().size());
+		assertEquals(1, response.getErrors().size());
+		assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+		assertEquals(ErrorEnum.UNAUTHORIZED_ACTION, response.getErrors().get(0).getType());
 	}
 }

@@ -6,6 +6,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,22 +24,26 @@ public class BallotController {
 	@Autowired
 	private BallotService ballotService;
 	
+	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
 	@PostMapping("/ballot")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<BallotDTO> createBallot(@RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.createBallot(ballot);
 	}
 	
+	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
 	@DeleteMapping("ballot/{id}")
 	public ResponseEntity<BallotDTO> deleteBallot(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.deleteBallot(ballotId);
 	}
 	
+	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
 	@GetMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> retrieveBallot(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.retrieveBallot(ballotId);
 	}
 	
+	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
 	@PutMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> updateBallot(@PathVariable(value = "id") final Long ballotId, @RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.updateBallot(ballotId, ballot);

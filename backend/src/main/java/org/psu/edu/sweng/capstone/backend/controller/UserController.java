@@ -8,6 +8,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,24 +26,29 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/users")
 	public ResponseEntity<UserDTO> getUsers() {
 		return userService.getUsers();
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@GetMapping("/user/{username}")
-	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
-		return userService.getUser(userName);
+	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
+		return userService.getUser(username);
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@DeleteMapping("/user/{username}")
-	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
-		return userService.deleteUser(userName);
+	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
+		return userService.deleteUser(username);
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@PutMapping("/user/{username}")
-	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") final String userName, @RequestBody final UserDTO user) throws EntityNotFoundException {
-		return userService.updateUser(userName, user);
+	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") final String username, @RequestBody final UserDTO user) 
+			throws EntityNotFoundException {
+		return userService.updateUser(username, user);
 	}
 	
 	@PostMapping("/user")
@@ -51,8 +57,9 @@ public class UserController {
 		return userService.createUser(user);
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@GetMapping("/user/{username}/decisions")
-	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
-		return userService.getDecisions(userName);
+	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
+		return userService.getDecisions(username);
 	}
 }
