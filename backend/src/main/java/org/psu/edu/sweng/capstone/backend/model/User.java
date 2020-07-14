@@ -14,9 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 @Entity
 @Table(name = "USERS")
 public class User {
@@ -52,8 +49,7 @@ public class User {
 	@Column(name = "LAST_LOGGED_IN")
 	private Date lastLoggedIn;
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
-	@Fetch(FetchMode.SELECT)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
 	private Set<UserRole> userRoles = new HashSet<>();
 	
 	protected User() {}

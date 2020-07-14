@@ -26,25 +26,29 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/users")
 	public ResponseEntity<UserDTO> getUsers() {
 		return userService.getUsers();
 	}
 	
-	@PreAuthorize("#username == authentication.getName()")
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@GetMapping("/user/{username}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
 		return userService.getUser(username);
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@DeleteMapping("/user/{username}")
-	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
-		return userService.deleteUser(userName);
+	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
+		return userService.deleteUser(username);
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@PutMapping("/user/{username}")
-	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") final String userName, @RequestBody final UserDTO user) throws EntityNotFoundException {
-		return userService.updateUser(userName, user);
+	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") final String username, @RequestBody final UserDTO user) 
+			throws EntityNotFoundException {
+		return userService.updateUser(username, user);
 	}
 	
 	@PostMapping("/user")
@@ -53,8 +57,9 @@ public class UserController {
 		return userService.createUser(user);
 	}
 	
+	@PreAuthorize("@authCheck.hasUserAccess(#username)")
 	@GetMapping("/user/{username}/decisions")
-	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") final String userName) throws EntityNotFoundException {
-		return userService.getDecisions(userName);
+	public ResponseEntity<DecisionDTO> getUserDecisions(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
+		return userService.getDecisions(username);
 	}
 }

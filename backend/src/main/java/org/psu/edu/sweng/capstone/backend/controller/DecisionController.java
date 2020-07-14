@@ -32,21 +32,25 @@ public class DecisionController {
 		return decisionService.createDecision(decision);
 	}
 
+	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
 	@DeleteMapping("/decision/{id}")
 	public ResponseEntity<DecisionDTO> deleteDecision(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.deleteDecision(id);
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/decision/{id}")
 	public ResponseEntity<DecisionDTO> getDecision(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.getDecision(id);
 	}
 
+	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
 	@PutMapping("/decision/{id}")
 	public ResponseEntity<DecisionDTO> updateDecision(@PathVariable(value = "id") final Long id, @RequestBody final DecisionDTO decision) throws EntityNotFoundException {
 		return decisionService.updateDecision(id, decision);
 	}
 	
+	@PreAuthorize("@authCheck.onDecisionUserList(#id)")
 	@GetMapping("/decision/{id}/users")
 	public ResponseEntity<UserDTO> getUsers(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.getUsers(id);
