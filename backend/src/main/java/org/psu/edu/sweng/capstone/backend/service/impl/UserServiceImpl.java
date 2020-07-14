@@ -52,10 +52,7 @@ public class UserServiceImpl implements UserService {
 		
 		List<User> users = userDao.findAll();
 		
-		for (User u : users) {
-			UserDTO userDto = UserDTO.build(u);
-			response.getData().add(userDto);
-		}
+		users.stream().forEach(u -> response.getData().add(UserDTO.build(u)));
 		
 		response.attachGenericSuccess();
 		
@@ -66,16 +63,12 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<UserDTO> getUser(final String username) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 
-		final Optional<User> user = userDao.findByUserName(username);
+		final User user = userDao.findByUserName(username).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		if (user.isPresent()) {
-			response.getData().add(UserDTO.build(user.get()));
-			response.attachGenericSuccess();
-		}
-		else {
-			throw new EntityNotFoundException(ERROR_HEADER + username);
-		}
-		
+		response.getData().add(UserDTO.build(user));
+		response.attachGenericSuccess();
+			
 		return response;
 	}
 
@@ -83,29 +76,18 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<UserDTO> deleteUser(final String username) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 
-		final Optional<User> user = userDao.findByUserName(username);
-
-		if (user.isPresent()) {
-			User u = user.get();
-			
-			ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(u);
-			ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(u);
-			
-			if (!userRoles.isEmpty()) {
-				userRoleDao.deleteAll(userRoles);
-			}
-			
-			if (!userDecisions.isEmpty()) {
-				decisionUserDao.deleteAll(userDecisions);
-			}
-			
-			userDao.delete(user.get());
-			
-			response.attachGenericSuccess();
-		}
-		else {
-			throw new EntityNotFoundException(ERROR_HEADER + username);
-		}
+		final User user = userDao.findByUserName(username).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + username));
+		
+		ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
+		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
+		
+		if (!userRoles.isEmpty()) { userRoleDao.deleteAll(userRoles); }
+		if (!userDecisions.isEmpty()) { decisionUserDao.deleteAll(userDecisions); }
+		
+		userDao.delete(user);
+		
+		response.attachGenericSuccess();
 		
 		return response;
 	}
@@ -114,25 +96,18 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<UserDTO> updateUser(final String username, final UserDTO userDto) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
-		final Optional<User> user = userDao.findByUserName(username);
-			
-		if (user.isPresent()) {
-			User u = user.get();
-			
-			if (userDto.getLastName() != null) { u.setLastName(userDto.getLastName()); }
-			if (userDto.getFirstName() != null) { u.setFirstName(userDto.getFirstName()); }
-			if (userDto.getEmailAddress() != null) { u.setEmailAddress(userDto.getEmailAddress()); }
-			if (userDto.getBirthDate() != null) { u.setBirthDate(userDto.getBirthDate()); }
+		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
+		
+		if (userDto.getLastName() != null) { user.setLastName(userDto.getLastName()); }
+		if (userDto.getFirstName() != null) { user.setFirstName(userDto.getFirstName()); }
+		if (userDto.getEmailAddress() != null) { user.setEmailAddress(userDto.getEmailAddress()); }
+		if (userDto.getBirthDate() != null) { user.setBirthDate(userDto.getBirthDate()); }
 
-			u.setUpdatedDate(new Date());
-			
-			userDao.save(u);
-			
-			response.attachGenericSuccess();
-		}
-		else {
-			throw new EntityNotFoundException(ERROR_HEADER + username);
-		}
+		user.setUpdatedDate(new Date());
+		
+		userDao.save(user);
+		
+		response.attachGenericSuccess();
 				
 		return response;
 	}
@@ -142,33 +117,16 @@ public class UserServiceImpl implements UserService {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
 		final String username = userDto.getUserName();
-
-		Optional<User> user = userDao.findByUserName(username);
+		final Optional<User> user = userDao.findByUserName(username);
 		
 		if (user.isPresent()) {
 			throw new EntityConflictException(ERROR_HEADER + user.get().getUserName());
 		}
 		else {
-			User newUser = new User(username,
-					bCryptPasswordEncoder.encode(userDto.getPassword()),
-					userDto.getLastName(),
-					userDto.getFirstName(),
-					userDto.getEmailAddress(),
-					userDto.getBirthDate()
-			);
-			
-			newUser.setCreatedDate(new Date());
-			
-			final Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
-			
-			if (role.isPresent()) {
-				newUser.getUserRoles().add(new UserRole(newUser, role.get()));
-			}
-			
-			userDao.save(newUser);
-			
-			response.attachCreatedSuccess();
+			createNewUser(userDto);
 		}
+		
+		response.attachCreatedSuccess();
 		
 		return response;
 	}
@@ -177,21 +135,32 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity<DecisionDTO> getDecisions(final String username) throws EntityNotFoundException {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
-		final Optional<User> user = userDao.findByUserName(username);
+		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		if (user.isPresent()) {
-			ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByUser(user.get());
-			
-			for (DecisionUser du : decisionUsers) {
-				response.getData().add(DecisionDTO.build(du.getDecision()));
-			}
-			
-			response.attachGenericSuccess();
-		}
-		else {
-			throw new EntityNotFoundException(ERROR_HEADER + username);
-		}
+		ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByUser(user);
+		
+		decisionUsers.stream().forEach(du -> response.getData().add(DecisionDTO.build(du.getDecision())));
+
+		response.attachGenericSuccess();
 		
 		return response;
+	}
+	
+	private void createNewUser(UserDTO userDto) {
+		User newUser = new User(userDto.getUserName(),
+				bCryptPasswordEncoder.encode(userDto.getPassword()),
+				userDto.getLastName(),
+				userDto.getFirstName(),
+				userDto.getEmailAddress(),
+				userDto.getBirthDate()
+		);
+		
+		newUser.setCreatedDate(new Date());
+		
+		final Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+		
+		if (role.isPresent()) { newUser.getUserRoles().add(new UserRole(newUser, role.get())); }
+		
+		userDao.save(newUser);
 	}
 }

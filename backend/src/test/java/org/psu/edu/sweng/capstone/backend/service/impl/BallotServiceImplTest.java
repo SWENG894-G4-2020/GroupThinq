@@ -75,9 +75,6 @@ class BallotServiceImplTest extends ServiceImplTest {
 		// given
 		testBallotDTO.setExpirationDate(null);
 		
-		// when
-		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.ofNullable(testDecision));
-		
 		// then
 	    assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.createBallot(testBallotDTO); });
 		verify(ballotDao, times(0)).save(Mockito.any(Ballot.class));
@@ -136,7 +133,6 @@ class BallotServiceImplTest extends ServiceImplTest {
 	void updateBallot_ballotNotPresent() throws EntityNotFoundException {
 		// when
 		when(ballotDao.findById(testBallotDTO.getId())).thenReturn(Optional.empty());
-		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.of(testDecision));
 
 		// then
 		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateBallot(testBallotDTO.getId(), testBallotDTO); });

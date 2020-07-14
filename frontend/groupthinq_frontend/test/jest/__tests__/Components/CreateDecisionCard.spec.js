@@ -19,26 +19,6 @@ const components = Object.keys(All).reduce((object, key) => {
   return object
 }, {})
 
-const testData = { data: [
-  {
-    id: 4,
-    name: "Title",
-    description: "Description",
-    expirationDate: '2020-09-01T09:26:00-04:00',
-    ownerUsername: "test",
-    users: []
-  }
-]}
-
-const resetData = {
-  name: '',
-  // eslint-disable-next-line no-multi-str
-  description: '',
-  expirationDate: '',
-  ownerUsername: 'test',
-  users: []
-}
-
 describe('Create Decision Card tests', () => {
   const localVue = createLocalVue()
   localVue.use(Quasar, { components }) // , lang: langEn
@@ -69,7 +49,7 @@ describe('Create Decision Card tests', () => {
     const wrapper = shallowMount(CreateDecisionCard, { localVue })
     const vm = wrapper.vm
 
-    vm.$data.newDecision.expirationDate = '2020-09-01T09:26:00-04:00'
+    vm.$data.newDecision.ballots = [{expirationDate: '2020-09-01T09:26:00-04:00'}]
     await vm.onCreate() // wait for the mounted function to finish
     expect(console.log).toHaveBeenCalledWith('Test Error')
   })
@@ -89,7 +69,7 @@ describe('Create Decision Card tests', () => {
     const wrapper = shallowMount(CreateDecisionCard, { localVue })
     const vm = wrapper.vm
     
-    vm.$data.newDecision.expirationDate = '2020-09-01T09:26:00-04:00'
+    vm.$data.newDecision.ballots = [{expirationDate: '2020-09-01T09:26:00-04:00'}]
     vm.$data.addedUsers = ['test1', 'test2']
     await vm.onCreate()
     expect(axios.post).toHaveBeenCalledTimes(1)

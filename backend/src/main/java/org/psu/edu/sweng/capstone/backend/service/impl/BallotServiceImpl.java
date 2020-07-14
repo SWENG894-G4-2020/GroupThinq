@@ -1,7 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import java.util.Date;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -32,21 +31,16 @@ public class BallotServiceImpl implements BallotService {
 	public ResponseEntity<BallotDTO> createBallot(final BallotDTO ballotDTO) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		final Optional<Decision> decision = decisionDao.findById(ballotDTO.getDecisionId());
-
-		if (!decision.isPresent()) {
-			throw new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString());
-		}
-		else if (ballotDTO.getExpirationDate() == null) {
-			throw new EntityNotFoundException("Expiration Date");
-		}
-		else {
-			Ballot ballot = new Ballot(decision.get(), ballotDTO.getExpirationDate());
+		if (ballotDTO.getExpirationDate() == null) { throw new EntityNotFoundException("Expiration Date"); }
+		
+		final Decision decision = decisionDao.findById(ballotDTO.getDecisionId()).orElseThrow(
+				() -> new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString()));
+		
+		Ballot ballot = new Ballot(decision, ballotDTO.getExpirationDate());
 			
-			ballotDao.save(ballot);
-			
-			response.attachCreatedSuccess();
-		}
+		ballotDao.save(ballot);
+		
+		response.attachCreatedSuccess();
 		
 		return response;
 	}
@@ -55,16 +49,12 @@ public class BallotServiceImpl implements BallotService {
 	public ResponseEntity<BallotDTO> deleteBallot(final Long ballotId) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		final Optional<Ballot> ballot = ballotDao.findById(ballotId);
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
 			
-		if (!ballot.isPresent()) {
-			throw new EntityNotFoundException(ERROR_HEADER + ballotId.toString());
-		}
-		else {
-			ballotDao.delete(ballot.get());
-			
-			response.attachGenericSuccess();
-		}
+		ballotDao.delete(ballot);
+		
+		response.attachGenericSuccess();
 		
 		return response;
 	}
@@ -73,16 +63,12 @@ public class BallotServiceImpl implements BallotService {
 	public ResponseEntity<BallotDTO> retrieveBallot(final Long ballotId) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		final Optional<Ballot> ballot = ballotDao.findById(ballotId);
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
 		
-		if (!ballot.isPresent()) {
-			throw new EntityNotFoundException(ERROR_HEADER + ballotId.toString());
-		}
-		else {
-			response.getData().add(BallotDTO.build(ballot.get()));
-			response.attachGenericSuccess();
-		}
-		
+		response.getData().add(BallotDTO.build(ballot));
+		response.attachGenericSuccess();
+	
 		return response;
 	}
 
@@ -90,26 +76,19 @@ public class BallotServiceImpl implements BallotService {
 	public ResponseEntity<BallotDTO> updateBallot(final Long ballotId, final BallotDTO ballotDTO) throws EntityNotFoundException {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
-		final Optional<Ballot> ballot = ballotDao.findById(ballotId);
-		final Optional<Decision> decision = decisionDao.findById(ballotDTO.getDecisionId());
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
 		
-		if (!ballot.isPresent()) {
-			throw new EntityNotFoundException(ERROR_HEADER + ballotId.toString());
-		}
-		else if (!decision.isPresent()) {
-			throw new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString());
-		}
-		else {
-			Ballot b = ballot.get();
+		decisionDao.findById(ballotDTO.getDecisionId()).orElseThrow(
+				() -> new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString()));
+		
+		if (ballotDTO.getExpirationDate() != null) { ballot.setExpirationDate(ballotDTO.getExpirationDate()); }
 			
-			if (ballotDTO.getExpirationDate() != null) { b.setExpirationDate(ballotDTO.getExpirationDate()); }
-			
-			b.setUpdatedDate(new Date());
-			
-			ballotDao.save(b);
-			
-			response.attachGenericSuccess();
-		}
+		ballot.setUpdatedDate(new Date());
+		
+		ballotDao.save(ballot);
+		
+		response.attachGenericSuccess();
 		
 		return response;
 	}

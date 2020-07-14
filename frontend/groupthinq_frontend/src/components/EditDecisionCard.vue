@@ -1,26 +1,28 @@
 <template>
   <q-card style="width:50%">
     <q-card-section class='column items-center q-pa-md'>
-      <div class="text-h5 q-ma-md"> Create A New Decision </div>
-      <q-input filled class="q-mb-md" style="width: 100%" v-model="newDecision.name" label="Title" />
-      <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="newDecision.description" label="Description" />
-      <q-input filled v-model="newDecision.ballots[0].expirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" style="width: 100%">
+      <div class="text-h5 q-ma-md"> Editing Decision... </div>
+      <div class="text-subtitle2"> Decision Details </div>
+      <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" />
+      <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="editableDecision.description" label="Description" />
+      <q-input filled v-model="editableDecision.ballots[0].expirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" style="width: 100%">
         <template v-slot:prepend>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date v-model="newDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
+              <q-date v-model="editableDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
             </q-popup-proxy>
           </q-icon>
         </template>
         <template v-slot:append>
           <q-icon name="access_time" class="cursor-pointer">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-time v-model="newDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
+              <q-time v-model="editableDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
             </q-popup-proxy>
           </q-icon>
         </template>
       </q-input>
       <q-separator class="q-my-md" />
+      <div class="text-subtitle2"> Add/Edit Members (by username) </div>
       <div class="row items-center" style="width: 100%">
         <div class="col">
       <q-select
@@ -49,17 +51,17 @@
       </div>
       </div>
       <div class="row items-center" style="width: 100%">
-      <q-chip v-for="(addedUser,idx) in addedUsers" :key="idx"
+      <q-chip v-for="(includedUser,idx) in includedUsers" :key="idx"
         removable
-        :label="addedUser"
-        @remove="removeUser(addedUser)"
+        :label="includedUser.userName"
+        @remove="removeUser(includedUser.userName)"
         class ="col-shrink" />
       </div>
       <q-separator class="q-my-md" />
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
-      <q-btn color="green-8" @click="onCreate()" label="Create Decision" />
+      <q-btn color="green-8" @click="onEditConfirm()" label="Confirm Edit" />
     </q-card-actions>
   </q-card>
 </template>
@@ -67,36 +69,65 @@
 <script>
 import auth from 'src/store/auth'
 export default {
-  name: 'CreateDecisionModal',
+  name: 'EditDecisionModal',
   data () {
     return {
       currentUserName: '',
-      newDecision: { ballots: [{}] },
+      editableDecision: { ballots: [{}] },
       allUsersList: [],
       filteredUsersList: [],
-      addedUsers: [],
       newIncludedUser: ''
+    }
+  },
+
+  props: {
+    id: {
+      type: Number,
+      required: true
+    },
+
+    name: {
+      type: String,
+      required: true
+    },
+
+    description: {
+      type: String,
+      default: ''
+    },
+
+    ballots: {
+      type: Array,
+      required: true
+    },
+
+    includedUsers: {
+      type: Array,
+      default: function () {
+        return [
+          { userName: this.ownerUsername }
+        ]
+      }
     }
   },
 
   mounted () {
     this.currentUserName = auth.getTokenData().sub
-    this.resetNewDecision()
+    this.fillEditableDecision()
     this.getAllUsers()
   },
 
   methods: {
     onCancel () {
-      this.$emit('createClose')
+      this.$emit('editClose')
     },
 
-    async onCreate () {
-      this.newDecision.ballots[0].expirationDate = new Date(this.newDecision.ballots[0].expirationDate).toISOString()
-      this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
+    async onEditConfirm () {
+      this.editableDecision.ballots[0].expirationDate = new Date(this.editableDecision.ballots[0].expirationDate).toISOString()
 
       try {
-        await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
-        this.$emit('createClose')
+        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editableDecision)
+        this.$emit('editClose')
       } catch (error) {
         console.log(error)
         this.$emit('error')
@@ -113,30 +144,29 @@ export default {
       }
     },
 
-    resetNewDecision () {
-      this.newDecision = {
-        name: '',
-        description: '',
-        ballots: [{ expirationDate: '' }],
-        ownerUsername: this.currentUserName,
-        includedUsers: [
-          { userName: this.currentUserName }
-        ]
+    fillEditableDecision () {
+      this.editableDecision = {
+        id: this.id,
+        name: this.name,
+        description: this.description,
+        includedUsers: this.includedUsers,
+        ballots: this.ballots
       }
-      this.addedUsers = []
     },
 
     addIncludedUser () {
       if (this.newIncludedUser &&
-          !this.addedUsers.includes(this.newIncludedUser) &&
+          !this.editableDecision.includedUsers.includes({ userName: this.newIncludedUser }) &&
           this.newIncludedUser !== this.currentUserName) {
-        this.addedUsers.push(this.newIncludedUser)
+        this.editableDecision.includedUsers.push({ userName: this.newIncludedUser })
       }
     },
 
     removeUser (user) {
-      const pos = this.addedUsers.indexOf(user)
-      this.addedUsers.splice(pos, 1)
+      if (user !== this.currentUserName) {
+        const pos = this.editableDecision.includedUsers.findIndex((element) => element.userName === user)
+        this.editableDecision.includedUsers.splice(pos, 1)
+      }
     },
 
     filterFn (val, update, abort) {

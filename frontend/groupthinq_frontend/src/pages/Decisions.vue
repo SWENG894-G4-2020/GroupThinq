@@ -1,10 +1,18 @@
 <template>
-    <q-page padding class="column">
-      <div v-if="isLoaded" class="column items-center">
-        <q-btn color="green-8" label="New Decision" icon-right="add"  class="self-start" @click="createDecision()"/>
-        <div class="text-h5 text-primary" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
+    <q-page padding class="fit column items-stretch">
+      <div v-if="isLoaded">
+        <div class="full-width row justify-between">
+          <q-btn color="green-8" label="New Decision" icon-right="add" @click="createDecision()"/>
+          <q-select
+            outlined
+            dense
+            label="Sort Order"
+            v-model="currentSort"
+            :options="sortOptions" />
+        </div>
+        <div class="text-h5 text-primary text-center" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
         <DecisionCard
-          v-for="decision in decisionList.slice().sort((a,b) => new Date(a.expirationDate) - new Date(b.expirationDate))"
+          v-for="decision in sortedDecisions"
           :key="decision.name"
           v-bind="decision"
           @needReload="getData()"
@@ -47,8 +55,36 @@ export default {
       isLoaded: false,
       isError: false,
       createDecisionDialog: false,
-      decisionList: []
+      decisionList: [],
+      sortOptions: ['Expiration', 'Ownership'],
+      currentSort: 'Expiration'
     }
+  },
+
+  computed: {
+    sortedDecisions: function () {
+      if (this.currentSort === 'Ownership') {
+        const expiryOrdered = this.decisionList.slice().sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
+        const reordered = []
+        expiryOrdered.forEach(element => {
+          if (element.ownerUsername === auth.getTokenData().sub) {
+            reordered.push(element)
+          }
+        })
+        expiryOrdered.forEach(element => {
+          if (element.ownerUsername !== auth.getTokenData().sub) {
+            reordered.push(element)
+          }
+        })
+        return reordered
+      } else {
+        return this.decisionList.slice().sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
+      }
+    }
+  },
+
+  mounted () {
+    this.getData()
   },
 
   methods: {
@@ -72,10 +108,7 @@ export default {
         this.isError = true
       }
     }
-  },
-
-  mounted () {
-    this.getData()
   }
+
 }
 </script>

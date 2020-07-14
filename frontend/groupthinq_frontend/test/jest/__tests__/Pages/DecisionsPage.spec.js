@@ -25,18 +25,26 @@ const testData = { data: { data: [
     id: 4,
     name: "Title",
     description: "Description",
-    expirationDate: '2020-09-01T09:26:00-04:00',
-    ownerUsername: "test"
+    ownerUsername: "test",
+    ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+    includedUsers: [{userName: 'test'}]
+  },
+  {
+    id: 5,
+    name: "AnotherTitle",
+    description: "AnotherDescription",
+    ownerUsername: "testUser",
+    ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+    includedUsers: [{userName: 'testUser'}]
   }
 ]}}
 
 const resetData = {
   name: '',
-  // eslint-disable-next-line no-multi-str
   description: '',
-  expirationDate: '',
   ownerUsername: 'test',
-  users: []
+  ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+  includedUsers: [{userName: 'test'}]
 }
 
 describe('Decisions page tests', () => {
@@ -84,6 +92,18 @@ describe('Decisions page tests', () => {
     expect(vm.createDecisionDialog).toBe(true)
     await vm.closeCreateModal()
     expect(vm.createDecisionDialog).toBe(false)
+  })
+
+  it('changes sorts correctly', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    const wrapper = shallowMount(Decisions, { localVue })
+    const vm = wrapper.vm
+    
+    await localVue.nextTick()
+    vm.$data.currentSort = 'Ownership'
+    await localVue.nextTick()
+    vm.$data.currentSort = 'Expiration'
+    await localVue.nextTick()
   })
 
 })
