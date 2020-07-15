@@ -29,8 +29,8 @@ public class Ballot {
 	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
 	private Set<BallotOption> ballotOptions = new HashSet<>();
 
-	@Column(name = "VOTES")
-	private HashMap<String, LinkedList<Long>> ballotVotes = new HashMap<>();
+	@Column(name = "BALLOT_VOTES")
+	private ArrayList<BallotVote> ballotVotes = new ArrayList<>();
 
 	protected Ballot() {}
 	
@@ -92,11 +92,11 @@ public class Ballot {
 		this.ballotOptions = ballotOptions;
 	}
 
-	public HashMap<String, LinkedList<Long>> getBallotVotes() {
+	public ArrayList<BallotVote> getBallotVotes() {
 		return ballotVotes;
 	}
 
-	public void setBallotVotes(HashMap<String, LinkedList<Long>> ballotVotes) {
+	public void setBallotVotes(ArrayList<BallotVote> ballotVotes) {
 		this.ballotVotes = ballotVotes;
 	}
 }

@@ -6,6 +6,7 @@ import org.psu.edu.sweng.capstone.backend.model.Ballot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BallotDTO {
@@ -16,7 +17,7 @@ public class BallotDTO {
 	private Date createdDate;
 	private Date updatedDate;
 	private Set<BallotOptionDTO> ballotOptions = new HashSet<>();
-	private HashMap<String, LinkedList<Long>> ballotVotes = new HashMap<>();
+	private ArrayList<BallotVote> ballotVotes = new ArrayList<>();
 	
 	public Long getId() {
 		return id;
@@ -66,11 +67,11 @@ public class BallotDTO {
 		this.ballotOptions = ballotOptions;
 	}
 
-	public HashMap<String, LinkedList<Long>> getBallotVotes() {
+	public ArrayList<BallotVote> getBallotVotes() {
 		return ballotVotes;
 	}
 
-	public void setBallotVotes(HashMap<String, LinkedList<Long>> ballotVotes) {
+	public void setBallotVotes(ArrayList<BallotVote> ballotVotes) {
 		this.ballotVotes = ballotVotes;
 	}
 
@@ -88,8 +89,8 @@ public class BallotDTO {
 			dto.getBallotOptions().add(bDTO);
 		}
 		if(b.getBallotVotes().size() > 0) {
-			for (Map.Entry<String, LinkedList<Long>> entry : b.getBallotVotes().entrySet()) {
-				dto.getBallotVotes().put(entry.getKey(), entry.getValue());
+			for (BallotVote vote : b.getBallotVotes()) {
+				dto.getBallotVotes().add(vote);
 			}
 		}
 		return dto;

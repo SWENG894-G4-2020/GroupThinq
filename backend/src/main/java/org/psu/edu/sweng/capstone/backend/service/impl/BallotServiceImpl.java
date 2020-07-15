@@ -12,10 +12,7 @@ import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.exception.BallotExpiredException;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
-import org.psu.edu.sweng.capstone.backend.model.Ballot;
-import org.psu.edu.sweng.capstone.backend.model.BallotOption;
-import org.psu.edu.sweng.capstone.backend.model.Decision;
-import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.model.*;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,7 +150,7 @@ public class BallotServiceImpl implements BallotService {
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
 		if(ballot.getExpirationDate().after(new Date())){
-			ballotDao.getOne(ballotId).getBallotVotes().put(userName, new LinkedList<>(Arrays.asList(ballotOptionId)));
+			ballotDao.getOne(ballotId).getBallotVotes().add(new BallotVote(userName, new LinkedList<>(Arrays.asList(ballotOptionId))));
 			response.attachGenericSuccess();
 			return response;
 		}
