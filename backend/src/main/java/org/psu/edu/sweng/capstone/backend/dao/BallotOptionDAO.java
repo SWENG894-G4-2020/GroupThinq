@@ -10,6 +10,6 @@ import java.util.ArrayList;
 
 @Repository
 public interface BallotOptionDAO extends JpaRepository<BallotOption, Long> {
-    ArrayList<BallotOption> findAllByuser(final User user);
+    ArrayList<BallotOption> findAllByUser(final User user);
     ArrayList<BallotOption> findAllByBallot(final Ballot ballot);
 }
