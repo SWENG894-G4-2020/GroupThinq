@@ -1,8 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
+import java.util.*;
 
 import javax.transaction.Transactional;
 
@@ -49,8 +47,11 @@ public class BallotServiceImpl implements BallotService {
 		
 		final Decision decision = decisionDao.findById(ballotDTO.getDecisionId()).orElseThrow(
 				() -> new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString()));
-		
-		Ballot ballot = new Ballot(decision, ballotDTO.getExpirationDate());
+		Set<BallotOption> ballotOptions = new HashSet<>();
+		if(ballotDTO.getBallotOptions() != null){
+			ballotOptions = (Set) ballotDTO.getBallotOptions();
+		}
+		Ballot ballot = new Ballot(decision, ballotDTO.getExpirationDate(), ballotOptions);
 			
 		ballotDao.save(ballot);
 		
@@ -121,17 +122,21 @@ public class BallotServiceImpl implements BallotService {
 	}
 
 	@Override
-	public ResponseEntity<BallotOptionDTO> addBallotOptions(Long ballotId, BallotOptionDTO ballotOption) throws EntityNotFoundException, BallotExpiredException {
+	public ResponseEntity<BallotOptionDTO> addBallotOptions(Long ballotId, List<BallotOptionDTO> ballotOptions) throws EntityNotFoundException, BallotExpiredException {
 		ResponseEntity<BallotOptionDTO> response = new ResponseEntity<>();
+
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
-		final User user = userDao.findByUserName(ballotOption.getUserName()).orElseThrow(
-				() -> new EntityNotFoundException("User " + ballotOption.getUserName()));
-
-		BallotOption bo = new BallotOption(ballot, ballotOption.getExpirationDate(), user, ballotOption.getOptionTitle(), ballotOption.getOptionDescription());
-		if(ballot.getExpirationDate().after(new Date())){
-			ballotDao.getOne(ballotId).getBallotOptions().add(bo);
-			response.attachGenericSuccess();
+		final User user = userDao.findByUserName(ballotOptions.get(0).getUserName()).orElseThrow(
+				() -> new EntityNotFoundException("User " + ballotOptions.get(0).getUserName()));
+		for(BallotOptionDTO ballotOptionDTO: ballotOptions) {
+			BallotOption bo = new BallotOption(ballot, ballotOptionDTO.getExpirationDate(), user, ballotOptionDTO.getOptionTitle(), ballotOptionDTO.getOptionDescription());
+			if (ballot.getExpirationDate().after(new Date())) {
+				ballotDao.getOne(ballotId).getBallotOptions().add(bo);
+				response.attachGenericSuccess();
+			}
+		}
+		if(response.getSuccess()) {
 			return response;
 		}
 		throw new BallotExpiredException("Ballot " + ballotId);

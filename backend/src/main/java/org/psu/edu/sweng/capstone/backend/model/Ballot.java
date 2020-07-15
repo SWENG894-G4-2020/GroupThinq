@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "BALLOT")
+@Access(AccessType.FIELD)
 public class Ballot {
 	
 	@Id
@@ -33,10 +34,13 @@ public class Ballot {
 
 	protected Ballot() {}
 	
-	public Ballot(Decision decision, Date expirationDate) {
+	public Ballot(Decision decision, Date expirationDate, Set<BallotOption> ballotOptions) {
 		this.decision = decision;
 		this.expirationDate = expirationDate;
-		
+		if(ballotOptions != null && ballotOptions.size() > 0) {
+			this.ballotOptions = ballotOptions;
+		}
+
 		this.setCreatedDate(new Date());
 	}
 	

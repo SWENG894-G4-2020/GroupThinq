@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 public class BallotController {
@@ -52,8 +54,8 @@ public class BallotController {
 	}
 
 	@PostMapping("/ballot/{id}/ballotoptions")
-	public ResponseEntity<BallotOptionDTO> addBallotOptions(@PathVariable(value = "id") final Long ballotId, @RequestBody final BallotOptionDTO ballotOption) throws EntityNotFoundException, BallotExpiredException {
-		return ballotService.addBallotOptions(ballotId, ballotOption);
+	public ResponseEntity<BallotOptionDTO> addBallotOptions(@PathVariable(value = "id") final Long ballotId, @RequestBody final List<BallotOptionDTO> ballotOptions) throws EntityNotFoundException, BallotExpiredException {
+		return ballotService.addBallotOptions(ballotId, ballotOptions);
 	}
 
 	@PostMapping("/ballot/{id}/vote")
