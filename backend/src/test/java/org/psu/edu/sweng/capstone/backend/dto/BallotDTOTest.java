@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Date;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class BallotDTOTest {
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
     
     private Decision decision = new Decision("why is gamora?", "what is gamora?", USER);
-    private Ballot ballot = new Ballot(decision, new Date(1337L));
+    private Ballot ballot = new Ballot(decision, new Date(1337L), new HashSet<>());
     private BallotDTO testDTO;
 		
 	@BeforeEach
@@ -60,7 +61,7 @@ class BallotDTOTest {
 	@Test
 	void build_handlesNullsProperly() {
 		// given
-		Ballot testBallot = new Ballot(null, null);
+		Ballot testBallot = new Ballot(null, null, null);
 		testBallot.setCreatedDate(null);
 		
 		// when

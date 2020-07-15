@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +39,7 @@ class BallotServiceImplTest extends ServiceImplTest {
 	
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	private Decision testDecision = new Decision("Test Decision", "Test Description", testUser);
-	private Ballot testBallot = new Ballot(testDecision, new Date(1337));
+	private Ballot testBallot = new Ballot(testDecision, new Date(1337), new HashSet<>());
 	
 	private BallotDTO testBallotDTO = BallotDTO.build(testBallot);
 	

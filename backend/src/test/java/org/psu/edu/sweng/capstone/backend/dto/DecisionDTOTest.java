@@ -9,6 +9,7 @@ import org.psu.edu.sweng.capstone.backend.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +32,7 @@ public class DecisionDTOTest {
         DecisionUser du = new DecisionUser(decision, new User("tuser", "pw", "User", "Test", "testuser@foo.bar", new Date(1337L)));
         decision.getDecisionUsers().add(du);
         
-        Ballot ballot = new Ballot(decision, new Date());
+        Ballot ballot = new Ballot(decision, new Date(), new HashSet<>());
         decision.getBallots().add(ballot);
         
         testDecisionDTO = DecisionDTO.build(decision);
@@ -58,7 +59,7 @@ public class DecisionDTOTest {
     	includedUsers.add(userDto);
     	
     	List<BallotDTO> ballots = new ArrayList<>();
-    	BallotDTO ballotDTO = BallotDTO.build(new Ballot(decision, new Date()));
+    	BallotDTO ballotDTO = BallotDTO.build(new Ballot(decision, new Date(), new HashSet<>()));
     	ballots.add(ballotDTO);
     	
         // when

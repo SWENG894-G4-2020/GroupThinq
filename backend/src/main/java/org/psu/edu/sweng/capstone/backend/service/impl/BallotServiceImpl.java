@@ -5,7 +5,6 @@ import java.util.*;
 import javax.transaction.Transactional;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
-import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
@@ -29,9 +28,6 @@ public class BallotServiceImpl implements BallotService {
 	private BallotDAO ballotDao;
 
 	@Autowired
-	private BallotOptionDAO ballotOptionDao;
-
-	@Autowired
 	private UserDAO userDao;
 	
 	@Autowired
@@ -47,10 +43,19 @@ public class BallotServiceImpl implements BallotService {
 		
 		final Decision decision = decisionDao.findById(ballotDTO.getDecisionId()).orElseThrow(
 				() -> new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString()));
+		
 		Set<BallotOption> ballotOptions = new HashSet<>();
-		if(ballotDTO.getBallotOptions() != null){
-			ballotOptions = (Set) ballotDTO.getBallotOptions();
+		for (BallotOptionDTO boDto : ballotDTO.getBallotOptions()) {
+			final Ballot ballot = ballotDao.findById(boDto.getBallotId()).orElseThrow(
+					() -> new EntityNotFoundException(ERROR_HEADER + boDto.getBallotId().toString()));
+			
+			final User user = userDao.findByUserName(boDto.getUserName()).orElseThrow(
+					() -> new EntityNotFoundException("User " + boDto.getUserName()));
+			
+			BallotOption bo = new BallotOption(ballot, boDto.getExpirationDate(), user, boDto.getOptionTitle(), boDto.getOptionDescription());
+			ballotOptions.add(bo);
 		}
+		
 		Ballot ballot = new Ballot(decision, ballotDTO.getExpirationDate(), ballotOptions);
 			
 		ballotDao.save(ballot);

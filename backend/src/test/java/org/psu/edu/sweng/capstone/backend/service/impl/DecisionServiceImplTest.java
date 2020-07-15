@@ -147,7 +147,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasActualValues() throws EntityNotFoundException {
 		// given
 		Decision decision = new Decision("Test Decision", "Test Description", testUser);
-		decision.getBallots().add(new Ballot(decision, new Date()));
+		decision.getBallots().add(new Ballot(decision, new Date(), new HashSet<>()));
 		decision.setId(1L);
 		
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
@@ -171,7 +171,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void createDecision_hasUser_addsDecisionUsersAndBallot() throws EntityNotFoundException {
 		// given
 		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
-		dec.getBallots().add(new Ballot(dec, new Date()));
+		dec.getBallots().add(new Ballot(dec, new Date(), new HashSet<>()));
 		
 		DecisionDTO dto = DecisionDTO.build(dec);
 		

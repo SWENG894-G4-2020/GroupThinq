@@ -26,7 +26,7 @@ public class Ballot {
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
 
-	@OneToMany(mappedBy = "ballot", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
+	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
 	private Set<BallotOption> ballotOptions = new HashSet<>();
 
 	@Column(name = "VOTES")

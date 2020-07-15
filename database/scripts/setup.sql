@@ -61,18 +61,16 @@ CREATE TABLE DECISION_USERS (
 DROP TABLE IF EXISTS ballot_option;
 CREATE TABLE ballot_option
 (
-    id                 BIGSERIAL PRIMARY KEY,
-    ballot_id          Text  NOT NULL,
-    decision_id        Text  NOT NULL,
-    user_name          Text  NOT NULL,
-    expiration_date    TIMESTAMP   NOT NULL,
-    created_date       TIMESTAMP   NOT NULL,
-    updated_date       TIMESTAMP,
-    option_title       TEXT  NOT NULL,
-    option_description TEXT
+    ID                 SERIAL PRIMARY KEY,
+    BALLOT_ID          INTEGER REFERENCES BALLOT(ID) NOT NULL,
+    DECISION_ID        INTEGER REFERENCES DECISION(ID) NOT NULL,
+    USER_ID            INTEGER REFERENCES USERS(ID) NOT NULL,
+    EXPIRATION_DATE    TIMESTAMP NOT NULL,
+    CREATED_DATE       TIMESTAMP NOT NULL,
+    UPDATED_DATE       TIMESTAMP,
+    OPTION_TITLE       VARCHAR(32)NOT NULL,
+    OPTION_DESCRIPTION VARCHAR(1000)
 );
 
-
 ALTER TABLE ballot add ballot_options TEXT default NULL;
-
 ALTER TABLE ballot add ballot_votes TEXT default NULL;

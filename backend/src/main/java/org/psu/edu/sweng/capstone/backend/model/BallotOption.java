@@ -11,6 +11,7 @@ public class BallotOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BALLOT_ID")
     private Ballot ballot;
 
@@ -19,7 +20,7 @@ public class BallotOption {
     private Decision decision;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_NAME")
+    @JoinColumn(name = "USER_ID")
     private User user;
 
     @Column(name = "EXPIRATION_DATE")
@@ -37,9 +38,9 @@ public class BallotOption {
     @Column(name = "OPTION_DESCRIPTION")
     private String optionDescription;
 
-    protected BallotOption(){}
+    protected BallotOption() {}
 
-    public BallotOption(Ballot ballot, Date expirationDate, User user, String title, String description){
+    public BallotOption(Ballot ballot, Date expirationDate, User user, String title, String description) {
         this.ballot = ballot;
         this.decision = ballot.getDecision();
         this.user = user;

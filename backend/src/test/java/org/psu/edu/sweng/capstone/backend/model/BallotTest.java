@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Date;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class BallotTest {
 	
 	@Test
 	void constructor_worksProperly() {
-		Ballot ballot = new Ballot(DECISION, new Date(1337L));
+		Ballot ballot = new Ballot(DECISION, new Date(1337L), new HashSet<>());
 		
 		assertNotNull(ballot.getCreatedDate());
 		assertEquals("mboyer87", ballot.getDecision().getOwnerId().getUserName());

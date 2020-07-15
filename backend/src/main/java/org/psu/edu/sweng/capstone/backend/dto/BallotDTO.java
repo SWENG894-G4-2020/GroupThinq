@@ -15,7 +15,7 @@ public class BallotDTO {
 	private Date expirationDate;
 	private Date createdDate;
 	private Date updatedDate;
-	private List<BallotOptionDTO> ballotOptions = new ArrayList<>();
+	private Set<BallotOptionDTO> ballotOptions = new HashSet<>();
 	private HashMap<String, LinkedList<Long>> ballotVotes = new HashMap<>();
 	
 	public Long getId() {
@@ -58,11 +58,11 @@ public class BallotDTO {
 		this.updatedDate = updatedDate;
 	}
 
-	public List<BallotOptionDTO> getBallotOptions() {
+	public Set<BallotOptionDTO> getBallotOptions() {
 		return ballotOptions;
 	}
 
-	public void setBallotOptions(List<BallotOptionDTO> ballotOptions) {
+	public void setBallotOptions(HashSet<BallotOptionDTO> ballotOptions) {
 		this.ballotOptions = ballotOptions;
 	}
 
