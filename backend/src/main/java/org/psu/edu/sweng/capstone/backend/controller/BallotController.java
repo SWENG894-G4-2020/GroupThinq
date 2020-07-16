@@ -24,7 +24,7 @@ public class BallotController {
 	@Autowired
 	private BallotService ballotService;
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
+	@PreAuthorize("@authCheck.isDecisionOwner(#ballot.getDecisionId())")
 	@PostMapping("/ballot")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<BallotDTO> createBallot(@RequestBody final BallotDTO ballot) throws EntityNotFoundException {
