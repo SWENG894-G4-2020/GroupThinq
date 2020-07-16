@@ -10,15 +10,9 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
-import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
-import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
-import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
-import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
+import org.psu.edu.sweng.capstone.backend.dto.*;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
-import org.psu.edu.sweng.capstone.backend.model.Ballot;
-import org.psu.edu.sweng.capstone.backend.model.Decision;
-import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
-import org.psu.edu.sweng.capstone.backend.model.User;
+import org.psu.edu.sweng.capstone.backend.model.*;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.psu.edu.sweng.capstone.backend.service.DecisionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,17 +105,23 @@ public class DecisionServiceImpl implements DecisionService {
 		}
 		
 		newDecision.setDecisionUsers(decisionUsers);
-
-		decisionDao.save(newDecision);
+		//decisionDao.save(newDecision);
 	
 		// Attach Ballots to Decision
 		if (!decisionDto.getBallots().isEmpty()) {
 			for (BallotDTO bDTO : decisionDto.getBallots()) {
-				Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate(), new HashSet<>());
+				Set<BallotOption> ballotOptions = new HashSet<>();
+				if(bDTO.getBallotOptions() != null && bDTO.getBallotOptions().size() > 0){
+					for(BallotOptionDTO option: bDTO.getBallotOptions()){
+						ballotOptions.add(new BallotOption(null, option.getExpirationDate(), user, option.getOptionTitle(), option.getOptionDescription()));
+					}
+				}
+				Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate(), ballotOptions);
+				newDecision.getBallots().add(ballot);
 				ballotDao.save(ballot);
 			}
 		}
-		
+		decisionDao.save(newDecision);
 		response.attachCreatedSuccess();
 		
 		return response;
