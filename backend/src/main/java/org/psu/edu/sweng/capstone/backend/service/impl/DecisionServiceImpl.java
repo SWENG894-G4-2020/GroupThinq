@@ -108,7 +108,7 @@ public class DecisionServiceImpl implements DecisionService {
 		//decisionDao.save(newDecision);
 	
 		// Attach Ballots to Decision
-		if (!decisionDto.getBallots().isEmpty()) {
+		if (decisionDto.getBallots() != null && !decisionDto.getBallots().isEmpty()) {
 			for (BallotDTO bDTO : decisionDto.getBallots()) {
 				Set<BallotOption> ballotOptions = new HashSet<>();
 				if(bDTO.getBallotOptions() != null && bDTO.getBallotOptions().size() > 0){
