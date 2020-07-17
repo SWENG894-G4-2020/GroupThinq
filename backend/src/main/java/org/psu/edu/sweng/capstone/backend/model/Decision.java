@@ -16,9 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 @Entity
 @Table(name = "DECISION")
 public class Decision {
@@ -39,15 +36,14 @@ public class Decision {
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "OWNER_ID")
 	private User ownerId;
 
-	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
-	@Fetch(FetchMode.SELECT)
+	@OneToMany(mappedBy = "decision", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 	
-	@OneToMany(mappedBy = "decision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Ballot.class)
+	@OneToMany(mappedBy = "decision", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Ballot.class)
 	private Set<Ballot> ballots = new HashSet<>();
 
 	protected Decision() {}
