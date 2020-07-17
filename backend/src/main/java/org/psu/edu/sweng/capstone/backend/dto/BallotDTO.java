@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
-import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
