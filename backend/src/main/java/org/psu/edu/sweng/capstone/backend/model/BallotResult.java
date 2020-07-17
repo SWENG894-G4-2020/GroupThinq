@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import org.psu.edu.sweng.capstone.backend.model.id.BallotResultId;
 
 @Entity
-@Table(name = "BALLOT_RESULT")
+@Table(name = "BALLOT_RESULTS")
 @IdClass(BallotResultId.class)
 public class BallotResult {
 

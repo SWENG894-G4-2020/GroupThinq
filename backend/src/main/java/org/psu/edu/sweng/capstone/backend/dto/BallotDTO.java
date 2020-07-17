@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
-import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -77,10 +76,7 @@ public class BallotDTO {
         if (b.getCreatedDate() != null) { dto.setCreatedDate(b.getCreatedDate()); }
         if (b.getUpdatedDate() != null) { dto.setUpdatedDate(b.getUpdatedDate()); }
         
-        for (BallotOption bo : b.getBallotOptions()) {
-        	BallotOptionDTO boDTO = BallotOptionDTO.build(bo);
-        	dto.getBallotOptions().add(boDTO);
-        }
+        b.getBallotOptions().stream().forEach(bo -> dto.getBallotOptions().add(BallotOptionDTO.build(bo)));
         
 		return dto;
 	}
