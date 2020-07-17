@@ -147,6 +147,7 @@ public class DecisionServiceImpl implements DecisionService {
 				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
 
 		decision.getDecisionUsers().clear();
+		decision.getBallots().clear();
 
 		decisionDao.delete(decision);
 		
