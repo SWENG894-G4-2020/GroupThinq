@@ -2,6 +2,7 @@ package org.psu.edu.sweng.capstone.backend.controller;
 
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,15 @@ public class BallotController {
 	@PutMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> updateBallot(@PathVariable(value = "id") final Long ballotId, @RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.updateBallot(ballotId, ballot);
+	}
+	
+	@PostMapping("/ballot/{id}/vote")
+	public ResponseEntity<String> castVote(@RequestBody final BallotResultDTO vote) throws EntityNotFoundException {
+		return ballotService.castVote(vote);
+	}
+	
+	@GetMapping("/ballot/{id}/results")
+	public ResponseEntity<BallotResultDTO> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
+		return ballotService.retrieveResults(ballotId);
 	}
 }
