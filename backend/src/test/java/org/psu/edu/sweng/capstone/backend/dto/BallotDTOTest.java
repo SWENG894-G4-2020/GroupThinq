@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,9 +28,11 @@ class BallotDTOTest {
 	@BeforeEach
 	void setUp() {
 		ballot.setId(1L);
-		ballot.setUpdatedDate(new Date(1111L));
+		ballot.setUpdatedDate(new Date(1111L));		
+		ballot.getOptions().add(ballotOption);
+		
 		decision.setId(2L);
-		optionDTOs = new ArrayList<>(Arrays.asList(BallotOptionDTO.build(ballotOption)));
+
 		testDTO = BallotDTO.build(ballot);	
 	}
 	
@@ -42,6 +43,7 @@ class BallotDTOTest {
 		assertEquals(2L, testDTO.getDecisionId());
 		assertEquals(new Date(1337L), testDTO.getExpirationDate());
 		assertEquals(new Date(1111L), testDTO.getUpdatedDate());
+		assertEquals(1, testDTO.getBallotOptions().size());
 	}
 	
 	@Test
