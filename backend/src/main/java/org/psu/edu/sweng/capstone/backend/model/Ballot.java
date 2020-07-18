@@ -38,7 +38,7 @@ public class Ballot {
 	private Date updatedDate;
 	
 	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
-	private Set<BallotOption> ballotOptions = new HashSet<>();
+	private Set<BallotOption> options = new HashSet<>();
 	
 	protected Ballot() {}
 	
@@ -89,11 +89,11 @@ public class Ballot {
 		this.updatedDate = updatedDate;
 	}
 
-	public Set<BallotOption> getBallotOptions() {
-		return ballotOptions;
+	public Set<BallotOption> getOptions() {
+		return options;
 	}
 
-	public void setBallotOptions(Set<BallotOption> ballotOptions) {
-		this.ballotOptions = ballotOptions;
+	public void setOptions(Set<BallotOption> ballotOptions) {
+		this.options = ballotOptions;
 	}
 }

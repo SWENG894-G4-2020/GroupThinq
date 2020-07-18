@@ -1,5 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Set;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -19,6 +21,7 @@ import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.BallotResult;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -49,6 +52,9 @@ public class DecisionServiceImpl implements DecisionService {
 	
 	@Autowired
 	private BallotOptionDAO ballotOptionDao;
+	
+	@Autowired
+	private BallotResultDAO ballotResultDao;
 	
 	private static final String ERROR_HEADER = "Decision ";
 
@@ -146,6 +152,12 @@ public class DecisionServiceImpl implements DecisionService {
 		final Decision decision = decisionDao.findById(id).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
 
+		// Delete results, if any
+		for (Ballot b : decision.getBallots()) {
+			ArrayList<BallotResult> results = ballotResultDao.findAllByBallot(b);
+			if (!results.isEmpty()) { ballotResultDao.deleteAll(results); }
+		}
+				
 		decision.getDecisionUsers().clear();
 		decision.getBallots().clear();
 
