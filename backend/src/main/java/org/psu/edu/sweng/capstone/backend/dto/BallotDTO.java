@@ -76,7 +76,7 @@ public class BallotDTO {
         if (b.getCreatedDate() != null) { dto.setCreatedDate(b.getCreatedDate()); }
         if (b.getUpdatedDate() != null) { dto.setUpdatedDate(b.getUpdatedDate()); }
         
-        b.getBallotOptions().stream().forEach(bo -> dto.getBallotOptions().add(BallotOptionDTO.build(bo)));
+        b.getOptions().stream().forEach(bo -> dto.getBallotOptions().add(BallotOptionDTO.build(bo)));
         
 		return dto;
 	}

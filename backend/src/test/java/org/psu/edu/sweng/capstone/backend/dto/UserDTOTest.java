@@ -21,7 +21,7 @@ class UserDTOTest {
 		user.setCreatedDate(new Date(2222L));
 		user.setUpdatedDate(new Date(3333L));
 		user.setLastLoggedIn(new Date(11111L));
-		user.getUserRoles().add(new UserRole(user, new Role()));
+		user.getRoles().add(new UserRole(user, new Role()));
 		
 		testUser = UserDTO.build(user);
 		testUser.setPassword("fakepw");

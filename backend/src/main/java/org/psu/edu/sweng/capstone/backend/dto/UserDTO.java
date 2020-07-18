@@ -112,7 +112,7 @@ public class UserDTO {
 		if (u.getUpdatedDate() != null) { dto.setUpdatedDate(u.getUpdatedDate()); }
 		if (u.getLastLoggedIn() != null) { dto.setLastLoggedIn(u.getLastLoggedIn()); }
 		
-		for (UserRole userRole : u.getUserRoles()) {
+		for (UserRole userRole : u.getRoles()) {
 			dto.getUserRoles().add(userRole.getRole().getName());
 		}
 		
