@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
 import org.psu.edu.sweng.capstone.backend.service.impl.BallotServiceImpl;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
@@ -37,6 +38,7 @@ class BallotControllerTest {
 	
 	private static final Long BALLOT_ID = 1L;
 	private static final BallotDTO BALLOT_DTO = new BallotDTO();
+	private static final BallotResultDTO BALLOT_RESULT_DTO = new BallotResultDTO();
 
 	@BeforeEach
 	void setUp() {
@@ -86,5 +88,27 @@ class BallotControllerTest {
 
 		// then
 		verify(ballotServiceImpl, times(1)).updateBallot(Mockito.anyLong(), Mockito.any(BallotDTO.class));
+	}
+	
+	@Test
+	void retrieveResults_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(get("/ballot/{id}/results", BALLOT_ID)).andExpect(status().isOk());
+		
+		// then
+		verify(ballotServiceImpl, times(1)).retrieveResults(BALLOT_ID);
+	}
+	
+	@Test
+	void castVote_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(post("/ballot/{id}/vote", BALLOT_RESULT_DTO)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(BALLOT_RESULT_DTO)))
+				.andExpect(status().isCreated());
+
+		// then
+		verify(ballotServiceImpl, times(1)).castVote(Mockito.any(BallotResultDTO.class));
 	}
 }
