@@ -3,6 +3,7 @@ package org.psu.edu.sweng.capstone.backend.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -53,6 +54,7 @@ public class Decision {
 	protected Decision() {}
 
 	public Decision(String name, String description, User ownerId) {
+		//this.id = (long)(Math.random()*((Integer.MAX_VALUE)));
 		this.name = name;
 		this.description = description;
 		this.ownerId = ownerId;

@@ -105,20 +105,22 @@ public class DecisionServiceImpl implements DecisionService {
 		}
 		
 		newDecision.setDecisionUsers(decisionUsers);
-		//decisionDao.save(newDecision);
+		decisionDao.save(newDecision);
 	
 		// Attach Ballots to Decision
 		if (decisionDto.getBallots() != null && !decisionDto.getBallots().isEmpty()) {
 			for (BallotDTO bDTO : decisionDto.getBallots()) {
 				Set<BallotOption> ballotOptions = new HashSet<>();
+				Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate(), ballotOptions);
+
 				if(bDTO.getBallotOptions() != null && bDTO.getBallotOptions().size() > 0){
 					for(BallotOptionDTO option: bDTO.getBallotOptions()){
-						ballotOptions.add(new BallotOption(null, option.getExpirationDate(), user, option.getOptionTitle(), option.getOptionDescription()));
+						ballotOptions.add(new BallotOption(newDecision, ballot, option.getExpirationDate(), user, option.getOptionTitle(), option.getOptionDescription()));
 					}
 				}
-				Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate(), ballotOptions);
-				newDecision.getBallots().add(ballot);
+				ballot.setBallotOptions(ballotOptions);
 				ballotDao.save(ballot);
+				newDecision.getBallots().add(ballot);
 			}
 		}
 		decisionDao.save(newDecision);

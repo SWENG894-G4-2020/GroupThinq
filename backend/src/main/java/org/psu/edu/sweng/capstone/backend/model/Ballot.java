@@ -35,6 +35,7 @@ public class Ballot {
 	protected Ballot() {}
 	
 	public Ballot(Decision decision, Date expirationDate, Set<BallotOption> ballotOptions) {
+		//this.id = (long)(Math.random()*((Integer.MAX_VALUE)));
 		this.decision = decision;
 		this.expirationDate = expirationDate;
 		if(ballotOptions != null && ballotOptions.size() > 0) {

@@ -49,7 +49,7 @@ public class BallotServiceImpl implements BallotService {
 			final User user = userDao.findByUserName(boDto.getUserName()).orElseThrow(
 					() -> new EntityNotFoundException("User " + boDto.getUserName()));
 			
-			BallotOption bo = new BallotOption(ballot, boDto.getExpirationDate(), user, boDto.getOptionTitle(), boDto.getOptionDescription());
+			BallotOption bo = new BallotOption(decision, ballot, boDto.getExpirationDate(), user, boDto.getOptionTitle(), boDto.getOptionDescription());
 			ballotOptions.add(bo);
 		}
 		
@@ -132,7 +132,7 @@ public class BallotServiceImpl implements BallotService {
 		final User user = userDao.findByUserName(ballotOptions.get(0).getUserName()).orElseThrow(
 				() -> new EntityNotFoundException("User " + ballotOptions.get(0).getUserName()));
 		for(BallotOptionDTO ballotOptionDTO: ballotOptions) {
-			BallotOption bo = new BallotOption(ballot, ballotOptionDTO.getExpirationDate(), user, ballotOptionDTO.getOptionTitle(), ballotOptionDTO.getOptionDescription());
+			BallotOption bo = new BallotOption(ballot.getDecision(), ballot, ballotOptionDTO.getExpirationDate(), user, ballotOptionDTO.getOptionTitle(), ballotOptionDTO.getOptionDescription());
 			if (ballot.getExpirationDate().after(new Date())) {
 				ballotDao.getOne(ballotId).getBallotOptions().add(bo);
 				response.attachGenericSuccess();

@@ -25,7 +25,6 @@ public class DecisionDTOTest {
     void setUp() {
         Decision decision = new Decision("why is gamora?", "what is gamora?", testUser);
 
-        decision.setId(8675309L);
         decision.setCreatedDate(new Date(1101L));
         decision.setUpdatedDate(new Date(1011L));
         
@@ -40,7 +39,6 @@ public class DecisionDTOTest {
 
     @Test
     void getters_worksProperly() {
-        assertEquals(8675309L, testDecisionDTO.getId());
         assertEquals("why is gamora?", testDecisionDTO.getName());
         assertEquals("what is gamora?", testDecisionDTO.getDescription());
         assertEquals(new Date(1101L), testDecisionDTO.getCreatedDate());
@@ -63,7 +61,6 @@ public class DecisionDTOTest {
     	ballots.add(ballotDTO);
     	
         // when
-        testDecisionDTO.setId(8675309L);
         testDecisionDTO.setName("why is gamora?");
         testDecisionDTO.setDescription("testdescription");
         testDecisionDTO.setCreatedDate(new Date(8008L));
@@ -73,7 +70,6 @@ public class DecisionDTOTest {
         testDecisionDTO.setBallots(ballots);
 
         // then
-        assertEquals(8675309L, testDecisionDTO.getId());
         assertEquals("why is gamora?", testDecisionDTO.getName());
         assertEquals("testdescription", testDecisionDTO.getDescription());
         assertEquals(new Date(8008L), testDecisionDTO.getCreatedDate());
@@ -93,7 +89,6 @@ public class DecisionDTOTest {
         DecisionDTO dto = DecisionDTO.build(decision);
 
         // then
-        assertNull(dto.getId());
         assertNull(dto.getName());
         assertNull(dto.getCreatedDate());
         assertNull(dto.getUpdatedDate());

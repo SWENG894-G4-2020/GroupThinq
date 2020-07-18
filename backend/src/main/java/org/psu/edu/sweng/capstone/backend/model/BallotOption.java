@@ -40,9 +40,10 @@ public class BallotOption {
 
     protected BallotOption() {}
 
-    public BallotOption(Ballot ballot, Date expirationDate, User user, String title, String description) {
+    public BallotOption(Decision decision, Ballot ballot, Date expirationDate, User user, String title, String description) {
+        //this.id = (long)(Math.random()*((Integer.MAX_VALUE)));
         this.ballot = ballot;
-        this.decision = ballot.getDecision();
+        this.decision = decision;
         this.user = user;
         this.expirationDate = expirationDate;
         this.optionTitle = title;
