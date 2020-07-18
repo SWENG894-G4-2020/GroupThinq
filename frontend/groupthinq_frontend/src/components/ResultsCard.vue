@@ -9,7 +9,8 @@
       No results to show.
     </q-card-section>
     <q-card-section class="q-pa-md column items-center" >
-      Results Graph Here
+      {{ballotOptions}}
+      {{resultTotals}}
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="Close" @click="$emit('resultsClose')" />
@@ -28,19 +29,27 @@ export default {
   },
 
   computed: {
-    winnerId: function () {
-      const resultTotal = {}
+    resultTotals: function () {
+      const resultTotals = {}
+      let option
+      for (option of this.ballotOptions) {
+        resultTotals[option.id] = 0
+      }
+
       let result
       for (result of this.results) {
-        if (!resultTotal[result.ballotOptionId]) { resultTotal[result.ballotOptionId] = 0 }
-        resultTotal[result.ballotOptionId] += 1
+        resultTotals[result.ballotOptionId] += 1
       }
+      return resultTotals
+    },
+
+    winnerId: function () {
       let winnerId = 0
       let max = 0
       let resultId
-      for (resultId in resultTotal) {
-        if (resultTotal[resultId] > max) {
-          max = resultTotal[resultId]
+      for (resultId in this.resultTotals) {
+        if (this.resultTotals[resultId] > max) {
+          max = this.resultTotals[resultId]
           winnerId = parseInt(resultId)
         }
       }
@@ -61,10 +70,6 @@ export default {
       type: Array,
       required: true
     }
-  },
-
-  methods: {
-
   }
 }
 </script>
