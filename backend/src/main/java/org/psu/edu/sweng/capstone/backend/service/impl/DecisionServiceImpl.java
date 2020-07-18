@@ -181,12 +181,37 @@ public class DecisionServiceImpl implements DecisionService {
 		return response;
 	}
 	
-	private void wipeAndAddNewDecisionUsers(Decision decision, final List<UserDTO> includedUsers) {
-		decisionUserDao.deleteAllByDecision(decision);
+	private void wipeAndAddNewDecisionUsers(Decision decision, final List<UserDTO> includedUsers) throws EntityNotFoundException {
+		Set<DecisionUser> oldDecisionUserList = decision.getDecisionUsers();
 		
-		for (UserDTO usrDTO : includedUsers) {
-			Optional<User> user = userDao.findByUserName(usrDTO.getUserName());
-			if (user.isPresent()) { decision.getDecisionUsers().add(new DecisionUser(decision, user.get())); }
+		for (UserDTO userDto : includedUsers) {
+			final User user = userDao.findByUserName(userDto.getUserName()).orElseThrow(
+					() -> new EntityNotFoundException("User " + userDto.getUserName()));
+			
+			Optional<DecisionUser> du = decisionUserDao.findByUserAndDecision(user, decision);
+			
+			// Adds User to Decision that didn't previously exist on the Decision User list.
+			if (!du.isPresent()) {
+				decision.getDecisionUsers().add(new DecisionUser(decision, user)); 
+			}
+		}
+		
+		// If a User existed on the old Decision User list but doesn't exist on the new one, 
+		// then delete it from the Decision User list.
+		for (DecisionUser du : oldDecisionUserList) {
+			boolean deleteUserFromList = true;
+			
+			User oldUser = du.getUser();
+			
+			for (UserDTO userDto : includedUsers) {
+				if (userDto.getUserName().equals(oldUser.getUserName())) { 
+					deleteUserFromList = false; 
+				}
+			}
+			
+			if (deleteUserFromList) { 
+				decisionUserDao.deleteByUserAndDecision(oldUser, decision); 
+			}
 		}
 	}
 }
