@@ -124,9 +124,9 @@ export default {
 
     async onEditConfirm () {
       this.editableDecision.ballots[0].expirationDate = new Date(this.editableDecision.ballots[0].expirationDate).toISOString()
-
+      console.log({ name: 'TestEdit', ownerUsername: this.currentUserName })
       try {
-        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editableDecision)
+        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, { name: 'TestEdit', ownerUsername: this.currentUserName, includedUsers: [{ userName: 'test' }] })
         this.$emit('editClose')
       } catch (error) {
         console.log(error)

@@ -122,7 +122,7 @@ export default {
     return {
       currentUserName: '',
       newDecision: { ballots: [{}] },
-      newOption: { title: '', description: '' },
+      newOption: { title: '', description: '', userName: this.currentUserName },
       optionsList: [],
       allUsersList: [],
       filteredUsersList: [],
@@ -149,7 +149,7 @@ export default {
       this.newDecision.ballots[0].expirationDate = new Date(this.newDecision.ballots[0].expirationDate).toISOString()
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
 
-      // PLACEHOLDER FOR HANDLING DECISION OPTIONS THROUGH THE API (USE optionsList)
+      this.newDecision.ballots[0].ballotOptions = this.optionsList
 
       try {
         await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
@@ -174,7 +174,7 @@ export default {
       this.newDecision = {
         name: '',
         description: '',
-        ballots: [{ expirationDate: '' }],
+        ballots: [{ expirationDate: '', ballotOptions: [] }],
         ownerUsername: this.currentUserName,
         includedUsers: [
           { userName: this.currentUserName }
@@ -199,7 +199,7 @@ export default {
     addDecisionOption () {
       if (this.newOption.title !== '' && this.newOption.description !== '') {
         this.optionsList.push(this.newOption)
-        this.newOption = { title: '', description: '' }
+        this.newOption = { title: '', description: '', userName: this.currentUserName }
       }
     },
 

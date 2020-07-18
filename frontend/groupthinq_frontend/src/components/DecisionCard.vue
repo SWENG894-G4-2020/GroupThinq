@@ -37,16 +37,18 @@
           <q-btn label="View Results"
             class="q-mx-xs"
             :outline="!status.results"
-            :disable="!status.results"
-            color="primary" />
+            color="primary"
+            @click="resultsDialog = true"/>
           <!--
+          :disable="!status.results"
           <q-btn label="Nominate"
             class="q-mx-xs"
             :outline="!status.nominate"
             :disable="!status.nominate"
             color="primary" />
             -->
-          <q-btn label="Vote"
+          <q-btn
+            :label="voteLabel"
             class="q-mx-xs"
             :outline="!status.vote"
             :disable="!status.vote"
@@ -94,10 +96,18 @@
   </q-dialog>
   <q-dialog v-model="votingDialog" persistent style="width: 500px">
     <VotingCard
-      v-bind:ballotOptions="ballotOptions"
+      v-bind:previousVote="previousVote"
+      v-bind:ballotId="ballots[0].id"
+      v-bind:ballotOptions="ballots[0].ballotOptions"
       v-bind:title="name"
       v-bind:description="description"
-      @votingClose="closeVotingModal" />
+      @votingClose="closeVotingModal()" />
+  </q-dialog>
+  <q-dialog v-model="resultsDialog" persistent style="width: 500px">
+    <ResultsCard
+      v-bind:ballotOptions="ballots[0].ballotOptions"
+      v-bind:results="resultsList"
+      @resultsClose="resultsDialog = false" />
   </q-dialog>
 </div>
 </template>
@@ -106,21 +116,25 @@
 import auth from 'src/store/auth'
 import EditDecisionCard from 'src/components/EditDecisionCard'
 import VotingCard from 'src/components/VotingCard'
+import ResultsCard from 'src/components/ResultsCard'
 
 export default {
   name: 'DecisionCard',
 
   components: {
     EditDecisionCard,
-    VotingCard
+    VotingCard,
+    ResultsCard
   },
 
   data () {
     return {
       currentUserName: '',
+      resultsList: [],
       editDecisionDialog: false,
       deleteDecisionDialog: false,
       votingDialog: false,
+      resultsDialog: false,
       expirationDate: '',
       expanded: false,
       expired: false,
@@ -143,6 +157,29 @@ export default {
       return new Date(this.editableDecision.ballots[0].expirationDate)
     },
 
+    voteLabel: function () {
+      let result
+      for (result of this.resultsList) {
+        if (result.userName === this.currentUserName) { return 'View Vote' }
+      }
+      return 'Vote'
+    },
+
+    previousVote: function () {
+      let result
+      for (result of this.resultsList) {
+        if (result.userName === this.currentUserName) {
+          let option
+          for (option of this.ballots[0].ballotOptions) {
+            if (result.ballotOptionId === option.id) {
+              return { title: option.title, description: option.description }
+            }
+          }
+        }
+      }
+      return undefined
+    },
+
     editableDecision: function () {
       let tempBallots = [{ expirationDate: '1970-01-01T00:01:00-00:00' }]
       if (this.ballots.length !== 0) {
@@ -155,17 +192,6 @@ export default {
         includedUsers: this.includedUsers,
         ballots: tempBallots
       }
-    },
-
-    ballotOptions: function () {
-      // this is a placeholder for test ballot options in the VotingCard component
-      // TODO: after API endpoint representation is created, extract ballot options using the computed property
-      return [
-        { title: 'Ballot Option 1', description: 'This is a description for ballot option 1.' },
-        { title: 'Ballot Option 2', description: 'This is a longer description for ballot option 2.' },
-        { title: 'Ballot Option 3', description: 'Short option 3.' },
-        { title: 'Ballot Option 4', description: 'This is an extremely long descriptpion for ball option 4 for testing.' }
-      ]
     }
   },
 
@@ -207,6 +233,7 @@ export default {
 
   mounted () {
     this.currentUserName = auth.getTokenData().sub
+    this.getResultsData()
     this.calculateRemainingTime()
   },
 
@@ -229,7 +256,7 @@ export default {
         this.hoursRemaining = hours
         this.minutesRemaining = minutes
         this.secondsRemaining = seconds
-      }, 1000)
+      }, 500)
     },
 
     openEditModal () {
@@ -243,7 +270,17 @@ export default {
 
     closeVotingModal () {
       this.votingDialog = false
+      this.getResultsData()
       this.$emit('needReload')
+    },
+
+    async getResultsData () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballots[0].id}/results`)
+        this.resultsList = response.data.data
+      } catch (error) {
+        console.log(error)
+      }
     },
 
     async onConfirmDelete () {
