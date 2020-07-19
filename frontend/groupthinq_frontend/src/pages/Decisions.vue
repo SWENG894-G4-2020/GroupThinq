@@ -12,8 +12,8 @@
         </div>
         <div class="text-h5 text-primary text-center" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
         <DecisionCard
-          v-for="decision in sortedDecisions"
-          :key="decision.name"
+          v-for="(decision, idx) in sortedDecisions"
+          :key="idx"
           v-bind="decision"
           @needReload="getData()"
         />
@@ -63,8 +63,16 @@ export default {
 
   computed: {
     sortedDecisions: function () {
+      // Temporary solution for ballot - decision deletion display
+      // Make sure to change tempDecisionList back to this.DecsionList when issue is resolved
+      const tempDecisionList = []
+      let iDec
+      for (iDec of this.decisionList) {
+        if (iDec.ballots.length > 0) { tempDecisionList.push(iDec) }
+      }
+
       if (this.currentSort === 'Ownership') {
-        const expiryOrdered = this.decisionList.slice().sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
+        const expiryOrdered = tempDecisionList.slice().sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
         const reordered = []
         expiryOrdered.forEach(element => {
           if (element.ownerUsername === auth.getTokenData().sub) {
@@ -78,7 +86,7 @@ export default {
         })
         return reordered
       } else {
-        return this.decisionList.slice().sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
+        return tempDecisionList.slice().sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
       }
     }
   },
