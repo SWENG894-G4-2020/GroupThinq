@@ -34,6 +34,8 @@ public class DecisionDTOTest {
         Ballot ballot = new Ballot(decision, new Date());
         decision.getBallots().add(ballot);
         
+        decision.setDeleted(true);
+        
         testDecisionDTO = DecisionDTO.build(decision);
     }
 
