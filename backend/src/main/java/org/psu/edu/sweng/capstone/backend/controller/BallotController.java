@@ -51,6 +51,7 @@ public class BallotController {
 	}
 	
 	@PostMapping("/ballot/{id}/vote")
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<String> castVote(@RequestBody final BallotResultDTO vote) throws EntityNotFoundException {
 		return ballotService.castVote(vote);
 	}
