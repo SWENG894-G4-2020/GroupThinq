@@ -5,7 +5,7 @@
 
 import { mount, createLocalVue, shallowMount } from '@vue/test-utils'
 import Signup from 'src/pages/Signup'
-import SignupCard from 'src/components/SignupCard'
+import SignUpCard from 'src/components/SignUpCard'
 import VueRouter from 'vue-router'
 import * as All from 'quasar'
 // import langEn from 'quasar/lang/en-us' // change to any language you wish! => this breaks wallaby :(
@@ -34,7 +34,7 @@ describe('Sign up page tests', () => {
   const vm = wrapper.vm
 
   it('contains a Signup card', () => {
-    expect(wrapper.findComponent(SignupCard).exists())
+    expect(wrapper.findComponent(SignUpCard).exists())
       .toBe(true)
   })
 })
