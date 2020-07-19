@@ -4,21 +4,35 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UserTest {
 
+	private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+	private Ballot ballot = new Ballot(null, new Date(1337L));
+	private BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", ballot, USER);
+	private BallotResult ballotResult = new BallotResult(ballot, ballotOption, USER);
+	private Decision decision = new Decision("why is gamora?", "what is gamora?", USER);
+	private DecisionUser decisionUser = new DecisionUser(decision, USER);
+
 	private User testUser = new User();
 	private HashSet<UserRole> userRoles = new HashSet<>();
+	private Set<BallotResult> ballotResults = new HashSet<>();
+	private Set<DecisionUser> decisionUsers = new HashSet<>();
 	
 	@BeforeEach
 	void setup() {
 		UserRole userRole = new UserRole(testUser, new Role());
 		userRoles.add(userRole);
-		
-		testUser.setUserRoles(userRoles);
+		ballotResults.add(ballotResult);
+		decisionUsers.add(decisionUser);
+
+		testUser.setDecisions(decisionUsers);
+		testUser.setVotes(ballotResults);
+		testUser.setRoles(userRoles);
 		testUser.setUserName("testUser");
 		testUser.setPassword("testPassword");
 		testUser.setLastName("user");
@@ -28,6 +42,7 @@ class UserTest {
 		testUser.setCreatedDate(new Date(1L));
 		testUser.setUpdatedDate(new Date(2L));
 		testUser.setLastLoggedIn(new Date(3L));
+		testUser.setId(1L);
 	}
 	
 	@Test
@@ -51,7 +66,26 @@ class UserTest {
 		assertEquals("mboyer87@gmail.com", newUser.getEmailAddress());
 		assertEquals(birthDate, newUser.getBirthDate());
 	}
-	
+
+	//null test
+	@Test
+	void defaultConstructor_worksProperly(){
+		User user = new User();
+
+		assertNull(user.getUserName());
+		assertNull(null, user.getPassword());
+		assertNull(user.getLastName());
+		assertNull(user.getFirstName());
+		assertNull(user.getEmailAddress());
+		assertNull(user.getBirthDate());
+		assertNull(user.getCreatedDate());
+		assertNull(user.getUpdatedDate());
+		assertNull(user.getLastLoggedIn());
+		assertEquals(0, user.getRoles().size());
+		assertEquals(0, user.getDecisions().size());
+		assertEquals(0, user.getVotes().size());
+	}
+
 	@Test
 	void getters_worksProperly() {
 		assertEquals("testUser", testUser.getUserName());
@@ -63,14 +97,17 @@ class UserTest {
 		assertEquals(new Date(1L), testUser.getCreatedDate());
 		assertEquals(new Date(2L), testUser.getUpdatedDate());
 		assertEquals(new Date(3L), testUser.getLastLoggedIn());
-		assertEquals(1, testUser.getUserRoles().size());
+		assertEquals(1L, testUser.getId());
+		assertEquals(1, testUser.getRoles().size());
+		assertEquals(1, testUser.getDecisions().size());
+		assertEquals(1, testUser.getVotes().size());
 	}
 	
 	@Test
 	void setters_worksProperly() {
 		// when
 		UserRole newRole = new UserRole(testUser, new Role());
-		testUser.getUserRoles().add(newRole);
+		testUser.getRoles().add(newRole);
 		
 		testUser.setUserName("mwboyer");
 		testUser.setPassword("newpassword");
@@ -91,7 +128,7 @@ class UserTest {
 		assertEquals(new Date(9587L), testUser.getCreatedDate());
 		assertEquals(new Date(1111L), testUser.getUpdatedDate());
 		assertEquals(new Date(2222L), testUser.getLastLoggedIn());
-		assertEquals(2, testUser.getUserRoles().size());
+		assertEquals(2, testUser.getRoles().size());
 	}
 	
 	@Test

@@ -1,6 +1,8 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 
@@ -14,6 +16,8 @@ public class BallotDTO {
 	private Date expirationDate;
 	private Date createdDate;
 	private Date updatedDate;
+	
+    private List<BallotOptionDTO> ballotOptions = new ArrayList<>();
 	
 	public Long getId() {
 		return id;
@@ -55,6 +59,14 @@ public class BallotDTO {
 		this.updatedDate = updatedDate;
 	}
 	
+	public List<BallotOptionDTO> getBallotOptions() {
+		return ballotOptions;
+	}
+
+	public void setBallotOptions(List<BallotOptionDTO> ballotOptions) {
+		this.ballotOptions = ballotOptions;
+	}
+
 	public static BallotDTO build(Ballot b) {
 		BallotDTO dto = new BallotDTO();
 		
@@ -63,7 +75,9 @@ public class BallotDTO {
         if (b.getExpirationDate() != null) { dto.setExpirationDate(b.getExpirationDate()); }
         if (b.getCreatedDate() != null) { dto.setCreatedDate(b.getCreatedDate()); }
         if (b.getUpdatedDate() != null) { dto.setUpdatedDate(b.getUpdatedDate()); }
-	        
+        
+        b.getOptions().stream().forEach(bo -> dto.getBallotOptions().add(BallotOptionDTO.build(bo)));
+        
 		return dto;
 	}
 }

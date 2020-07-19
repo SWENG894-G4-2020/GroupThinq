@@ -1,21 +1,17 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
-import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.exception.EntityConflictException;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
-import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
@@ -34,12 +30,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private RoleDAO roleDao;
-		
-	@Autowired
-	private UserRoleDAO userRoleDao;
-	
-	@Autowired
-	private DecisionUserDAO decisionUserDao;
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -79,12 +69,11 @@ public class UserServiceImpl implements UserService {
 		final User user = userDao.findByUserName(username).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
-		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
-		
-		if (!userRoles.isEmpty()) { userRoleDao.deleteAll(userRoles); }
-		if (!userDecisions.isEmpty()) { decisionUserDao.deleteAll(userDecisions); }
-		
+
+		user.getRoles().clear();
+		user.getDecisions().clear();
+		user.getVotes().clear();
+
 		userDao.delete(user);
 		
 		response.attachGenericSuccess();
@@ -136,11 +125,9 @@ public class UserServiceImpl implements UserService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
+				
+		user.getDecisions().stream().forEach(du -> response.getData().add(DecisionDTO.build(du.getDecision())));
 		
-		ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByUser(user);
-		
-		decisionUsers.stream().forEach(du -> response.getData().add(DecisionDTO.build(du.getDecision())));
-
 		response.attachGenericSuccess();
 		
 		return response;
@@ -159,7 +146,7 @@ public class UserServiceImpl implements UserService {
 		
 		final Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
 		
-		if (role.isPresent()) { newUser.getUserRoles().add(new UserRole(newUser, role.get())); }
+		if (role.isPresent()) { newUser.getRoles().add(new UserRole(newUser, role.get())); }
 		
 		userDao.save(newUser);
 	}
