@@ -66,9 +66,9 @@ export default {
       // Temporary solution for ballot - decision deletion display
       // Make sure to change tempDecisionList back to this.DecsionList when issue is resolved
       const tempDecisionList = []
-      let iDec
-      for (iDec of this.decisionList) {
-        if (iDec.ballots.length > 0) { tempDecisionList.push(iDec) }
+      let decisionIterator
+      for (decisionIterator of this.decisionList) {
+        if (!decisionIterator.deleted) { tempDecisionList.push(decisionIterator) }
       }
 
       if (this.currentSort === 'Ownership') {

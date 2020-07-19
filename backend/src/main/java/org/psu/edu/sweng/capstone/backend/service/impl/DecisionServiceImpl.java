@@ -161,7 +161,9 @@ public class DecisionServiceImpl implements DecisionService {
 		decision.getDecisionUsers().clear();
 		decision.getBallots().clear();
 
-		decisionDao.delete(decision);
+		decision.setDeleted(true);
+		decisionDao.save(decision);
+//		decisionDao.delete(decision);
 		
 		response.attachGenericSuccess();
 		
