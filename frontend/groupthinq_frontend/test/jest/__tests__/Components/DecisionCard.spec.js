@@ -25,7 +25,53 @@ describe('Decision Card tests', () => {
   localVue.directive('close-popup', All.ClosePopup)
   localVue.prototype.$axios = axios
 
+  const testPropsTemplate = {
+    id: 5,
+    name: "Decision 1",
+    description: "Decision with Ballot and 4 Ballot Options",
+    ownerUsername: "test",
+    includedUsers: [
+        {userName: "test"},
+        {userName: "test2"}
+    ],
+    ballots: [{
+      id: 10,
+      expirationDate: "2020-10-10T04:00:00.000Z",
+      ballotOptions: [
+        {
+          title: "Ballot Option 1",
+          userName: "testuser1",
+          description: "This is a description for Ballot Option 1"
+        },
+        {
+            title: "Ballot Option 2",
+            userName: "testuser1",
+            description: "This is a description for Ballot Option 2"
+        }
+            ]
+        }
+    ]
+  }
+  var testProps = {}
+
+  const testData = { data: { data: [
+    {
+      ballotId: 1,
+      ballotOptionId: 1,
+      userName: "testuser1",
+      voteDate: "2020-07-17T20:11:47.334+00:00",
+      voteUpdatedDate: null
+    },
+    {
+      ballotId: 1,
+      ballotOptionId: 2,
+      userName: "testUser",
+      voteDate: "2020-07-17T20:11:59.481+00:00",
+      voteUpdatedDate: null
+    }]}}
+
   beforeEach( () => {
+    testProps = JSON.parse(JSON.stringify(testPropsTemplate))
     jest.clearAllMocks()
     auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
   })
@@ -33,15 +79,17 @@ describe('Decision Card tests', () => {
   it('calculates expiration time correctly', async () => {
     jest.useFakeTimers()
     Date.now = jest.fn(() => new Date('2020-09-01T09:26:00-04:00'))
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    await vm.calculateRemainingTime()
+    jest.advanceTimersByTime(1001)
+    expect(Date.now).toHaveBeenCalled()
+  })
+
+  it('exit expiration calculation when expired', async () => {
+    jest.useFakeTimers()
+    Date.now = jest.fn(() => new Date('2020-11-11T09:26:00-04:00'))
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
     await vm.calculateRemainingTime()
     jest.advanceTimersByTime(1001)
@@ -51,46 +99,72 @@ describe('Decision Card tests', () => {
   it('determines the status for an expired vote', async () => {
     jest.useFakeTimers()
     Date.now = jest.fn(() => new Date('2020-09-02T09:26:00-04:00'))
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-01T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
-    jest.advanceTimersByTime(1001)
-    expect(vm.$data.expired).toBe(true)
+    expect(DecisionCard.computed.expired
+      .call({editableDecision: {ballots: [{epirationDate: "2020-10-10T04:00:00.000Z"}]}}))
+      .toBe(false)
+  })
+
+  it('determines previous vote status', async () => {
+
+    expect(DecisionCard.computed.previousVote
+      .call({
+        currentUserName: 'testUser', 
+        resultsList: testData.data.data,
+        ballots: [{
+          ballotOptions: [
+            {
+              id: 1,
+              title: "Ballot Option 1",
+              userName: "testuser1",
+              description: "This is a description for Ballot Option 1"
+            },
+            {
+              id: 2,
+                title: "Ballot Option 2",
+                userName: "testuser1",
+                description: "This is a description for Ballot Option 2"
+            }
+                ]
+            }
+        ]
+      }))
+      .toStrictEqual({title: "Ballot Option 2", description: "This is a description for Ballot Option 2"})
+  })
+
+  it('determines correct vote label', async () => {
+
+    expect(DecisionCard.computed.voteLabel
+      .call({currentUserName: 'testUser', resultsList: [{userName: 'testUser'}]}))
+      .toBe('View Vote')
+
+    expect(DecisionCard.computed.voteLabel
+      .call({currentUserName: 'test', resultsList: [{userName: 'testUser'}]}))
+      .toBe('Vote')
+  })
+
+  it('gets results data on mount', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    // no need for getResultsData() call since it occurs on mount
+    
+    expect(axios.get).toHaveBeenCalledTimes(1)
   })
 
   it('uses a default users list when none is provided', async () => {
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ownerUsername: 'test',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    let tempTestProps = testProps
+    tempTestProps.includedUsers = undefined
+    const wrapper = shallowMount(DecisionCard, { propsData: tempTestProps, localVue })
     const vm = wrapper.vm
     expect(vm.$props.includedUsers).toStrictEqual([{ userName: 'test'}])
   })
 
   it('deletes a decision', async () => {
     axios.delete = jest.fn(() => Promise.resolve())
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.onConfirmDelete()
@@ -99,54 +173,40 @@ describe('Decision Card tests', () => {
   })
 
   it('opens and closes the edit modal', async () => {
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.openEditModal()
     expect(vm.editDecisionDialog).toBeTruthy()
     await vm.closeEditModal()
     expect(vm.editDecisionDialog).toBeFalsy()
+  })
 
+  it('closes the voting modal', async () => {
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    vm.$data.votingDialog = true
+    await vm.closeVotingModal()
+    expect(vm.votingDialog).toBeFalsy()
   })
 
   it('catches axios errors', async () => {
+    axios.get= jest.fn(() => Promise.reject('Test Axios Error'))
     axios.delete= jest.fn(() => Promise.reject('Test Axios Error'))
     console.log = jest.fn()
-
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.onConfirmDelete()
+    // no need for getResultsData() call since it occurs when mounted
     
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
-    expect(console.log).toHaveBeenCalledTimes(1)
+    expect(console.log).toHaveBeenCalledTimes(2)
   })
 
   it('handles zero length prop inputs', async () => {
-    const wrapper = shallowMount(DecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: []
-      }
-    , localVue })
+    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
   })
 })

@@ -2,8 +2,11 @@
 <div style="min-width: 100%">
   <q-card bordered class="q-mx-xl q-mt-md">
     <q-card-section>
-      <div class="text-h5 row items-center">
-        <div class="col q-my-md">{{name}}</div>
+      <div class="row items-center justify-between">
+        <div class="col">
+          <span class="text-overline q-pr-lg">Decision:</span>
+          <span class="text-h5">{{name}}</span>
+        </div>
         <q-btn round icon="edit" class="col-auto" v-if="ownerUsername === this.currentUserName">
           <q-menu>
             <q-list>
@@ -17,9 +20,12 @@
           </q-menu>
         </q-btn>
       </div>
-      <div class="text-grey">{{description}}</div>
-      <div class="text-negative" v-if="!expired">Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
-      <div class="text-negative" v-else>Voting has closed.</div>
+      <div class="q-mb-sm">
+          <span class="text-overline q-mr-sm">Description:</span>
+          <span class="text-body-1">{{description}}</span>
+        </div>
+      <div class="text-negative" v-if="!expired">Time Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
+      <div class="text-negative" v-else>Time Remaining: Voting has closed.</div>
     </q-card-section>
     <q-card-actions class="row justify-between">
       <div class="col">
@@ -37,20 +43,23 @@
           <q-btn label="View Results"
             class="q-mx-xs"
             :outline="!status.results"
-            :disable="!status.results"
-            color="primary" />
+            color="primary"
+            @click="resultsDialog = true"/>
           <!--
+          :disable="!status.results"
           <q-btn label="Nominate"
             class="q-mx-xs"
             :outline="!status.nominate"
             :disable="!status.nominate"
             color="primary" />
             -->
-          <q-btn label="Vote"
+          <q-btn
+            :label="voteLabel"
             class="q-mx-xs"
             :outline="!status.vote"
-            :disable="!status.vote"
-            color="primary" />
+            :disable="!status.vote && !previousVote"
+            color="primary"
+            @click="votingDialog = true" />
         </div>
     </q-card-actions>
 
@@ -63,14 +72,16 @@
                 <div class="text-h7">{{ ownerUsername }}</div>
             <q-separator class="q-my-md" />
                 <div class="text-overline">Members</div>
-                <div class="text-h7 row" v-for="(user,idx) in includedUsers" :key="idx">{{ user.userName }}</div>
+                <div class="text-h7 row" v-for="(user,idx) in includedUsers" :key="idx">&#8226; {{ user.userName }}</div>
             </q-card-section>
             <q-card-section>
                 <div class="text-overline">Voting Deadline</div>
                 <div class="text-h7 row">{{ prettyDate }}</div>
                 <q-separator class="q-my-md" />
-                <div class="text-overline">Nomination Deadline</div>
-                <div class="text-h7 row"> not implemented. </div>
+                <div class="text-overline">Ballot Options</div>
+                <div class="text-h7 row" v-for="(option, idx) in ballots[0].ballotOptions" :key="idx">
+                  &#8226; {{option.title}}: {{option.description}}
+                </div>
             </q-card-section>
         </q-card-section>
       </div>
@@ -91,28 +102,49 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+  <q-dialog v-model="votingDialog" persistent style="width: 500px">
+    <VotingCard
+      v-bind:previousVote="previousVote"
+      v-bind:ballotId="ballots[0].id"
+      v-bind:ballotOptions="ballots[0].ballotOptions"
+      v-bind:title="name"
+      v-bind:description="description"
+      @votingClose="closeVotingModal()" />
+  </q-dialog>
+  <q-dialog v-model="resultsDialog" persistent style="width: 500px">
+    <ResultsCard
+      v-bind:ballot="ballots[0]"
+      v-bind:decisionInfo="{ name: name, description: description, showClose: true }"
+      @resultsClose="resultsDialog = false" />
+  </q-dialog>
 </div>
 </template>
 
 <script>
 import auth from 'src/store/auth'
 import EditDecisionCard from 'src/components/EditDecisionCard'
+import VotingCard from 'src/components/VotingCard'
+import ResultsCard from 'src/components/ResultsCard'
 
 export default {
   name: 'DecisionCard',
 
   components: {
-    EditDecisionCard
+    EditDecisionCard,
+    VotingCard,
+    ResultsCard
   },
 
   data () {
     return {
       currentUserName: '',
+      resultsList: [],
       editDecisionDialog: false,
       deleteDecisionDialog: false,
+      votingDialog: false,
+      resultsDialog: false,
       expirationDate: '',
       expanded: false,
-      expired: false,
       daysRemaining: '',
       hoursRemaining: '',
       minutesRemaining: '',
@@ -121,6 +153,12 @@ export default {
   },
 
   computed: {
+    expired: function () {
+      const diff = (new Date(this.editableDecision.ballots[0].expirationDate) - Date.now()) / 1000
+      if (diff < 0) { return true }
+      return false
+    },
+
     status: function () {
       if (!this.expired) {
         return { vote: true, nominate: false, results: false }
@@ -132,17 +170,36 @@ export default {
       return new Date(this.editableDecision.ballots[0].expirationDate)
     },
 
-    editableDecision: function () {
-      let tempBallots = [{ expirationDate: '1970-01-01T00:01:00-00:00' }]
-      if (this.ballots.length !== 0) {
-        tempBallots = this.ballots
+    voteLabel: function () {
+      let result
+      for (result of this.resultsList) {
+        if (result.userName === this.currentUserName) { return 'View Vote' }
       }
+      return 'Vote'
+    },
+
+    previousVote: function () {
+      let result
+      for (result of this.resultsList) {
+        if (result.userName === this.currentUserName) {
+          let option
+          for (option of this.ballots[0].ballotOptions) {
+            if (result.ballotOptionId === option.id) {
+              return { title: option.title, description: option.description }
+            }
+          }
+        }
+      }
+      return undefined
+    },
+
+    editableDecision: function () {
       return {
         id: this.id,
         name: this.name,
         description: this.description,
         includedUsers: this.includedUsers,
-        ballots: tempBallots
+        ballots: this.ballots
       }
     }
   },
@@ -185,6 +242,7 @@ export default {
 
   mounted () {
     this.currentUserName = auth.getTokenData().sub
+    this.getResultsData()
     this.calculateRemainingTime()
   },
 
@@ -195,7 +253,6 @@ export default {
 
         if (diff < 0) {
           clearInterval(secondsTiemr)
-          this.expired = true
           return
         }
 
@@ -207,7 +264,7 @@ export default {
         this.hoursRemaining = hours
         this.minutesRemaining = minutes
         this.secondsRemaining = seconds
-      }, 1000)
+      }, 500)
     },
 
     openEditModal () {
@@ -217,11 +274,27 @@ export default {
     closeEditModal () {
       this.editDecisionDialog = false
       this.$emit('needReload')
+      this.calculateRemainingTime()
+    },
+
+    closeVotingModal () {
+      this.votingDialog = false
+      this.getResultsData()
+      this.$emit('needReload')
+    },
+
+    async getResultsData () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballots[0].id}/results`)
+        this.resultsList = response.data.data
+      } catch (error) {
+        console.log(error)
+      }
     },
 
     async onConfirmDelete () {
       try {
-        await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editDetails)
+        await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.id}`)
         this.deleteDecisionDialog = false
         this.$emit('needReload')
       } catch (error) {

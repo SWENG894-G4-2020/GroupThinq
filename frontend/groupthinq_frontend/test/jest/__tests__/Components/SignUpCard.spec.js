@@ -27,6 +27,11 @@ describe('SignUp Card tests', () => {
   localVue.use(VueRouter)
   localVue.prototype.$axios = axios
 
+  beforeEach( () => {
+    jest.clearAllMocks()
+    auth.removeTokens = jest.fn()
+  })
+
   it('can cancel a signup', async () => {
     const wrapper = shallowMount(SignUpCard, { localVue, router})
     const vm = wrapper.vm

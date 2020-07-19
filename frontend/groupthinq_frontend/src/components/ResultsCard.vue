@@ -1,0 +1,165 @@
+<template>
+  <q-card style="">
+    <q-card-section class="q-pa-md column">
+      <span class="text-h4">{{decisionInfo.name}}</span>
+      <span class="text-subtitle1 text-grey">{{decisionInfo.description}}</span>
+      <span class="text-caption">Decided on: {{this.prettyDate}}</span>
+    </q-card-section>
+    <q-card-section class="q-pa-md column items-center" v-if="resultsList">
+      <q-table
+        title="Results"
+        dense
+        :data="tabulatedResults"
+        :columns="columns"
+        color="primary"
+        row-key="title"
+        no-data-label="No results yet."
+        :pagination="initialPagination"
+      >
+      <template v-slot:body-cell-name="props">
+        <q-td :props="props">
+          <div>
+            {{props.value}}
+          </div>
+          <div class="option-desc">
+            {{ props.row.description }}
+          </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-winner="props">
+        <q-td :props="props">
+          <div v-if="props.row.winner">
+            <q-icon name="done" class="text-green"/>
+          </div>
+        </q-td>
+      </template>
+    </q-table>
+    </q-card-section>
+    <q-card-section v-else>
+      No results to show.
+    </q-card-section>
+    <q-card-actions align="right" v-if="decisionInfo.showClose">
+      <q-btn label="Close" @click="$emit('resultsClose')" />
+    </q-card-actions>
+  </q-card>
+</template>
+
+<script>
+
+export default {
+  name: 'ResultsCard',
+
+  data () {
+    return {
+      isLoaded: false,
+      resultsList: [],
+      initialPagination: {
+        sortBy: 'desc',
+        descending: false,
+        page: 1,
+        rowsPerPage: 10
+      },
+      columns: [
+        {
+          name: 'name',
+          required: true,
+          label: 'Option',
+          align: 'left',
+          field: row => row.name,
+          format: val => `${val}`,
+          sortable: true
+        },
+        { name: 'winner', align: 'center', label: 'Winner', field: 'winner', sortable: true },
+        { name: 'votes', align: 'center', label: '# of Votes', field: 'votes', sortable: true }
+      ]
+    }
+  },
+
+  mounted () {
+    this.getResultsData()
+  },
+
+  computed: {
+    resultTotals: function () {
+      const resultTotals = {}
+      let option
+      for (option of this.ballot.ballotOptions) {
+        resultTotals[option.id] = 0
+      }
+
+      let result
+      for (result of this.resultsList) {
+        resultTotals[result.ballotOptionId] += 1
+      }
+      return resultTotals
+    },
+
+    winnerId: function () {
+      let winnerId = []
+      let max = 0
+      let resultId
+      for (resultId in this.resultTotals) {
+        if (this.resultTotals[resultId] > max) {
+          max = this.resultTotals[resultId]
+          winnerId = [parseInt(resultId)]
+        } else if (this.resultTotals[resultId] === max) {
+          winnerId.push(parseInt(resultId))
+        }
+      }
+      return winnerId
+    },
+
+    tabulatedResults: function () {
+      const data = []
+      let option
+      for (option of this.ballot.ballotOptions) {
+        data.push({
+          name: option.title,
+          description: option.description,
+          votes: this.resultTotals[option.id],
+          winner: this.winnerId.includes(option.id)
+        })
+      }
+      return data
+    },
+
+    prettyDate: function () {
+      return new Date(this.ballot.expirationDate).toGMTString()
+    }
+  },
+
+  methods: {
+    async getResultsData () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballot.id}/results`)
+        this.resultsList = response.data.data
+        this.isLoaded = true
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  },
+
+  props: {
+    decisionInfo: {
+      type: Object,
+      required: true
+    },
+    ballot: {
+      type: Object,
+      required: true
+    }
+  }
+}
+</script>
+
+<style>
+.option-desc {
+  font-size: 0.85em;
+  font-style: italic;
+  max-width: 200px;
+  white-space: normal;
+  color: #555;
+  margin-top: 4px;
+}
+</style>

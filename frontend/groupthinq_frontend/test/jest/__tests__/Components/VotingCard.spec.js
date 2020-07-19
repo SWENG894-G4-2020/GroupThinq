@@ -4,7 +4,7 @@
  */
 
 import { mount, createLocalVue, shallowMount } from '@vue/test-utils'
-import EditDecisionCard from 'src/components/EditDecisionCard'
+import VotingCard from 'src/components/VotingCard'
 import axios from 'axios'
 import auth from 'src/store/auth'
 import * as All from 'quasar'
@@ -19,38 +19,27 @@ const components = Object.keys(All).reduce((object, key) => {
   return object
 }, {})
 
-describe('Edit Decision Card tests', () => {
+describe('Voting Card tests', () => {
   const localVue = createLocalVue()
   localVue.use(Quasar, { components }) // , lang: langEn
 
   const testPropsTemplate = {
-    id: 5,
-    name: "Decision 1",
-    description: "Decision with Ballot and 4 Ballot Options",
-    ownerUsername: "testUser",
-    includedUsers: [
-        {userName: "test"},
-        {userName: "test2"}
-    ],
-    ballots: [{
-      id: 10,
-      expirationDate: "2020-10-10T04:00:00.000Z",
-      ballotOptions: [
-        {
-          title: "Ballot Option 1",
+    previousVote: {title: "Ballot Option 2", description: "This is a description for Ballot Option 2"},
+    ballotId: 10,
+    title: "Decision 1",
+    description: "Decision with Ballot and 2 Ballot Options",
+    ballotOptions: [
+      {
+        title: "Ballot Option 1",
+        userName: "testuser1",
+        description: "This is a description for Ballot Option 1"
+      },
+      {
+          title: "Ballot Option 2",
           userName: "testuser1",
-          description: "This is a description for Ballot Option 1"
-        },
-        {
-            title: "Ballot Option 2",
-            userName: "testuser1",
-            description: "This is a description for Ballot Option 2"
-        }
-            ]
-        }
-    ]
+          description: "This is a description for Ballot Option 2"
+      }]
   }
-
   var testProps = {}
 
   beforeEach( () => {
@@ -59,19 +48,47 @@ describe('Edit Decision Card tests', () => {
     auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
   })
 
-  it('catches axios get errors', async () => {
+  it('catches submission and axios post errors', async () => {
     console.log = jest.fn()
-    axios.get = jest.fn(() => Promise.reject("Test Error"))
+    axios.post = jest.fn(() => Promise.reject("Test Error"))
     localVue.prototype.$axios = axios
 
-    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
+    const wrapper = shallowMount(VotingCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
-    await localVue.nextTick()// wait for the mounted function to finish
+    vm.$data.voteResult = 'Ballot Option 1'
+    await vm.onSubmit()
     expect(console.log).toHaveBeenCalledWith('Test Error')
+    expect(console.log).toHaveBeenCalledTimes(1)
+
+    vm.$data.voteResult = 'Ballot Option 3'
+    await vm.onSubmit()
 
   })
 
+  it('posts a new vote correctly', async () => {
+    console.log = jest.fn()
+    axios.post = jest.fn(() => Promise.resolve())
+    localVue.prototype.$axios = axios
+
+    const wrapper = shallowMount(VotingCard, {propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    vm.$data.voteResult = 'Ballot Option 1'
+    await vm.onSubmit()
+    expect(axios.post).toHaveBeenCalledTimes(1)
+  })
+
+  it('correctly formats ballot options', async () => {
+    expect(VotingCard.computed.formattedVoteOptions
+      .call({ballotOptions: testProps.ballotOptions}))
+      .toStrictEqual(
+      [{"label": "Ballot Option 1: This is a description for Ballot Option 1", "value": "Ballot Option 1"}, 
+      {"label": "Ballot Option 2: This is a description for Ballot Option 2", "value": "Ballot Option 2"}])
+
+  })
+
+  /*
   it('catches axios put errors', async () => {
     console.log = jest.fn()
     axios.put = jest.fn(() => Promise.reject("Test Error"))
@@ -167,4 +184,6 @@ describe('Edit Decision Card tests', () => {
     await vm.checkValidSubmit()
     await vm.onEditConfirm()
   })
+
+  */
 })
