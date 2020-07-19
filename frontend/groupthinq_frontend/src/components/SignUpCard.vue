@@ -68,6 +68,11 @@ export default {
     }
   },
 
+  mounted () {
+    // this is neccesary in case a browser has stale JWTs from a previous session
+    auth.removeTokens()
+  },
+
   methods: {
     cancel () {
       this.$router.push('/')

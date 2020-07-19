@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
@@ -33,7 +34,6 @@ import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
-import org.psu.edu.sweng.capstone.backend.model.UserRole;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -51,6 +51,9 @@ class UserServiceImplTest extends ServiceImplTest {
 	
 	@Mock
 	private UserRoleDAO userRoleDao;
+	
+	@Mock
+	private BallotResultDAO ballotResultDao;
 	
 	@Mock
 	private DecisionUserDAO decisionUserDao;
@@ -203,8 +206,6 @@ class UserServiceImplTest extends ServiceImplTest {
 	void deleteUser_worksProperly_withUserAlreadyInSystem_noChildDependencies() throws EntityNotFoundException {
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
-		when(userRoleDao.findAllByUser(user)).thenReturn(new ArrayList<>());
-		when(decisionUserDao.findAllByUser(user)).thenReturn(new ArrayList<>());
 		ResponseEntity<UserDTO> response = userServiceImpl.deleteUser(userName);
 		
 		// then
@@ -214,27 +215,8 @@ class UserServiceImplTest extends ServiceImplTest {
 
 	@Test
 	void deleteUser_worksProperly_withUserAlreadyInSystem_childDependencies() throws EntityNotFoundException {
-		// given
-		ArrayList<UserRole> userRoles = new ArrayList<>();
-		ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
-
-		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-		Decision newDecision = new Decision("New Decision", "Description of Decision", testUser);
-		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
-		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
-		
-		// given
-		User newUser2 = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
-		Role newRole = new Role();
-		UserRole userRole = new UserRole(newUser2, newRole);
-		
-		decisionUsers.add(newDecisionUser);
-		userRoles.add(userRole);
-		
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
-		when(userRoleDao.findAllByUser(user)).thenReturn(userRoles);
-		when(decisionUserDao.findAllByUser(user)).thenReturn(decisionUsers);
 		ResponseEntity<UserDTO> response = userServiceImpl.deleteUser(userName);
 		
 		// then
@@ -290,7 +272,6 @@ class UserServiceImplTest extends ServiceImplTest {
 
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(userOptional);
-		when(decisionUserDao.findAllByUser(user)).thenReturn(new ArrayList<>());
 	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
 		
 		// then
@@ -302,18 +283,15 @@ class UserServiceImplTest extends ServiceImplTest {
 		// given
 		Decision decisionOne = new Decision("New Decision #1", "Description of Decision #1", user);
 		Decision decisionTwo  = new Decision("New Decision #2", "Description of Decision #2", user);
+				
+		user.getDecisions().add(new DecisionUser(decisionOne, user));
+		user.getDecisions().add(new DecisionUser(decisionTwo, user));
 		
-		ArrayList<DecisionUser> decisionUserList = new ArrayList<>();
-		
-		decisionUserList.add(new DecisionUser(decisionOne, user));
-		decisionUserList.add(new DecisionUser(decisionTwo, user));
-
 		Optional<User> userOptional = Optional.of(user);
 
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(userOptional);
-		when(decisionUserDao.findAllByUser(user)).thenReturn(decisionUserList);
-	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
+		ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
 		
 		// then
 	    assertEquals(2, response.getData().size());

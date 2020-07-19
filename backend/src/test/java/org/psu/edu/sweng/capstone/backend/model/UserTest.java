@@ -18,7 +18,7 @@ class UserTest {
 		UserRole userRole = new UserRole(testUser, new Role());
 		userRoles.add(userRole);
 		
-		testUser.setUserRoles(userRoles);
+		testUser.setRoles(userRoles);
 		testUser.setUserName("testUser");
 		testUser.setPassword("testPassword");
 		testUser.setLastName("user");
@@ -63,14 +63,14 @@ class UserTest {
 		assertEquals(new Date(1L), testUser.getCreatedDate());
 		assertEquals(new Date(2L), testUser.getUpdatedDate());
 		assertEquals(new Date(3L), testUser.getLastLoggedIn());
-		assertEquals(1, testUser.getUserRoles().size());
+		assertEquals(1, testUser.getRoles().size());
 	}
 	
 	@Test
 	void setters_worksProperly() {
 		// when
 		UserRole newRole = new UserRole(testUser, new Role());
-		testUser.getUserRoles().add(newRole);
+		testUser.getRoles().add(newRole);
 		
 		testUser.setUserName("mwboyer");
 		testUser.setPassword("newpassword");
@@ -91,7 +91,7 @@ class UserTest {
 		assertEquals(new Date(9587L), testUser.getCreatedDate());
 		assertEquals(new Date(1111L), testUser.getUpdatedDate());
 		assertEquals(new Date(2222L), testUser.getLastLoggedIn());
-		assertEquals(2, testUser.getUserRoles().size());
+		assertEquals(2, testUser.getRoles().size());
 	}
 	
 	@Test

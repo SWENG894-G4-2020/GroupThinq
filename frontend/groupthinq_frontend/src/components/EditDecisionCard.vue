@@ -3,9 +3,9 @@
     <q-card-section class='column items-center q-pa-md'>
       <div class="text-h5 q-ma-md"> Editing Decision... </div>
       <div class="text-subtitle2"> Decision Details </div>
-      <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" />
-      <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="editableDecision.description" label="Description" />
-      <q-input filled v-model="editableDecision.ballots[0].expirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" style="width: 100%">
+      <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" :rules="[val => !!val || '*Required']"/>
+      <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="editableDecision.description" label="Description" :rules="[val => !!val || '*Required']"/>
+      <q-input filled v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
         <template v-slot:prepend>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -59,6 +59,9 @@
       </div>
       <q-separator class="q-my-md" />
     </q-card-section>
+    <q-card-section class="text-center text-body-1 text-negative" v-if="!submissionValid">
+      An edited decision requires a title, description, and valid expiration date.
+    </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
       <q-btn color="green-8" @click="onEditConfirm()" label="Confirm Edit" />
@@ -73,10 +76,12 @@ export default {
   data () {
     return {
       currentUserName: '',
+      newExpirationDate: '',
       editableDecision: { ballots: [{}] },
       allUsersList: [],
       filteredUsersList: [],
-      newIncludedUser: ''
+      newIncludedUser: '',
+      submissionValid: true
     }
   },
 
@@ -123,15 +128,19 @@ export default {
     },
 
     async onEditConfirm () {
-      this.editableDecision.ballots[0].expirationDate = new Date(this.editableDecision.ballots[0].expirationDate).toISOString()
-      console.log({ name: 'TestEdit', ownerUsername: this.currentUserName })
+      if (!this.checkValidSubmit()) {
+        this.submissionValid = false
+        return
+      }
+
+      this.editableDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       try {
-        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, { name: 'TestEdit', ownerUsername: this.currentUserName, includedUsers: [{ userName: 'test' }] })
-        this.$emit('editClose')
+        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editableDecision)
       } catch (error) {
         console.log(error)
         this.$emit('error')
       }
+      this.$emit('editClose')
     },
 
     async getAllUsers () {
@@ -152,6 +161,7 @@ export default {
         includedUsers: this.includedUsers,
         ballots: this.ballots
       }
+      this.newExpirationDate = new Date(this.editableDecision.ballots[0].expirationDate).toISOString()
     },
 
     addIncludedUser () {
@@ -178,6 +188,19 @@ export default {
         const needle = val.toLowerCase()
         this.filteredUsersList = this.allUsersList.filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    checkValidDate (d) {
+      const check = Date.parse(d)
+      if (check) { return true }
+      return false
+    },
+
+    checkValidSubmit () {
+      if (!this.editableDecision.name) { return false }
+      if (!this.editableDecision.description) { return false }
+      if (!this.checkValidDate(this.newExpirationDate)) { return false }
+      return true
     }
   }
 }

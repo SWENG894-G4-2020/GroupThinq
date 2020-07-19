@@ -13,9 +13,9 @@
       </div>
       <q-slide-transition>
         <div v-show="detailsExpanded" style="width:100%">
-          <q-input filled class="q-my-md" style="width: 100%" v-model="newDecision.name" label="Title" />
-          <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description" />
-          <q-input filled v-model="newDecision.ballots[0].expirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" style="width: 100%">
+          <q-input filled class="q-my-md" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
+          <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description" :rules="[val => !!val || '*Required']"/>
+          <q-input filled v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
             <template v-slot:prepend>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -98,14 +98,17 @@
             <q-btn round dense class="col-shrink q-mx-md" color="green-8" icon="add" @click="addDecisionOption()" />
           </div>
           <div class="column">
-            <div v-for="(option,idx) in optionsList" :key="idx" class="row items-center" style="max-width:300px">
-              <span class="text-h6 q-mr-md">{{idx + 1}}.</span>
-              <span class="text-body1 q-mr-lg">{{option.title}}:  {{option.description}}</span>
-              <q-btn color="grey" round dense icon="close" size="xs" @click="removeDecisionOption(option)" />
-            </div>
+            <q-card v-for="(option,idx) in optionsList" :key="idx" class="row items-center q-mb-sm" style="width: 100%">
+              <span class="col-1 text-h6 q-pl-sm">{{idx + 1}}.</span>
+              <span class="col-10 text-body1">{{option.title}}:  {{option.description}}</span>
+              <q-btn color="negative" round dense icon="close" size="xs" @click="removeDecisionOption(option)" />
+            </q-card>
           </div>
         </div>
       </q-slide-transition>
+    </q-card-section>
+    <q-card-section class="text-center text-body-1 text-negative" v-if="!submissionValid">
+      A new decision requires a title, description, valid expiration date, and at least one option.
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
@@ -121,6 +124,7 @@ export default {
   data () {
     return {
       currentUserName: '',
+      newExpirationDate: '',
       newDecision: { ballots: [{}] },
       newOption: { title: '', description: '', userName: this.currentUserName },
       optionsList: [],
@@ -130,7 +134,8 @@ export default {
       newIncludedUser: '',
       detailsExpanded: true,
       usersExpanded: false,
-      optionsExpanded: false
+      optionsExpanded: false,
+      submissionValid: true
     }
   },
 
@@ -146,7 +151,12 @@ export default {
     },
 
     async onCreate () {
-      this.newDecision.ballots[0].expirationDate = new Date(this.newDecision.ballots[0].expirationDate).toISOString()
+      if (!this.checkValidSubmit()) {
+        this.submissionValid = false
+        return
+      }
+
+      this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
 
       this.newDecision.ballots[0].ballotOptions = this.optionsList
@@ -181,6 +191,7 @@ export default {
         ]
       }
       this.addedUsers = []
+      this.expirationDate = ''
     },
 
     addIncludedUser () {
@@ -217,6 +228,20 @@ export default {
         const needle = val.toLowerCase()
         this.filteredUsersList = this.allUsersList.filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    checkValidDate (d) {
+      const check = Date.parse(d)
+      if (check) { return true }
+      return false
+    },
+
+    checkValidSubmit () {
+      if (this.newDecision.name === '') { return false }
+      if (this.newDecision.description === '') { return false }
+      if (!this.checkValidDate(this.newExpirationDate)) { return false }
+      if (this.optionsList.length < 1) { return false }
+      return true
     }
   }
 }

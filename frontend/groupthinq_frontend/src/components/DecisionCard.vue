@@ -2,8 +2,11 @@
 <div style="min-width: 100%">
   <q-card bordered class="q-mx-xl q-mt-md">
     <q-card-section>
-      <div class="text-h5 row items-center">
-        <div class="col q-my-md">{{name}}</div>
+      <div class="row items-center justify-between">
+        <div class="col">
+          <span class="text-overline q-pr-lg">Decision:</span>
+          <span class="text-h5">{{name}}</span>
+        </div>
         <q-btn round icon="edit" class="col-auto" v-if="ownerUsername === this.currentUserName">
           <q-menu>
             <q-list>
@@ -17,9 +20,12 @@
           </q-menu>
         </q-btn>
       </div>
-      <div class="text-grey">{{description}}</div>
-      <div class="text-negative" v-if="!expired">Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
-      <div class="text-negative" v-else>Voting has closed.</div>
+      <div class="q-mb-sm">
+          <span class="text-overline q-mr-sm">Description:</span>
+          <span class="text-body-1">{{description}}</span>
+        </div>
+      <div class="text-negative" v-if="!expired">Time Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
+      <div class="text-negative" v-else>Time Remaining: Voting has closed.</div>
     </q-card-section>
     <q-card-actions class="row justify-between">
       <div class="col">
@@ -51,7 +57,7 @@
             :label="voteLabel"
             class="q-mx-xs"
             :outline="!status.vote"
-            :disable="!status.vote"
+            :disable="!status.vote && !previousVote"
             color="primary"
             @click="votingDialog = true" />
         </div>
@@ -66,14 +72,16 @@
                 <div class="text-h7">{{ ownerUsername }}</div>
             <q-separator class="q-my-md" />
                 <div class="text-overline">Members</div>
-                <div class="text-h7 row" v-for="(user,idx) in includedUsers" :key="idx">{{ user.userName }}</div>
+                <div class="text-h7 row" v-for="(user,idx) in includedUsers" :key="idx">&#8226; {{ user.userName }}</div>
             </q-card-section>
             <q-card-section>
                 <div class="text-overline">Voting Deadline</div>
                 <div class="text-h7 row">{{ prettyDate }}</div>
                 <q-separator class="q-my-md" />
-                <div class="text-overline">Nomination Deadline</div>
-                <div class="text-h7 row"> not implemented. </div>
+                <div class="text-overline">Ballot Options</div>
+                <div class="text-h7 row" v-for="(option, idx) in ballots[0].ballotOptions" :key="idx">
+                  &#8226; {{option.title}}: {{option.description}}
+                </div>
             </q-card-section>
         </q-card-section>
       </div>
@@ -137,7 +145,6 @@ export default {
       resultsDialog: false,
       expirationDate: '',
       expanded: false,
-      expired: false,
       daysRemaining: '',
       hoursRemaining: '',
       minutesRemaining: '',
@@ -146,6 +153,12 @@ export default {
   },
 
   computed: {
+    expired: function () {
+      const diff = (new Date(this.editableDecision.ballots[0].expirationDate) - Date.now()) / 1000
+      if (diff < 0) { return true }
+      return false
+    },
+
     status: function () {
       if (!this.expired) {
         return { vote: true, nominate: false, results: false }
@@ -244,7 +257,6 @@ export default {
 
         if (diff < 0) {
           clearInterval(secondsTiemr)
-          this.expired = true
           return
         }
 
@@ -266,6 +278,7 @@ export default {
     closeEditModal () {
       this.editDecisionDialog = false
       this.$emit('needReload')
+      this.calculateRemainingTime()
     },
 
     closeVotingModal () {
@@ -285,7 +298,7 @@ export default {
 
     async onConfirmDelete () {
       try {
-        await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editDetails)
+        await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.id}`)
         this.deleteDecisionDialog = false
         this.$emit('needReload')
       } catch (error) {

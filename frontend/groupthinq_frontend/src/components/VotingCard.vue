@@ -1,19 +1,26 @@
 <template>
-  <q-card style="width=100%">
+  <q-card style="width:50%; min-width:400px">
     <q-card-section class="q-pa-md column items-center" v-if="!previousVote">
-    <div class="q-px-md q-mt-md text-h5">Vote for {{title}}</div>
-    <div class="text-subtitle1">{{description}}</div>
+    <div class="text-overline">Submit a vote for:</div>
+    <div class="text-h5">{{title}}</div>
+    <div class="text-subtitle1 q-mb-md">{{description}}</div>
+    <q-separator />
+    <div class="text-overline">Voting Options:</div>
     <q-option-group
-      class="q-my-md"
+      class=""
       :options="formattedVoteOptions"
       label="vote"
       type="radio"
       v-model="voteResult" />
-      <div class="q-pa-md text-h6">Current Selection: {{voteResult}}</div>
+    <q-separator />
+    <div class="q-pa-md">
+      <span class="text-h6 q-pr-sm text-weight-light">Current Selection:</span>
+      <span class="text-h6">{{voteResult}}</span>
+    </div>
       <div class="text-body1 text-negative" v-if="selectionError">You must make a selection to vote.</div>
     </q-card-section>
     <q-card-section class="q-pa-md column items-center" v-else>
-      <div class="q-px-md q-mt-md text-h5">Your vote was:</div>
+      <div class="text-overline">Your submitted vote was:</div>
       <div class="q-px-md q-mt-sm text-h6">{{previousVote.title}}</div>
       <div class="q-px-md q-mt-sm text-body-1">{{previousVote.description}}</div>
     </q-card-section>
