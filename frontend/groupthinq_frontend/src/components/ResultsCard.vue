@@ -84,7 +84,7 @@ export default {
     },
 
     prettyDate: function () {
-      return new Date(this.ballot.expirationDate)
+      return new Date(this.ballot.expirationDate).toGMTString()
     }
   },
 
