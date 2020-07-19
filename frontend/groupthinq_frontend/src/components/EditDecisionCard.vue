@@ -6,17 +6,13 @@
       <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" :rules="[val => !!val || '*Required']"/>
       <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="editableDecision.description" label="Description" :rules="[val => !!val || '*Required']"/>
       <q-input filled v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
-        <template v-slot:prepend>
+        <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date v-model="editableDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-        <template v-slot:append>
-          <q-icon name="access_time" class="cursor-pointer">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-time v-model="editableDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
+              <div class="q-gutter-md row items-start">
+                <q-date v-model="newDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" color="purple" />
+                <q-time v-model="newDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" color="purple" />
+              </div>
             </q-popup-proxy>
           </q-icon>
         </template>
