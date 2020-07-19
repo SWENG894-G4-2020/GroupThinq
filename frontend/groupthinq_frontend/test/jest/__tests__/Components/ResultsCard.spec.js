@@ -105,6 +105,15 @@ describe('Results Card tests', () => {
     expect(axios.get).toHaveBeenCalledTimes(1)
   })
 
+  it('calls anonymous functions', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    const wrapper = shallowMount(ResultsCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    
+    vm.$data.columns[0].field('row')
+    vm.$data.columns[0].format('val')
+  })
+
   it('contains a Results table after initial data fetch', async () => {
     // set up the Axios mock
     axios.get = jest.fn(() => Promise.resolve(testData))

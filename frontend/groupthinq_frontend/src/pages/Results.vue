@@ -1,5 +1,5 @@
 <template>
-    <q-page padding class="fit column items-stretch">
+    <q-page padding class="fit column items-center">
       <div v-if="isLoaded">
         <div class="text-h5 text-primary text-center" v-if="decisionList.length == 0">No results yet.</div>
         <div class="row q-gutter-md">
