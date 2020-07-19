@@ -5,7 +5,6 @@
 
 import { mount, createLocalVue, shallowMount } from '@vue/test-utils'
 import ResultsCard from 'src/components/ResultsCard'
-import ResultsTable from 'src/components/ResultsTable'
 import axios from 'axios'
 import auth from 'src/store/auth'
 import * as All from 'quasar'
@@ -118,7 +117,7 @@ describe('Results Card tests', () => {
     // test for expected results
     await localVue.nextTick() // wait for the mounted function to finish
     expect(vm.isLoaded).toBe(true)
-    expect(wrapper.findComponent(ResultsTable).exists()).toBe(true)
+    expect(wrapper.findComponent(ResultsCard).exists()).toBe(true)
   })
 
   it('catches axios errors', async () => {
