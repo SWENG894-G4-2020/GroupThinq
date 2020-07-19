@@ -30,8 +30,8 @@ export default {
 
   data () {
     return {
-      resultsList: [],
-      selectionError: false
+      isLoaded: false,
+      resultsList: []
     }
   },
 
@@ -93,6 +93,7 @@ export default {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballot.id}/results`)
         this.resultsList = response.data.data
+        this.isLoaded = true
       } catch (error) {
         console.log(error)
       }
