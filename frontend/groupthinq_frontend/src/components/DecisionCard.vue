@@ -194,16 +194,12 @@ export default {
     },
 
     editableDecision: function () {
-      let tempBallots = [{ expirationDate: '1970-01-01T00:01:00-00:00' }]
-      if (this.ballots.length !== 0) {
-        tempBallots = this.ballots
-      }
       return {
         id: this.id,
         name: this.name,
         description: this.description,
         includedUsers: this.includedUsers,
-        ballots: tempBallots
+        ballots: this.ballots
       }
     }
   },

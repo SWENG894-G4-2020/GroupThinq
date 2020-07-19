@@ -106,25 +106,43 @@ describe('Decision Card tests', () => {
       .toBe(false)
   })
 
-  /*
-
   it('determines previous vote status', async () => {
-    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
-    const vm = wrapper.vm
+
     expect(DecisionCard.computed.previousVote
-      .call({resultsList: testData.data.data}))
-      .toBe(2)
+      .call({
+        currentUserName: 'testUser', 
+        resultsList: testData.data.data,
+        ballots: [{
+          ballotOptions: [
+            {
+              id: 1,
+              title: "Ballot Option 1",
+              userName: "testuser1",
+              description: "This is a description for Ballot Option 1"
+            },
+            {
+              id: 2,
+                title: "Ballot Option 2",
+                userName: "testuser1",
+                description: "This is a description for Ballot Option 2"
+            }
+                ]
+            }
+        ]
+      }))
+      .toStrictEqual({title: "Ballot Option 2", description: "This is a description for Ballot Option 2"})
   })
 
   it('determines correct vote label', async () => {
-    const wrapper = shallowMount(DecisionCard, { propsData: testProps, localVue })
-    const vm = wrapper.vm
-    expect(DecisionCard.computed.voteLabel
-      .call({resultsList: testData.data.data}))
-      .toBe('View Vote')
-  })
 
-  */
+    expect(DecisionCard.computed.voteLabel
+      .call({currentUserName: 'testUser', resultsList: [{userName: 'testUser'}]}))
+      .toBe('View Vote')
+
+    expect(DecisionCard.computed.voteLabel
+      .call({currentUserName: 'test', resultsList: [{userName: 'testUser'}]}))
+      .toBe('Vote')
+  })
 
   it('gets results data on mount', async () => {
     axios.get = jest.fn(() => Promise.resolve(testData))
