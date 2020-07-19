@@ -20,6 +20,7 @@ public class DecisionDTO {
     private Date createdDate;
     private Date updatedDate;
     private String ownerUsername;
+    private Boolean deleted;
     
     private List<BallotDTO> ballots = new ArrayList<>();
     private List<UserDTO> includedUsers = new ArrayList<>();
@@ -72,7 +73,15 @@ public class DecisionDTO {
         this.ownerUsername = ownerUsername;
     }
 	
-    public List<UserDTO> getIncludedUsers() {
+    public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public List<UserDTO> getIncludedUsers() {
         return includedUsers;
     }
 
@@ -96,6 +105,7 @@ public class DecisionDTO {
         if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
+        if (d.getDeleted() != null) { dto.setDeleted(d.getDeleted()); }
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
         for (DecisionUser decisionUser : d.getDecisionUsers()) {
