@@ -23,7 +23,38 @@ describe('Edit Decision Card tests', () => {
   const localVue = createLocalVue()
   localVue.use(Quasar, { components }) // , lang: langEn
 
+  const testPropsTemplate = {
+    id: 5,
+    name: "Decision 1",
+    description: "Decision with Ballot and 4 Ballot Options",
+    ownerUsername: "testUser",
+    includedUsers: [
+        {userName: "test"},
+        {userName: "test2"}
+    ],
+    ballots: [{
+      id: 10,
+      expirationDate: "2020-10-10T04:00:00.000Z",
+      ballotOptions: [
+        {
+          title: "Ballot Option 1",
+          userName: "testuser1",
+          description: "This is a description for Ballot Option 1"
+        },
+        {
+            title: "Ballot Option 2",
+            userName: "testuser1",
+            description: "This is a description for Ballot Option 2"
+        }
+            ]
+        }
+    ]
+  }
+
+  var testProps = {}
+
   beforeEach( () => {
+    testProps = JSON.parse(JSON.stringify(testPropsTemplate))
     jest.clearAllMocks()
     auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
   })
@@ -33,15 +64,7 @@ describe('Edit Decision Card tests', () => {
     axios.get = jest.fn(() => Promise.reject("Test Error"))
     localVue.prototype.$axios = axios
 
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await localVue.nextTick()// wait for the mounted function to finish
@@ -54,15 +77,7 @@ describe('Edit Decision Card tests', () => {
     axios.put = jest.fn(() => Promise.reject("Test Error"))
     localVue.prototype.$axios = axios
 
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.onEditConfirm() // wait for the mounted function to finish
@@ -71,15 +86,7 @@ describe('Edit Decision Card tests', () => {
 
   it('gets all users', async () => {
     axios.get = jest.fn(() => Promise.resolve({data: { data: [{ userName: 'test1' }, { userName: 'test2' }]}}))
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
     
     await localVue.nextTick()
@@ -89,15 +96,7 @@ describe('Edit Decision Card tests', () => {
 
   it('edits a decision', async () => {
     axios.put = jest.fn()
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.onEditConfirm()
@@ -105,15 +104,7 @@ describe('Edit Decision Card tests', () => {
   })
 
   it('emits a cancel event on cancel', async () => {
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.onCancel()
@@ -121,15 +112,7 @@ describe('Edit Decision Card tests', () => {
   })
 
   it('filters user hints', async () => {
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     vm.$data.allUsersList = ['test1', 'test2']
@@ -138,30 +121,14 @@ describe('Edit Decision Card tests', () => {
   })
 
   it('can reset the edited decision data', async () => {
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     await vm.fillEditableDecision()
   })
 
   it('can add a user to the addedUsers list', async () => {
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
     vm.$data.newIncludedUser = 'test1'
@@ -175,31 +142,29 @@ describe('Edit Decision Card tests', () => {
   })
 
   it('removes a user from the includedUsers list', async () => {
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
-        includedUsers: [{userName: 'test1'}, {userName: 'test2'}]
-      }
-    , localVue })
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
     
-    await vm.removeUser('test1')
+    await vm.removeUser('test')
     await vm.removeUser('testUser')
     expect(vm.$data.editableDecision.includedUsers).toStrictEqual([{userName: 'test2'}])
   })
 
   it('handles zero length prop inputs', async () => {
-    const wrapper = shallowMount(EditDecisionCard, {
-      propsData: {
-        id: 4,
-        name: 'test',
-        description: 'testDesc',
-        ballots: []
-      }
-    , localVue })
+    testProps.includedUsers = undefined
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
+  })
+
+  it('handles invalid submission information', async () => {
+    const wrapper = shallowMount(EditDecisionCard, {propsData: testProps, localVue })
+    const vm = wrapper.vm
+    vm.$data.newExpirationDate = '20'
+    await vm.checkValidSubmit()
+    vm.$data.editableDecision.description = ''
+    await vm.checkValidSubmit()
+    vm.$data.editableDecision.name = ''
+    await vm.checkValidSubmit()
+    await vm.onEditConfirm()
   })
 })
