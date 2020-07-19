@@ -107,6 +107,7 @@
     <ResultsCard
       v-bind:ballotOptions="ballots[0].ballotOptions"
       v-bind:results="resultsList"
+      v-bind:decision="{ name: name, description: description }"
       @resultsClose="resultsDialog = false" />
   </q-dialog>
 </div>

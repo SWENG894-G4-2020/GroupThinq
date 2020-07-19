@@ -1,20 +1,34 @@
 <template>
-  <q-card style="">
-    <q-card-section class="q-pa-md column items-center" v-if="winnerInfo">
-      The winner is:
-      {{winnerInfo.title}}
-      {{winnerInfo.description}}
-    </q-card-section>
-    <q-card-section v-else>
-      No results to show.
-    </q-card-section>
-    <q-card-section class="q-pa-md column items-center" >
-      Results Graph Here
-    </q-card-section>
-    <q-card-actions align="right">
-      <q-btn label="Close" @click="$emit('resultsClose')" />
-    </q-card-actions>
-  </q-card>
+  <div class="q-pa-md">
+    <q-table
+      title="Results"
+      dense
+      :data="tabulatedResults"
+      :columns="columns"
+      color="primary"
+      row-key="title"
+      no-data-label="No results yet."
+      :pagination="initialPagination"
+    >
+      <template v-slot:body-cell-name="props">
+        <q-td :props="props">
+          <div>
+            {{props.value}}
+          </div>
+          <div class="option-desc">
+            {{ props.row.description }}
+          </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-winner="props">
+        <q-td :props="props">
+          <div v-if="props.row.winner">
+            <q-icon name="done" class="text-green"/>
+          </div>
+        </q-td>
+      </template>
+    </q-table>
+  </div>
 </template>
 
 <script>
@@ -22,27 +36,46 @@ export default {
   name: 'ResultsTable',
   data () {
     return {
-      columns: ''
+      initialPagination: {
+        sortBy: 'desc',
+        descending: false,
+        page: 1,
+        rowsPerPage: 10
+      },
+
+      columns: [
+        {
+          name: 'name',
+          required: true,
+          label: 'Option',
+          align: 'left',
+          field: row => row.name,
+          format: val => `${val}`,
+          sortable: true
+        },
+        { name: 'winner', align: 'center', label: 'Winner', field: 'winner', sortable: true },
+        { name: 'votes', align: 'center', label: '# of Votes', field: 'votes', sortable: true }
+      ]
     }
   },
 
-  computed: {
-
-  },
-
   props: {
-    ballotOptions: {
+    tabulatedResults: {
       type: Array,
-      required: true
-    },
-    results: {
-      type: Array,
-      required: true
-    },
-    resultTotals: {
-      type: Object,
       required: true
     }
   }
 }
 </script>
+
+<style>
+.option-desc {
+  font-size: 0.85em;
+  font-style: italic;
+  max-width: 200px;
+  white-space: normal;
+  color: #555;
+  margin-top: 4px;
+}
+
+</style>
