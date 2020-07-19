@@ -26,13 +26,15 @@ import org.sikuli.script.Pattern;
 import org.sikuli.script.Region;
 
 import java.util.*;
-	import java.io.File;  
-	import java.io.IOException; 
+import java.io.File;  
+import java.io.IOException; 
 	
 public class TC2_1 {
 
 	public static Object main(String[] args) throws InterruptedException, FindFailed {
 		ImagePath.setBundlePath("C:\\Users\\non-admin\\groupthinq\\integration\\src\\imgDictionary");
+		
+		String tcNumber = "TC2_1 ";
 		
 		System.setProperty("webdriver.gecko.driver","C:\\Users\\non-admin\\groupthinq\\integration\\lib\\drivers\\geckodriver.exe");
 		FirefoxOptions capabilities = new FirefoxOptions(); //DesiredCapabilities.firefox()
@@ -82,9 +84,9 @@ public class TC2_1 {
         try {
             Region region = screen.find(img);
             region.highlight(2);
-            result = "TC2_1 = PASS";
+            result = (tcNumber + "= PASS");
         } catch (Exception e) {
-        	result = "TC2_1 = FAIL";
+        	result = (tcNumber + "= FAIL");
         }
         
 		//Wait for 5 Sec
