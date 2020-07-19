@@ -1,17 +1,18 @@
 <template>
   <q-card style="">
-    <q-card-section class="q-pa-md column items-center">
-      <span class="text-h4">{{decision.name}}</span>
-      <span class="text-subtitle1 text-grey">{{decision.description}}</span>
+    <q-card-section class="q-pa-md column">
+      <span class="text-h4">{{decisionInfo.name}}</span>
+      <span class="text-subtitle1 text-grey">{{decisionInfo.description}}</span>
+      <span class="text-caption">Decided on: {{this.prettyDate}}</span>
     </q-card-section>
-    <q-card-section class="q-pa-md column items-center" v-if="resultTotals">
+    <q-card-section class="q-pa-md column items-center" v-if="resultsList">
       <ResultsTable
             v-bind:tabulatedResults="tabulatedResults"/>
     </q-card-section>
     <q-card-section v-else>
       No results to show.
     </q-card-section>
-    <q-card-actions align="right">
+    <q-card-actions align="right" v-if="decisionInfo.showClose">
       <q-btn label="Close" @click="$emit('resultsClose')" />
     </q-card-actions>
   </q-card>
@@ -29,21 +30,25 @@ export default {
 
   data () {
     return {
-      voteResult: '',
+      resultsList: [],
       selectionError: false
     }
+  },
+
+  mounted () {
+    this.getResultsData()
   },
 
   computed: {
     resultTotals: function () {
       const resultTotals = {}
       let option
-      for (option of this.ballotOptions) {
+      for (option of this.ballot.ballotOptions) {
         resultTotals[option.id] = 0
       }
 
       let result
-      for (result of this.results) {
+      for (result of this.resultsList) {
         resultTotals[result.ballotOptionId] += 1
       }
       return resultTotals
@@ -67,7 +72,7 @@ export default {
     tabulatedResults: function () {
       const data = []
       let option
-      for (option of this.ballotOptions) {
+      for (option of this.ballot.ballotOptions) {
         data.push({
           name: option.title,
           description: option.description,
@@ -76,19 +81,30 @@ export default {
         })
       }
       return data
+    },
+
+    prettyDate: function () {
+      return new Date(this.ballot.expirationDate)
+    }
+  },
+
+  methods: {
+    async getResultsData () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballot.id}/results`)
+        this.resultsList = response.data.data
+      } catch (error) {
+        console.log(error)
+      }
     }
   },
 
   props: {
-    ballotOptions: {
-      type: Array,
+    decisionInfo: {
+      type: Object,
       required: true
     },
-    results: {
-      type: Array,
-      required: true
-    },
-    decision: {
+    ballot: {
       type: Object,
       required: true
     }

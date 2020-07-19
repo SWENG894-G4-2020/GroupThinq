@@ -105,9 +105,8 @@
   </q-dialog>
   <q-dialog v-model="resultsDialog" persistent style="width: 500px">
     <ResultsCard
-      v-bind:ballotOptions="ballots[0].ballotOptions"
-      v-bind:results="resultsList"
-      v-bind:decision="{ name: name, description: description }"
+      v-bind:ballot="ballots[0]"
+      v-bind:decisionInfo="{ name: name, description: description, showClose: true }"
       @resultsClose="resultsDialog = false" />
   </q-dialog>
 </div>
