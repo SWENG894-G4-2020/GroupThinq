@@ -1,4 +1,4 @@
-package automationFramework;
+package automationFramework.TC2_Signup;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -29,7 +29,7 @@ import java.util.*;
 import java.io.File;  
 import java.io.IOException; 
 	
-public class TC2_3 {
+public class TC2_2 {
 
 	public static Object main(String[] args) throws InterruptedException, FindFailed {
 		ImagePath.setBundlePath("C:\\Users\\non-admin\\groupthinq\\integration\\src\\imgDictionary");
@@ -51,7 +51,7 @@ public class TC2_3 {
 	    driver.manage().window().setSize(new Dimension(1200, 1000));
 	    driver.findElement(By.cssSelector(".q-btn:nth-child(1) .block")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).sendKeys("");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).sendKeys("auto");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).sendKeys("tester");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).click();
@@ -66,14 +66,14 @@ public class TC2_3 {
 
         String result = "unchanged";
         Screen screen = new Screen();
-        Pattern img = new Pattern("missingFirstName.png");
+        Pattern img = new Pattern("groupthinqWelcomeScreen.png");
         
         try {
             Region region = screen.find(img);
             region.highlight(2);
-            result = "TC2_3 = PASS";
+            result = "TC2_2 = PASS";
         } catch (Exception e) {
-        	result = "TC2_3 = FAIL";
+        	result = "TC2_2 = FAIL";
         }
         
 		//Wait for 5 Sec
