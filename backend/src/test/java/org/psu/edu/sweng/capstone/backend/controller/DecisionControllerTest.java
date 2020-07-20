@@ -40,6 +40,16 @@ class DecisionControllerTest {
 		FormattingConversionService bean = new FormattingConversionService();
 		mockMvc = standaloneSetup(decisionController).setConversionService(bean).build();
 	}
+	
+	@Test
+	void getDecisions_callsRightServiceFunction() throws Exception {
+
+		// when
+		mockMvc.perform(get("/decisions")).andExpect(status().isOk());
+
+		// then
+		verify(decisionServiceImpl, times(1)).getDecisions();
+	}
 
 	@Test
 	void getUsers_callsRightServiceFunction() throws Exception {

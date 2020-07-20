@@ -95,6 +95,33 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	}
 	
 	@Test
+	void getDecisions_returnsEmptyList() {
+		// when
+		when(decisionDao.findAll()).thenReturn(new ArrayList<>());
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.getDecisions();
+
+		// then
+		assertGenericSuccess(response);
+		assertEquals(0, response.getErrors().size());
+	}
+	
+	@Test
+	void getDecisions_returnsResultsList() {
+		// given
+		ArrayList<Decision> results = new ArrayList<>();
+		results.add(dec);
+		
+		// when
+		when(decisionDao.findAll()).thenReturn(results);
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.getDecisions();
+
+		// then
+		assertGenericSuccess(response);
+		assertEquals(0, response.getErrors().size());
+		assertEquals(1, response.getData().size());
+	}
+	
+	@Test
 	void getDecision_noDecisionExists() throws EntityNotFoundException {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(null));
 	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.getDecision(decisionId); });
