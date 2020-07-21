@@ -40,10 +40,18 @@ class DecisionControllerTest {
 		FormattingConversionService bean = new FormattingConversionService();
 		mockMvc = standaloneSetup(decisionController).setConversionService(bean).build();
 	}
+	
+	@Test
+	void getDecisions_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(get("/decisions")).andExpect(status().isOk());
+
+		// then
+		verify(decisionServiceImpl, times(1)).getDecisions();
+	}
 
 	@Test
 	void getUsers_callsRightServiceFunction() throws Exception {
-		
 		// when
 		mockMvc.perform(get("/decision/{id}/users", decisionId)).andExpect(status().isOk());
 		
@@ -53,7 +61,6 @@ class DecisionControllerTest {
 
 	@Test
 	void getDecision_callsRightServiceFunction() throws Exception {
-
 		// when
 		mockMvc.perform(get("/decision/{id}", decisionId)).andExpect(status().isOk());
 
@@ -63,7 +70,6 @@ class DecisionControllerTest {
 
 	@Test
 	void deleteDecision_callsRightServiceFunction() throws Exception {
-
 		// when
 		mockMvc.perform(delete("/decision/{id}", decisionId)).andExpect(status().isOk());
 
@@ -73,7 +79,6 @@ class DecisionControllerTest {
 
 	@Test
 	void createDecision_callsRightServiceFunction() throws Exception {
-
 		// when
 		mockMvc.perform(post("/decision", decisionDto)
 				.accept(MediaType.APPLICATION_JSON)
@@ -87,7 +92,6 @@ class DecisionControllerTest {
 
 	@Test
 	void updateDecision_callsRightServiceFunction() throws Exception {
-
 		// when
 		mockMvc.perform(put("/decision/{id}", decisionId, decisionDto)
 				.accept(MediaType.APPLICATION_JSON)

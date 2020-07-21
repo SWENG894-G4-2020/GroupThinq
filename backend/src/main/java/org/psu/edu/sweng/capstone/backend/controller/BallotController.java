@@ -25,26 +25,26 @@ public class BallotController {
 	@Autowired
 	private BallotService ballotService;
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#ballot.getDecisionId())")
+	@PreAuthorize("@authCheck.isDecisionOwner(#ballot.getDecisionId()) or @authCheck.isAdmin()")
 	@PostMapping("/ballot")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<BallotDTO> createBallot(@RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.createBallot(ballot);
 	}
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
+	@PreAuthorize("@authCheck.isDecisionOwner(#id) or @authCheck.isAdmin()")
 	@DeleteMapping("ballot/{id}")
 	public ResponseEntity<BallotDTO> deleteBallot(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.deleteBallot(ballotId);
 	}
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
+	@PreAuthorize("@authCheck.isDecisionOwner(#id) or @authCheck.isAdmin()")
 	@GetMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> retrieveBallot(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.retrieveBallot(ballotId);
 	}
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
+	@PreAuthorize("@authCheck.isDecisionOwner(#id) or @authCheck.isAdmin()")
 	@PutMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> updateBallot(@PathVariable(value = "id") final Long ballotId, @RequestBody final BallotDTO ballot) throws EntityNotFoundException {
 		return ballotService.updateBallot(ballotId, ballot);

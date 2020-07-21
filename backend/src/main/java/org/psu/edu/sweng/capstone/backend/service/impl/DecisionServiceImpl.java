@@ -199,4 +199,15 @@ public class DecisionServiceImpl implements DecisionService {
 			}
 		}
 	}
+
+	@Override
+	public ResponseEntity<DecisionDTO> getDecisions() {
+		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
+		
+		decisionDao.findAll().stream().forEach(d -> response.getData().add(DecisionDTO.build(d)));
+				
+		response.attachGenericSuccess();
+		
+		return response;
+	}
 }
