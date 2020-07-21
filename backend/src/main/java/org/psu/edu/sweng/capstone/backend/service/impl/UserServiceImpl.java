@@ -141,7 +141,10 @@ public class UserServiceImpl implements UserService {
 				
 		decisionUserDao.findAllByUser(user).stream().forEach(du -> {
 			DecisionDTO dto = DecisionDTO.build(du.getDecision());
+			
 			dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(du.getDecision()), dto);
+			
+			response.getData().add(dto);
 		});
 		
 		response.attachGenericSuccess();
