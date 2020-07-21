@@ -1,6 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.security;
 
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
@@ -13,6 +14,9 @@ public class AuthCheck {
 		
 	@Autowired
 	private DecisionDAO decisionDao;
+	
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
 		
 	/** Determines whether the authenticated user can access the requested user. 
 	 *
@@ -52,7 +56,7 @@ public class AuthCheck {
 				() -> new EntityNotFoundException("Decision " + decisionId.toString()));
 		
 		boolean isDecisionUser = false;
-		for (DecisionUser du : decision.getDecisionUsers()) {
+		for (DecisionUser du : decisionUserDao.findAllByDecision(decision)) {
 			if (authUsername.equals(du.getUser().getUserName())) {
 				isDecisionUser = true;
 			}

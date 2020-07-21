@@ -1,9 +1,11 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -13,6 +15,9 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DecisionDTO {
+	
+	@Autowired
+	private static DecisionUserDAO decisionUserDao;
 
     private Long id;
     private String name;
@@ -108,7 +113,7 @@ public class DecisionDTO {
         if (d.getDeleted() != null) { dto.setDeleted(d.getDeleted()); }
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
 
-        for (DecisionUser decisionUser : d.getDecisionUsers()) {
+        for (DecisionUser decisionUser : decisionUserDao.findAllByDecision(d)) {
         	UserDTO userDTO = new UserDTO();
         	final User user = decisionUser.getUser();
         	
