@@ -43,7 +43,6 @@ public class BallotOptionServiceImpl implements BallotOptionService {
 		}
 		
 		if (boDTO.getTitle() != null) { ballotOption.setTitle(boDTO.getTitle()); }
-		if (boDTO.getDescription() != null) { ballotOption.setDescription(boDTO.getDescription()); }
 		
 		ballotOption.setUpdatedDate(new Date());
 		

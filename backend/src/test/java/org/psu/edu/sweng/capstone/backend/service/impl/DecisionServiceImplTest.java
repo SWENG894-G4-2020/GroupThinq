@@ -63,7 +63,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 
 	private Long decisionId = 1337L;
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-	private Decision dec = new Decision("Test Decision", "Test Description", testUser);
+	private Decision dec = new Decision("Test Decision", testUser);
 	private DecisionUser decUser = new DecisionUser(dec, new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 		
@@ -118,7 +118,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasNullValues_includedUsers() throws EntityNotFoundException {
 		// given
 		UserDTO userDTO = UserDTO.build(testUser);
-		Decision decision = new Decision(null, null, null);
+		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
 		decisionDTO.setId(1L);
@@ -138,7 +138,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasNullValues_includedUsers_notExistPreviously() throws EntityNotFoundException {
 		// given
 		UserDTO userDTO = UserDTO.build(testUser);
-		Decision decision = new Decision(null, null, null);
+		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
 		DecisionUser du = new DecisionUser(decision, testUser);
@@ -161,7 +161,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasNullValues() throws EntityNotFoundException {
 		// given
 		UserDTO userDTO = UserDTO.build(new User("lmfao", "lul", "hehe", "haha", "test@gmail.com", new Date(1337L)));
-		Decision decision = new Decision(null, null, null);
+		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
 		decisionDTO.setId(1L);
@@ -180,7 +180,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasNullValues_includedUserNotFound() throws EntityNotFoundException {
 		// given
 		UserDTO userDTO = UserDTO.build(new User("lmfao", "lul", "hehe", "haha", "test@gmail.com", new Date(1337L)));
-		Decision decision = new Decision(null, null, null);
+		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
 		decisionDTO.setId(1L);
@@ -197,9 +197,10 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void updateDecision_decisionExists_hasActualValues() throws EntityNotFoundException {
 		// given
-		Decision decision = new Decision("Test Decision", "Test Description", testUser);
+		Decision decision = new Decision("Test Decision", testUser);
 		decision.getBallots().add(new Ballot(decision, new Date()));
 		decision.setId(1L);
+		decision.setDescription("Test Description");
 		
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
@@ -225,7 +226,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
 		
 		Ballot testBallot = new Ballot(dec, new Date());
-		testBallot.getOptions().add(new BallotOption("Title", "Description", testBallot, testUser));
+		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
 		
 		dec.getBallots().add(testBallot);
 		
@@ -270,7 +271,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void deleteDecision_decisionExists_withUserDecisionsAndBallotsAndResults() throws EntityNotFoundException {	
 		// then
 		Ballot testBallot = new Ballot(dec, new Date());
-		BallotOption testBallotOption = new BallotOption("Title", "Description", testBallot, testUser);
+		BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 		
 		testBallot.getOptions().add(testBallotOption);
 		dec.getBallots().add(testBallot);
@@ -293,7 +294,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void deleteDecision_decisionExists_withUserDecisionsAndBallots_noResults() throws EntityNotFoundException {	
 		// then
 		Ballot testBallot = new Ballot(dec, new Date());
-		BallotOption testBallotOption = new BallotOption("Title", "Description", testBallot, testUser);
+		BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 		
 		testBallot.getOptions().add(testBallotOption);
 		dec.getBallots().add(testBallot);
