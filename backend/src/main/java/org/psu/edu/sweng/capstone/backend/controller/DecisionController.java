@@ -25,6 +25,12 @@ public class DecisionController {
 	@Autowired
 	private DecisionService decisionService;
 	
+	@PreAuthorize("@authCheck.isAdmin()")
+	@GetMapping("/decisions")
+	public ResponseEntity<DecisionDTO> getDecisions() {
+		return decisionService.getDecisions();
+	}
+	
 	@PreAuthorize("#decision.getOwnerUsername() == authentication.getName()")
 	@PostMapping("/decision")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -32,7 +38,7 @@ public class DecisionController {
 		return decisionService.createDecision(decision);
 	}
 
-	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
+	@PreAuthorize("@authCheck.isDecisionOwner(#id) or @authCheck.isAdmin()")
 	@DeleteMapping("/decision/{id}")
 	public ResponseEntity<DecisionDTO> deleteDecision(@PathVariable(value = "id") final Long id) throws EntityNotFoundException {
 		return decisionService.deleteDecision(id);
@@ -44,7 +50,7 @@ public class DecisionController {
 		return decisionService.getDecision(id);
 	}
 
-	@PreAuthorize("@authCheck.isDecisionOwner(#id)")
+	@PreAuthorize("@authCheck.isDecisionOwner(#id) or @authCheck.isAdmin()")
 	@PutMapping("/decision/{id}")
 	public ResponseEntity<DecisionDTO> updateDecision(@PathVariable(value = "id") final Long id, @RequestBody final DecisionDTO decision) throws EntityNotFoundException {
 		return decisionService.updateDecision(id, decision);
