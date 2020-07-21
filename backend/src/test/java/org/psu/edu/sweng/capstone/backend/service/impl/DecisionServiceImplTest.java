@@ -77,13 +77,18 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 	@Test
 	void getUsers_returnsUsers_whenUsersExist() throws EntityNotFoundException {
+		// given
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		duList.add(new DecisionUser(dec, testUser));
+		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
+		when(decisionUserDao.findAllByDecision(dec)).thenReturn(duList);
 		ResponseEntity<UserDTO> response = decisionServiceImpl.getUsers(1337L);
 		
 		// then
 		assertEquals(1, response.getData().size());
-		assertEquals("TestUser", response.getData().get(0).getUserName());
+		assertEquals("pop pop", response.getData().get(0).getUserName());
 	}
 	
 	@Test
@@ -279,7 +284,6 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		when(ballotResultDao.findAllByBallot(testBallot)).thenReturn(results);
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
 		// then
@@ -297,7 +301,6 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		when(ballotResultDao.findAllByBallot(testBallot)).thenReturn(new ArrayList<>());
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
 		// then
