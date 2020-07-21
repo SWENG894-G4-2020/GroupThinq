@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 class BallotTest {
 
 	private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
-	private static final Decision DECISION = new Decision("Test Decision", "This is used for testing", USER);
+	private static final Decision DECISION = new Decision("Test Decision", USER);
 	private Ballot testBallot = new Ballot();
-	private BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", testBallot, USER);
+	private BallotOption ballotOption = new BallotOption("BK Lounge", testBallot, USER);
 
 	Set<BallotOption> ballotOptions = new HashSet<>();
 	

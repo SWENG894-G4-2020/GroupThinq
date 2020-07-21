@@ -13,7 +13,6 @@ public class BallotOptionDTO {
 	private Long ballotId;
 	private String userName;
 	private String title;
-	private String description;
 	private Date createdDate;
 	private Date updatedDate;
 	
@@ -49,14 +48,6 @@ public class BallotOptionDTO {
 		this.title = title;
 	}
 	
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -80,7 +71,6 @@ public class BallotOptionDTO {
 		if (bo.getBallot() != null) { dto.setBallotId(bo.getBallot().getId()); }
 		if (bo.getUser() != null) { dto.setUserName(bo.getUser().getUserName()); }
 		if (bo.getTitle() != null) { dto.setTitle(bo.getTitle()); }
-		if (bo.getDescription() != null) { dto.setDescription(bo.getDescription()); }
 		if (bo.getCreatedDate() != null) { dto.setCreatedDate(bo.getCreatedDate()); }
 		if (bo.getUpdatedDate() != null) { dto.setUpdatedDate(bo.getUpdatedDate()); }
 		

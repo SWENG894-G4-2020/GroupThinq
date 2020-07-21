@@ -22,9 +22,10 @@ public class DecisionDTOTest {
 
     @BeforeEach
     void setUp() {
-        Decision decision = new Decision("why is gamora?", "what is gamora?", testUser);
+        Decision decision = new Decision("why is gamora?", testUser);
 
         decision.setId(8675309L);
+        decision.setDescription("what is gamora?");
         decision.setCreatedDate(new Date(1101L));
         decision.setUpdatedDate(new Date(1011L));
         
@@ -53,7 +54,7 @@ public class DecisionDTOTest {
     @Test
     void setters_worksProperly() {
     	// given
-        Decision decision = new Decision("why is gamora?", "what is gamora?", testUser);
+        Decision decision = new Decision("why is gamora?", testUser);
 
     	List<UserDTO> includedUsers = new ArrayList<>();
     	UserDTO userDto = UserDTO.build(testUser);
@@ -87,7 +88,7 @@ public class DecisionDTOTest {
     @Test
     void buildDTO_returnsNullValues() {
         // given
-        Decision decision = new Decision(null, null, null);
+        Decision decision = new Decision(null, null);
         decision.setCreatedDate(null);
 
         // when

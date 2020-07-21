@@ -13,7 +13,7 @@ public class BallotResultTest {
 
     private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
     private Ballot ballot = new Ballot();
-    private BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", ballot, USER);
+    private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
 
     private BallotResult testResult = new BallotResult(ballot, ballotOption, USER);
 
@@ -36,7 +36,7 @@ public class BallotResultTest {
     void getters_setters_workProperly() {
         User USER = new User("zzzzzach", "dorwssap", "Beimford", "Zach", "email@fake.com", new Date());
         Ballot ballot = new Ballot();
-        BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", ballot, USER);
+        BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
 
 
         testResult.setBallotOption(ballotOption);
