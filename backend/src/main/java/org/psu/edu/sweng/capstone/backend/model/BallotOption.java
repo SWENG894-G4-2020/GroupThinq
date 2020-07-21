@@ -31,9 +31,6 @@ public class BallotOption {
 	@Column(name = "TITLE")
 	private String title;
 	
-	@Column(name = "DESCRIPTION")
-	private String description;
-	
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 	
@@ -42,9 +39,8 @@ public class BallotOption {
 
 	protected BallotOption() {}
 	
-	public BallotOption(String title, String description, Ballot ballot, User user) {
+	public BallotOption(String title, Ballot ballot, User user) {
 		this.title = title;
-		this.description = description;
 		this.ballot = ballot;
 		this.user = user;
 		
@@ -81,14 +77,6 @@ public class BallotOption {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public Date getCreatedDate() {

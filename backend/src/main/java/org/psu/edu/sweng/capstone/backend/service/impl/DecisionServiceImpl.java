@@ -106,11 +106,7 @@ public class DecisionServiceImpl implements DecisionService {
 				() -> new EntityNotFoundException("User " + decisionDto.getOwnerUsername()));
 		
 		// Create new Decision
-		Decision newDecision = new Decision(
-				decisionDto.getName(),
-				decisionDto.getDescription(),
-				user
-		);
+		Decision newDecision = new Decision(decisionDto.getName(), user);
 			
 		// Add Users
 		Set<DecisionUser> decisionUsers = new HashSet<>();
@@ -134,7 +130,7 @@ public class DecisionServiceImpl implements DecisionService {
 				
 				// Add Ballot Options
 				for (BallotOptionDTO boDTO : bDTO.getBallotOptions()) {
-					BallotOption ballotOption = new BallotOption(boDTO.getTitle(), boDTO.getDescription(), ballot, user);
+					BallotOption ballotOption = new BallotOption(boDTO.getTitle(), ballot, user);
 					ballotOptionDao.save(ballotOption);
 				}
 			}
