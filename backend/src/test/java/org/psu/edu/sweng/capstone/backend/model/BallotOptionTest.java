@@ -13,7 +13,7 @@ public class BallotOptionTest {
 
     private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
     private Ballot ballot = new Ballot();
-    private BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", ballot, USER);
+    private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
 
     @BeforeEach
     void setUp() {
@@ -25,7 +25,6 @@ public class BallotOptionTest {
 
         assertNotNull(ballotOption.getCreatedDate());
         assertEquals("BK Lounge", ballotOption.getTitle());
-        assertEquals("get those cheeze borger", ballotOption.getDescription());
         assertEquals(new Date(2222L), ballotOption.getUpdatedDate());
         assertEquals(ballot, ballotOption.getBallot());
         assertEquals(USER, ballotOption.getUser());
@@ -39,7 +38,6 @@ public class BallotOptionTest {
 
         ballotOption.setId(2L);
         ballotOption.setTitle("subway");
-        ballotOption.setDescription("it's a sandwhich");
         ballotOption.setCreatedDate(new Date(3333L));
         ballotOption.setUpdatedDate(new Date(4444L));
         ballotOption.setUser(USER);
@@ -47,7 +45,6 @@ public class BallotOptionTest {
 
         assertEquals(2L, ballotOption.getId());
         assertEquals("subway", ballotOption.getTitle());
-        assertEquals("it's a sandwhich", ballotOption.getDescription());
         assertEquals(new Date(3333L), ballotOption.getCreatedDate());
         assertEquals(new Date(4444L), ballotOption.getUpdatedDate());
         assertEquals(ballot, ballotOption.getBallot());
@@ -61,9 +58,7 @@ public class BallotOptionTest {
         assertNull(ballotOption.getId());
         assertNull(ballotOption.getBallot());
         assertNull(ballotOption.getTitle());
-        assertNull(ballotOption.getDescription());
         assertNull(ballotOption.getUpdatedDate());
         assertNull(ballotOption.getUser());
     }
-
 }

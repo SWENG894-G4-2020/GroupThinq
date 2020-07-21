@@ -52,7 +52,7 @@ class DecisionTest {
 		String description = "The description of this Decision";
 		
 		// when
-		Decision newDecision = new Decision(name, description, testUser);
+		Decision newDecision = new Decision(name, testUser);
 		
 		// then
 		assertEquals("Leetest Decision", newDecision.getName());
