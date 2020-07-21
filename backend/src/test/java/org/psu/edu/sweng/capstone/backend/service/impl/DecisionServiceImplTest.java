@@ -200,6 +200,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		Decision decision = new Decision("Test Decision", testUser);
 		decision.getBallots().add(new Ballot(decision, new Date()));
 		decision.setId(1L);
+		decision.setDescription("Test Description");
 		
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
