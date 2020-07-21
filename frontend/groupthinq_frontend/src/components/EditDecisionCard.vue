@@ -4,7 +4,7 @@
       <div class="text-h5 q-ma-md"> Editing Decision... </div>
       <div class="text-subtitle2"> Decision Details </div>
       <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" :rules="[val => !!val || '*Required']"/>
-      <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="editableDecision.description" label="Description" :rules="[val => !!val || '*Required']"/>
+      <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="editableDecision.description" label="Description" />
       <q-input filled v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
@@ -56,7 +56,7 @@
       <q-separator class="q-my-md" />
     </q-card-section>
     <q-card-section class="text-center text-body-1 text-negative" v-if="!submissionValid">
-      An edited decision requires a title, description, and valid expiration date.
+      An edited decision requires a title, and valid expiration date.
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
@@ -194,7 +194,6 @@ export default {
 
     checkValidSubmit () {
       if (!this.editableDecision.name) { return false }
-      if (!this.editableDecision.description) { return false }
       if (!this.checkValidDate(this.newExpirationDate)) { return false }
       return true
     }
