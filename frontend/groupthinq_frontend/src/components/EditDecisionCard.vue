@@ -3,9 +3,9 @@
     <q-card-section class='column items-center q-pa-md'>
       <div class="text-h5 q-ma-md"> Editing Decision... </div>
       <div class="text-subtitle2"> Decision Details </div>
-      <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" :rules="[val => !!val || '*Required']"/>
-      <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="editableDecision.description" label="Description" />
-      <q-input filled v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
+      <q-input fclass="q-my-xs text-h5" style="width: 100%" v-model="editableDecision.name" label="Title" :rules="[val => !!val || '*Required']"/>
+      <q-input autogrow clearable type="textarea" class="q-mb-md" style="width: 100%" v-model="editableDecision.description" label="Description (Optional)" />
+      <q-input v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy transition-show="scale" transition-hide="scale">

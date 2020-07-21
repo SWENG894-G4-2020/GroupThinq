@@ -13,12 +13,12 @@
       </div>
       <q-slide-transition>
         <div v-show="detailsExpanded" style="width:100%">
-          <q-input filled class="q-my-md" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
-          <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description" />
-          <q-input filled v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
+          <q-input class="q-my-xs text-h5" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
+          <q-input autogrow clearable type="textarea" class="q-my-md text-body2 text-grey-5" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description (Optional)" />
+          <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                <q-popup-proxy transition-show="scale" transition-hide="scale" :offset="[10, 10]">
                   <div class="q-gutter-md row items-start transparent">
                     <q-date v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" today-btn />
                     <q-time v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" now-btn />
