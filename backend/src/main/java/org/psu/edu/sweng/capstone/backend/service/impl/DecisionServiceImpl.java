@@ -49,14 +49,15 @@ public class DecisionServiceImpl implements DecisionService {
 	@Autowired
 	private BallotOptionDAO ballotOptionDao;
 	
-	private static final String ERROR_HEADER = "Decision ";
+	private static final String USER_HEADER = "User ";
+	private static final String DECISION_HEADER = "Decision ";
 
 	@Override
 	public ResponseEntity<UserDTO> getUsers(final Long id) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
 		final Decision dec = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
 		decisionUserDao.findAllByDecision(dec).stream().forEach(du -> response.getData().add(UserDTO.build(du.getUser())));
 		
@@ -70,7 +71,7 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
 		if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
 		if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
@@ -96,7 +97,7 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final User user = userDao.findByUserName(decisionDto.getOwnerUsername()).orElseThrow(
-				() -> new EntityNotFoundException("User " + decisionDto.getOwnerUsername()));
+				() -> new EntityNotFoundException(USER_HEADER + decisionDto.getOwnerUsername()));
 		
 		// Create new Decision
 		Decision newDecision = new Decision(decisionDto.getName(), user);		
@@ -104,12 +105,11 @@ public class DecisionServiceImpl implements DecisionService {
 
 		// Add Users
 		for (UserDTO dto : decisionDto.getIncludedUsers()) {
-			Optional<User> includedUser = userDao.findByUserName(dto.getUserName());
+			final User includedUser = userDao.findByUserName(dto.getUserName()).orElseThrow(
+					() -> new EntityNotFoundException(USER_HEADER + dto.getUserName()));
 			
-			if (includedUser.isPresent()) {
-				DecisionUser du = new DecisionUser(newDecision, includedUser.get());
-				decisionUserDao.save(du);
-			}
+			DecisionUser du = new DecisionUser(newDecision, includedUser);
+			decisionUserDao.save(du);
 		}
 	
 		if (!decisionDto.getBallots().isEmpty()) {
@@ -136,7 +136,7 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
 		decision.getBallots().clear();
 		
@@ -154,7 +154,7 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
 			DecisionDTO dto = DecisionDTO.build(decision);
 			dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(decision), dto);
@@ -170,9 +170,9 @@ public class DecisionServiceImpl implements DecisionService {
 		
 		for (UserDTO userDto : includedUsers) {
 			final User user = userDao.findByUserName(userDto.getUserName()).orElseThrow(
-					() -> new EntityNotFoundException("User " + userDto.getUserName()));
+					() -> new EntityNotFoundException(USER_HEADER + userDto.getUserName()));
 			
-			Optional<DecisionUser> du = decisionUserDao.findByUserAndDecision(user, decision);
+			Optional<DecisionUser> du = decisionUserDao.findByUserAndDecision(user, decision);			
 			
 			// Adds User to Decision that didn't previously exist on the Decision User list.
 			if (!du.isPresent()) {

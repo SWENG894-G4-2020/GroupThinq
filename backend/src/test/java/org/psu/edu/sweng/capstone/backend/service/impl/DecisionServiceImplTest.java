@@ -6,9 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +63,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	private Decision dec = new Decision("Test Decision", testUser);
 	private DecisionUser decUser = new DecisionUser(dec, new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
-	private Set<DecisionUser> decisionUsers = new HashSet<>();
+	private ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
 		
 	@BeforeEach
 	void setUp() {       
@@ -125,17 +123,22 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
+		User otherUser = new User("opp opp", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+		
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		duList.add(new DecisionUser(decision, otherUser));
+		
 		decisionDTO.setId(1L);
 		decisionDTO.getIncludedUsers().add(userDTO);
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
 		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(decisionUserDao.findAllByDecision(decision)).thenReturn(duList);
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 	
 	@Test
@@ -145,7 +148,9 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
+		ArrayList<DecisionUser> duList = new ArrayList<>();
 		DecisionUser du = new DecisionUser(decision, testUser);
+		duList.add(du);
 		
 		decisionDTO.setId(1L);
 		decisionDTO.getIncludedUsers().add(userDTO);
@@ -154,6 +159,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
 		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.ofNullable(testUser));
 		when(decisionUserDao.findByUserAndDecision(testUser, decision)).thenReturn(Optional.of(du));
+		when(decisionUserDao.findAllByDecision(decision)).thenReturn(duList);
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
@@ -223,18 +229,35 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.empty());
 	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.createDecision(DecisionDTO.build(dec)); });
 	}
+	
+	@Test
+	void createDecision_hasNoIncludedUser() throws EntityNotFoundException {
+		// given
+		DecisionDTO dto = DecisionDTO.build(dec);
+		dto = DecisionDTO.buildDecisionUserList(decisionUsers, dto);
+		final DecisionDTO finalDTO = dto;
+		
+		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(userDao.findByUserName(dto.getIncludedUsers().get(0).getUserName())).thenReturn(Optional.empty());
+
+	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.createDecision(finalDTO); });	    
+	}
 		
 	@Test
-	void createDecision_hasUser_addsDecisionUsersAndBallotWithOptions() throws EntityNotFoundException {		
+	void createDecision_hasUser_addsDecisionUsersAndBallotWithOptions() throws EntityNotFoundException {
+		// given
+		User newTestUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 		Ballot testBallot = new Ballot(dec, new Date());
 		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
 		
 		dec.getBallots().add(testBallot);
 		
 		DecisionDTO dto = DecisionDTO.build(dec);
+		dto = DecisionDTO.buildDecisionUserList(decisionUsers, dto);
 		
 		// when
-		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(userDao.findByUserName(dto.getOwnerUsername())).thenReturn(Optional.ofNullable(testUser));
+		when(userDao.findByUserName(dto.getIncludedUsers().get(0).getUserName())).thenReturn(Optional.ofNullable(newTestUser));
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
 		
 		// then
