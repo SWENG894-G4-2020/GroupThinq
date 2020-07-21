@@ -19,9 +19,9 @@ class BallotDTOTest {
 
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
     
-    private Decision decision = new Decision("why is gamora?", "what is gamora?", USER);
+    private Decision decision = new Decision("why is gamora?", USER);
     private Ballot ballot = new Ballot(decision, new Date(1337L));
-    private BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", ballot, USER);
+    private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
     private BallotDTO testDTO;
     private ArrayList<BallotOptionDTO> optionDTOs;
 		

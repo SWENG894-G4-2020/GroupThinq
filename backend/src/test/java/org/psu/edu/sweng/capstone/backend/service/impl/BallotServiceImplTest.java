@@ -57,9 +57,9 @@ class BallotServiceImplTest extends ServiceImplTest {
 	private BallotServiceImpl ballotServiceImpl;
 	
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-	private Decision testDecision = new Decision("Test Decision", "Test Description", testUser);
+	private Decision testDecision = new Decision("Test Decision", testUser);
 	private Ballot testBallot = new Ballot(testDecision, new Date(1337));
-	private BallotOption testBallotOption = new BallotOption("Title", "Description", testBallot, testUser);
+	private BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 	
 	private BallotDTO testBallotDTO;
 	
