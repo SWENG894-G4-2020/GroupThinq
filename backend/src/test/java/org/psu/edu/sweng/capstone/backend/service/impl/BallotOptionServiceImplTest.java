@@ -39,11 +39,11 @@ class BallotOptionServiceImplTest extends ServiceImplTest {
 	private BallotOptionServiceImpl ballotOptionServiceImpl;
 	
 	private static final User TEST_USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-	private static final Decision TEST_DECISION = new Decision("Test Decision", "Test Description", TEST_USER);
+	private static final Decision TEST_DECISION = new Decision("Test Decision", TEST_USER);
 
 	private static Ballot testBallot = new Ballot(TEST_DECISION, new Date(1337));
 
-	private static final BallotOption TEST_BALLOT_OPTION = new BallotOption("Title", "Description", testBallot, TEST_USER);
+	private static final BallotOption TEST_BALLOT_OPTION = new BallotOption("Title", testBallot, TEST_USER);
 	
 	private BallotOptionDTO dto; 
 	
@@ -70,7 +70,7 @@ class BallotOptionServiceImplTest extends ServiceImplTest {
 	@Test
 	void updateBallotOption_noTitleAndDescriptionUpdate() throws EntityNotFoundException {
 		// given
-		BallotOptionDTO newDTO = BallotOptionDTO.build(new BallotOption(null, null, testBallot, TEST_USER));
+		BallotOptionDTO newDTO = BallotOptionDTO.build(new BallotOption(null, testBallot, TEST_USER));
 		
 		// when
 		when(ballotOptionDao.findById(dto.getId())).thenReturn(Optional.of(TEST_BALLOT_OPTION));
@@ -105,7 +105,7 @@ class BallotOptionServiceImplTest extends ServiceImplTest {
 	void updateBallotOption_nullBallotId() throws EntityNotFoundException {
 		// given
 		testBallot.setId(null);
-		BallotOptionDTO newDTO = BallotOptionDTO.build(new BallotOption(null, null, testBallot, TEST_USER));
+		BallotOptionDTO newDTO = BallotOptionDTO.build(new BallotOption(null, testBallot, TEST_USER));
 		
 		// when
 		when(ballotOptionDao.findById(Mockito.anyLong())).thenReturn(Optional.of(TEST_BALLOT_OPTION));

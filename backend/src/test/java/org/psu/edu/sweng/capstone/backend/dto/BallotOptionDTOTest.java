@@ -14,7 +14,7 @@ public class BallotOptionDTOTest {
 
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
     private Ballot ballot = new Ballot(null, new Date(1337L));
-    private BallotOption ballotOption = new BallotOption("BK Lounge", "get those cheeze borger", ballot, USER);
+    private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
     private BallotOptionDTO testDTO;
 
     @BeforeEach
@@ -45,7 +45,6 @@ public class BallotOptionDTOTest {
         testDTO.setUpdatedDate(new Date(2222L));
         testDTO.setUserName("username");
         testDTO.setTitle("Mickey D's");
-        testDTO.setDescription("clown burgers");
 
         // then
         assertEquals(2L, testDTO.getId());
@@ -54,13 +53,12 @@ public class BallotOptionDTOTest {
         assertEquals(new Date(2222L), testDTO.getUpdatedDate());
         assertEquals("username", testDTO.getUserName());
         assertEquals("Mickey D's", testDTO.getTitle());
-        assertEquals("clown burgers", testDTO.getDescription());
     }
 
     @Test
     void build_handlesNullsProperly() {
         // given
-        BallotOption testOption = new BallotOption(null, null, null, null);
+        BallotOption testOption = new BallotOption(null, null, null);
         testOption.setCreatedDate(null);
 
         // when
@@ -73,8 +71,6 @@ public class BallotOptionDTOTest {
         assertNull(testDTO.getId());
         assertNull(testDTO.getBallotId());
         assertNull(testDTO.getTitle());
-        assertNull(testDTO.getDescription());
-
     }
 
 }
