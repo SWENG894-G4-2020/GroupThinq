@@ -139,7 +139,10 @@ public class UserServiceImpl implements UserService {
 		
 		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
 				
-		decisionUserDao.findAllByUser(user).stream().forEach(du -> response.getData().add(DecisionDTO.build(du.getDecision())));
+		decisionUserDao.findAllByUser(user).stream().forEach(du -> {
+			DecisionDTO dto = DecisionDTO.build(du.getDecision());
+			dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(du.getDecision()), dto);
+		});
 		
 		response.attachGenericSuccess();
 		

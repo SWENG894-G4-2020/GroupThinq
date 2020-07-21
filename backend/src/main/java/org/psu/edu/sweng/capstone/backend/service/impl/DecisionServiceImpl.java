@@ -156,7 +156,10 @@ public class DecisionServiceImpl implements DecisionService {
 		final Decision decision = decisionDao.findById(id).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
 		
-		response.getData().add(DecisionDTO.build(decision));
+			DecisionDTO dto = DecisionDTO.build(decision);
+			dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(decision), dto);
+			
+		response.getData().add(dto);
 		response.attachGenericSuccess();
 		
 		return response;

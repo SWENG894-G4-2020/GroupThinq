@@ -29,9 +29,7 @@ class UserTest {
 		userRoles.add(userRole);
 		ballotResults.add(ballotResult);
 		decisionUsers.add(decisionUser);
-
-		testUser.setDecisions(decisionUsers);
-		testUser.setVotes(ballotResults);
+		
 		testUser.setRoles(userRoles);
 		testUser.setUserName("testUser");
 		testUser.setPassword("testPassword");
@@ -82,8 +80,6 @@ class UserTest {
 		assertNull(user.getUpdatedDate());
 		assertNull(user.getLastLoggedIn());
 		assertEquals(0, user.getRoles().size());
-		assertEquals(0, user.getDecisions().size());
-		assertEquals(0, user.getVotes().size());
 	}
 
 	@Test
@@ -99,8 +95,6 @@ class UserTest {
 		assertEquals(new Date(3L), testUser.getLastLoggedIn());
 		assertEquals(1L, testUser.getId());
 		assertEquals(1, testUser.getRoles().size());
-		assertEquals(1, testUser.getDecisions().size());
-		assertEquals(1, testUser.getVotes().size());
 	}
 	
 	@Test

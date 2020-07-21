@@ -1,11 +1,8 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
-import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
-import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -15,9 +12,6 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DecisionDTO {
-	
-	@Autowired
-	private static DecisionUserDAO decisionUserDao;
 
     private Long id;
     private String name;
@@ -102,23 +96,24 @@ public class DecisionDTO {
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
-
-        for (DecisionUser decisionUser : decisionUserDao.findAllByDecision(d)) {
+        
+        d.getBallots().stream().forEach(b -> dto.getBallots().add(BallotDTO.build(b)));
+        
+        return dto;
+    }
+	
+	public static DecisionDTO buildDecisionUserList(List<DecisionUser> decisionUsers, DecisionDTO dto) {
+        decisionUsers.stream().forEach(du -> {
         	UserDTO userDTO = new UserDTO();
-        	final User user = decisionUser.getUser();
+        	final User user = du.getUser();
         	
         	userDTO.setUserName(user.getUserName());
         	userDTO.setFirstName(user.getFirstName());
         	userDTO.setLastName(user.getLastName());
         	
             dto.getIncludedUsers().add(userDTO);
-        }
-        
-        for (Ballot b : d.getBallots()) {
-        	BallotDTO bDTO = BallotDTO.build(b);
-        	dto.getBallots().add(bDTO);
-        }
-
-        return dto;
-    }
+        });
+		
+		return dto;
+	}
 }

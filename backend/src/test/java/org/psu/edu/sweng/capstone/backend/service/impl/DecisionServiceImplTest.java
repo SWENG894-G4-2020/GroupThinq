@@ -73,7 +73,6 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		decisionUsers.add(decUser);
 		
 		dec.setId(decisionId);
-		dec.setDecisionUsers(decisionUsers);
 	}
 		
 	@Test
@@ -221,10 +220,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	}
 		
 	@Test
-	void createDecision_hasUser_addsDecisionUsersAndBallotWithOptions() throws EntityNotFoundException {
-		// given
-		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
-		
+	void createDecision_hasUser_addsDecisionUsersAndBallotWithOptions() throws EntityNotFoundException {		
 		Ballot testBallot = new Ballot(dec, new Date());
 		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
 		
