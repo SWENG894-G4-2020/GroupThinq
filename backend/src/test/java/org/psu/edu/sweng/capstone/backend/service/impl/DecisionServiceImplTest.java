@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -29,6 +30,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -48,6 +50,9 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	
 	@Mock
 	private BallotService ballotService;
+	
+	@Mock
+	private BallotTypeDAO ballotTypeDao;
 	
 	@Mock
 	private BallotOptionDAO ballotOptionDao;
@@ -225,7 +230,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasActualValues() throws EntityNotFoundException {
 		// given
 		Decision decision = new Decision("Test Decision", testUser);
-		decision.getBallots().add(new Ballot(decision, new Date()));
+		decision.getBallots().add(new Ballot(decision, new BallotType(), new Date()));
 		decision.setId(1L);
 		decision.setDescription("Test Description");
 		
@@ -252,8 +257,11 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		// given
 		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
 		
-		Ballot testBallot = new Ballot(dec, new Date());
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
 		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
+		
+		BallotType type = new BallotType(1L, "Single-Choice");
+		testBallot.setType(type);
 		
 		dec.getBallots().add(testBallot);
 		
@@ -261,10 +269,34 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(ballotTypeDao.findById(type.getId())).thenReturn(Optional.of(type));
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
 		
 		// then
 		assertCreatedSuccess(response);
+	}
+	
+	@Test
+	void createDecision_hasUser_addsDecisionUsersAndBallotNoType() throws EntityNotFoundException {
+		// given
+		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
+		
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
+		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
+		
+		BallotType type = new BallotType(1L, "Single-Choice");
+		testBallot.setType(type);
+		
+		dec.getBallots().add(testBallot);
+		
+		DecisionDTO dto = DecisionDTO.build(dec);
+		
+		// when
+		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(ballotTypeDao.findById(type.getId())).thenReturn(Optional.empty());
+		
+		// then
+	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.createDecision(dto); });
 	}
 	
 	@Test
@@ -297,7 +329,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void deleteDecision_decisionExists_withUserDecisionsAndBallotsAndResults() throws EntityNotFoundException {	
 		// then
-		Ballot testBallot = new Ballot(dec, new Date());
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
 		BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 		
 		testBallot.getOptions().add(testBallotOption);
@@ -320,7 +352,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void deleteDecision_decisionExists_withUserDecisionsAndBallots_noResults() throws EntityNotFoundException {	
 		// then
-		Ballot testBallot = new Ballot(dec, new Date());
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
 		BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 		
 		testBallot.getOptions().add(testBallotOption);
