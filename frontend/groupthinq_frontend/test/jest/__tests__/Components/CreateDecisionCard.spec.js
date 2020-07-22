@@ -156,6 +156,16 @@ describe('Create Decision Card tests', () => {
     expect(vm.$data.optionsList.length).toBe(0)
   })
 
+  it('opens and closes the datetime picker dialog', async () => {
+    const wrapper = shallowMount(CreateDecisionCard, { localVue })
+    const vm = wrapper.vm
+    expect(vm.pickDatetimeDialog).toBe(false)
+    await vm.openDatetimeDialog()
+    expect(vm.pickDatetimeDialog).toBe(true)
+    await vm.closeDatetimeDialog()
+    expect(vm.pickDatetimeDialog).toBe(false)
+  })
+
   it('handles invalid submission information', async () => {
     const wrapper = shallowMount(CreateDecisionCard, { localVue })
     const vm = wrapper.vm
