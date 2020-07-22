@@ -4,31 +4,31 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.psu.edu.sweng.capstone.backend.model.id.BallotResultId;
-
 @Entity
-@Table(name = "BALLOT_RESULTS")
-@IdClass(BallotResultId.class)
+@Table(name = "BALLOT_RESULT")
 public class BallotResult {
 
 	@Id
-	@ManyToOne
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "BALLOT_ID")
 	private Ballot ballot;
 	
-	@Id
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "BALLOT_OPTION_ID")
 	private BallotOption ballotOption;
 	
-	@Id
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "USER_ID")
 	private User user;
 	
@@ -46,6 +46,14 @@ public class BallotResult {
 		this.user = user;
 		
 		this.voteDate = new Date();
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public Ballot getBallot() {

@@ -22,6 +22,7 @@ import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,7 +47,8 @@ public class BallotServiceImpl implements BallotService {
 	@Autowired
 	private BallotOptionService ballotOptionService;
 	
-	private static final String ERROR_HEADER = "Ballot ";
+	private static final String BALLOT_HEADER = "Ballot ";
+	private static final String BALLOT_OPTION_HEADER = "Ballot Option ";
 	
 	@Override
 	public ResponseEntity<BallotDTO> createBallot(final BallotDTO ballotDTO) throws EntityNotFoundException {
@@ -71,7 +73,7 @@ public class BallotServiceImpl implements BallotService {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
+				() -> new EntityNotFoundException(BALLOT_HEADER + ballotId.toString()));
 			
 		ballotDao.delete(ballot);
 		
@@ -85,7 +87,7 @@ public class BallotServiceImpl implements BallotService {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
+				() -> new EntityNotFoundException(BALLOT_HEADER + ballotId.toString()));
 		
 		response.getData().add(BallotDTO.build(ballot));
 		response.attachGenericSuccess();
@@ -98,11 +100,8 @@ public class BallotServiceImpl implements BallotService {
 		ResponseEntity<BallotDTO> response = new ResponseEntity<>();
 		
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + ballotId.toString()));
-		
-		decisionDao.findById(ballotDTO.getDecisionId()).orElseThrow(
-				() -> new EntityNotFoundException("Decision " + ballotDTO.getDecisionId().toString()));
-		
+				() -> new EntityNotFoundException(BALLOT_HEADER + ballotId.toString()));
+				
 		if (ballotDTO.getExpirationDate() != null) { ballot.setExpirationDate(ballotDTO.getExpirationDate()); }
 		
 		for (BallotOptionDTO bo : ballotDTO.getBallotOptions()) {
@@ -126,16 +125,48 @@ public class BallotServiceImpl implements BallotService {
 				() -> new EntityNotFoundException("User " + vote.getUserName()));
 		
 		final Ballot ballot = ballotDao.findById(vote.getBallotId()).orElseThrow(
-				() -> new EntityNotFoundException("Ballot " + vote.getBallotId()));
+				() -> new EntityNotFoundException(BALLOT_HEADER + vote.getBallotId()));
 
 		final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
-				() -> new EntityNotFoundException("Ballot Option " + vote.getBallotOptionId()));
+				() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
 		
-		BallotResult ballotResult = new BallotResult(ballot, ballotOption, user);
-		
-		ballotResultDao.save(ballotResult);
-		
+		BallotResult result = new BallotResult(ballot, ballotOption, user);
+		ballotResultDao.save(result);
+				
 		response.attachCreatedSuccess();
+		
+		return response;
+	}
+	
+	@Override
+	public ResponseEntity<String> updateVote(BallotResultDTO vote) throws EntityNotFoundException {
+		ResponseEntity<String> response = new ResponseEntity<>();
+			
+		final Ballot ballot = ballotDao.findById(vote.getBallotId()).orElseThrow(
+				() -> new EntityNotFoundException(BALLOT_HEADER + vote.getBallotId()));
+		
+		final User user = userDao.findByUserName(vote.getUserName()).orElseThrow(
+				() -> new EntityNotFoundException("User " + vote.getUserName()));		
+
+		BallotResult result = ballotResultDao.findByUserAndBallot(user, ballot)
+				.orElseThrow( () -> new EntityNotFoundException("Ballot Result with Ballot " + vote.getBallotId() +
+						", and User " + vote.getUserName()));
+		
+		final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
+				() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
+		
+		if (ballot.getOptions().contains(ballotOption)) {
+			result.setBallotOption(ballotOption);
+			result.setVoteUpdatedDate(new Date());
+			
+			ballotResultDao.save(result);
+		}
+		else {
+			throw new AccessDeniedException(BALLOT_OPTION_HEADER + vote.getBallotOptionId() + 
+					" is not part of Ballot " + vote.getBallotId());
+		}
+		
+		response.attachGenericSuccess();
 		
 		return response;
 	}
@@ -145,7 +176,7 @@ public class BallotServiceImpl implements BallotService {
 		ResponseEntity<BallotResultDTO> response = new ResponseEntity<>();
 		
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
-				() -> new EntityNotFoundException("Ballot " + ballotId));
+				() -> new EntityNotFoundException(BALLOT_HEADER + ballotId));
 		
 		ballotResultDao.findAllByBallot(ballot).stream().forEach(br -> response.getData().add(BallotResultDTO.build(br)));
 		
