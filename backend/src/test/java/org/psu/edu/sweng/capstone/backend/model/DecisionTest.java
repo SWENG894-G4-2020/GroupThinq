@@ -41,7 +41,6 @@ class DecisionTest {
 		testDecision.setOwnerId(testUser);
 		testDecision.setCreatedDate(new Date(1111L));
 		testDecision.setUpdatedDate(new Date(2222L));
-		testDecision.setDecisionUsers(decisionUsers);
 		testDecision.setBallots(decisionBallots);
 	}
 	
@@ -68,7 +67,6 @@ class DecisionTest {
 		assertEquals(testUser, testDecision.getOwnerId());
 		assertEquals(new Date(1111L), testDecision.getCreatedDate());
 		assertEquals(new Date(2222L), testDecision.getUpdatedDate());
-		assertEquals(3, testDecision.getDecisionUsers().size());
 		assertEquals(1, testDecision.getBallots().size());
 	}
 	
@@ -88,7 +86,6 @@ class DecisionTest {
 		testDecision.setDescription("New Test Description");
 		testDecision.setCreatedDate(new Date(4444L));
 		testDecision.setUpdatedDate(new Date(5555L));
-		testDecision.setDecisionUsers(decisionUsers);
 		testDecision.setBallots(decisionBallots);
 		
 		// then
@@ -97,7 +94,6 @@ class DecisionTest {
 		assertEquals(testUser, testDecision.getOwnerId());
 		assertEquals(new Date(4444L), testDecision.getCreatedDate());
 		assertEquals(new Date(5555L), testDecision.getUpdatedDate());
-		assertEquals(4, testDecision.getDecisionUsers().size());
 		assertEquals(2, testDecision.getBallots().size());
 	}
 }

@@ -59,6 +59,9 @@ class UserServiceImplTest extends ServiceImplTest {
 	private DecisionUserDAO decisionUserDao;
 	
 	@Mock
+	private static DecisionUserDAO staticDecisionUserDao;
+	
+	@Mock
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@InjectMocks
@@ -282,18 +285,20 @@ class UserServiceImplTest extends ServiceImplTest {
 	void getDecisions_hasUser_hasDecision() throws EntityNotFoundException {
 		// given
 		Decision decisionOne = new Decision("New Decision #1", user);
-		Decision decisionTwo  = new Decision("New Decision #2", user);
-				
-		user.getDecisions().add(new DecisionUser(decisionOne, user));
-		user.getDecisions().add(new DecisionUser(decisionTwo, user));
+		
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		
+		duList.add(new DecisionUser(decisionOne, user));
 		
 		Optional<User> userOptional = Optional.of(user);
 
 		// when
 		when(userDao.findByUserName(userName)).thenReturn(userOptional);
+		when(decisionUserDao.findAllByUser(userOptional.get())).thenReturn(duList);
+		when(decisionUserDao.findAllByDecision(decisionOne)).thenReturn(duList);
 		ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
 		
 		// then
-	    assertEquals(2, response.getData().size());
+	    assertEquals(1, response.getData().size());
 	}
 }
