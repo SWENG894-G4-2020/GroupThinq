@@ -39,7 +39,7 @@
     </q-card-section>
     <q-separator />
     <q-card-section class='column items-center q-pa-md'>
-      <div class="text-subtitle2"> Add/Edit Members (by username)
+      <div class="text-subtitle2"> Add Decision Participants (by username)
         <q-btn
           color="grey"
           round
