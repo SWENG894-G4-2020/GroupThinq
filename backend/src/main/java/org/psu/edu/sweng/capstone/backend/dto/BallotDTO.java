@@ -13,6 +13,7 @@ public class BallotDTO {
 	
 	private Long id;
 	private Long decisionId;
+	private Long ballotTypeId;
 	private Date expirationDate;
 	private Date createdDate;
 	private Date updatedDate;
@@ -35,6 +36,14 @@ public class BallotDTO {
 		this.decisionId = decisionId;
 	}
 	
+	public Long getBallotTypeId() {
+		return ballotTypeId;
+	}
+
+	public void setBallotTypeId(Long ballotTypeId) {
+		this.ballotTypeId = ballotTypeId;
+	}
+
 	public Date getExpirationDate() {
 		return expirationDate;
 	}
@@ -72,6 +81,7 @@ public class BallotDTO {
 		
 		if (b.getId() != null) { dto.setId(b.getId()); }
         if (b.getDecision() != null) { dto.setDecisionId(b.getDecision().getId()); }
+        if (b.getType() != null) { dto.setBallotTypeId(b.getType().getId()); }
         if (b.getExpirationDate() != null) { dto.setExpirationDate(b.getExpirationDate()); }
         if (b.getCreatedDate() != null) { dto.setCreatedDate(b.getCreatedDate()); }
         if (b.getUpdatedDate() != null) { dto.setUpdatedDate(b.getUpdatedDate()); }

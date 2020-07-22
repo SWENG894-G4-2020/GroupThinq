@@ -3,6 +3,7 @@ package org.psu.edu.sweng.capstone.backend.dto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -32,7 +33,9 @@ public class DecisionDTOTest {
         DecisionUser du = new DecisionUser(decision, new User("tuser", "pw", "User", "Test", "testuser@foo.bar", new Date(1337L)));
         decision.getDecisionUsers().add(du);
         
-        Ballot ballot = new Ballot(decision, new Date());
+        BallotType type = new BallotType();
+        
+        Ballot ballot = new Ballot(decision, type, new Date());
         decision.getBallots().add(ballot);
         
         decision.setDeleted(true);
@@ -61,7 +64,7 @@ public class DecisionDTOTest {
     	includedUsers.add(userDto);
     	
     	List<BallotDTO> ballots = new ArrayList<>();
-    	BallotDTO ballotDTO = BallotDTO.build(new Ballot(decision, new Date()));
+    	BallotDTO ballotDTO = BallotDTO.build(new Ballot(decision, new BallotType(), new Date()));
     	ballots.add(ballotDTO);
     	
         // when

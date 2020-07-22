@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
@@ -28,6 +29,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
@@ -46,6 +48,9 @@ class BallotServiceImplTest extends ServiceImplTest {
 	private DecisionDAO decisionDao;
 	
 	@Mock
+	private BallotTypeDAO ballotTypeDao;
+	
+	@Mock
 	private BallotOptionDAO ballotOptionDao;
 	
 	@Mock
@@ -59,7 +64,8 @@ class BallotServiceImplTest extends ServiceImplTest {
 	
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	private Decision testDecision = new Decision("Test Decision", testUser);
-	private Ballot testBallot = new Ballot(testDecision, new Date(1337));
+	private BallotType testBallotType = new BallotType(1L, "Single-Choice");
+	private Ballot testBallot = new Ballot(testDecision, testBallotType, new Date(1337));
 	private BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 	
 	private BallotDTO testBallotDTO;
@@ -79,6 +85,7 @@ class BallotServiceImplTest extends ServiceImplTest {
 	void createBallot_happyPath() throws EntityNotFoundException {
 		// when
 		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.ofNullable(testDecision));
+		when(ballotTypeDao.findById(testBallotDTO.getBallotTypeId())).thenReturn(Optional.of(testBallotType));
 		ResponseEntity<BallotDTO> response = ballotServiceImpl.createBallot(testBallotDTO);
 		
 		// then
@@ -90,6 +97,17 @@ class BallotServiceImplTest extends ServiceImplTest {
 	void createBallot_noDecisionExists() throws EntityNotFoundException {
 		// when
 		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.empty());
+		
+		// then
+	    assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.createBallot(testBallotDTO); });
+		verify(ballotDao, times(0)).save(Mockito.any(Ballot.class));
+	}
+	
+	@Test
+	void createBallot_noBallotTypeExists() throws EntityNotFoundException {
+		// when
+		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.ofNullable(testDecision));
+		when(ballotTypeDao.findById(testBallotDTO.getBallotTypeId())).thenReturn(Optional.empty());
 		
 		// then
 	    assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.createBallot(testBallotDTO); });
