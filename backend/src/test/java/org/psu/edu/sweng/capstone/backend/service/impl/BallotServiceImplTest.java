@@ -146,7 +146,6 @@ class BallotServiceImplTest extends ServiceImplTest {
 	void updateBallot_happyPath() throws EntityNotFoundException {
 		// when
 		when(ballotDao.findById(testBallotDTO.getId())).thenReturn(Optional.of(testBallot));
-		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.of(testDecision));
 		ResponseEntity<BallotDTO> response = ballotServiceImpl.updateBallot(testBallotDTO.getId(), testBallotDTO);
 		
 		// then
@@ -165,24 +164,12 @@ class BallotServiceImplTest extends ServiceImplTest {
 	}
 	
 	@Test
-	void updateBallot_decisionNotPresent() throws EntityNotFoundException {
-		// when
-		when(ballotDao.findById(testBallotDTO.getId())).thenReturn(Optional.of(testBallot));
-		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.empty());
-	    
-		// then
-		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateBallot(testBallotDTO.getId(), testBallotDTO); });
-		verify(ballotDao, times(0)).save(Mockito.any(Ballot.class));
-	}
-	
-	@Test
 	void updateBallot_expirationDateNull_noBallotOptions() throws EntityNotFoundException {
 		// given
 		testBallotDTO.setExpirationDate(null);
 		
 		// when
 		when(ballotDao.findById(testBallotDTO.getId())).thenReturn(Optional.of(testBallot));
-		when(decisionDao.findById(testBallotDTO.getDecisionId())).thenReturn(Optional.of(testDecision));
 		ResponseEntity<BallotDTO> response = ballotServiceImpl.updateBallot(testBallotDTO.getId(), testBallotDTO);
 		
 		// then
