@@ -22,7 +22,6 @@
     <q-card-section class="q-pa-md column items-center" v-else>
       <div class="text-overline">Your submitted vote was:</div>
       <div class="q-px-md q-mt-sm text-h6">{{previousVote.title}}</div>
-      <div class="q-px-md q-mt-sm text-body-1">{{previousVote.description}}</div>
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="$emit('votingClose')" />
@@ -44,7 +43,7 @@ export default {
 
   computed: {
     formattedVoteOptions: function () {
-      return this.ballotOptions.map(option => ({ label: `${option.title}: ${option.description}`, value: option.title }))
+      return this.ballotOptions.map(option => ({ label: `${option.title}`, value: option.title }))
     },
 
     voteResultID: function () {

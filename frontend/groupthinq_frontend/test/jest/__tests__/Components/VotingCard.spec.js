@@ -24,20 +24,18 @@ describe('Voting Card tests', () => {
   localVue.use(Quasar, { components }) // , lang: langEn
 
   const testPropsTemplate = {
-    previousVote: {title: "Ballot Option 2", description: "This is a description for Ballot Option 2"},
+    previousVote: {title: "Ballot Option 2"},
     ballotId: 10,
     title: "Decision 1",
     description: "Decision with Ballot and 2 Ballot Options",
     ballotOptions: [
       {
         title: "Ballot Option 1",
-        userName: "testuser1",
-        description: "This is a description for Ballot Option 1"
+        userName: "testuser1"
       },
       {
           title: "Ballot Option 2",
-          userName: "testuser1",
-          description: "This is a description for Ballot Option 2"
+          userName: "testuser1"
       }]
   }
   var testProps = {}
@@ -83,8 +81,8 @@ describe('Voting Card tests', () => {
     expect(VotingCard.computed.formattedVoteOptions
       .call({ballotOptions: testProps.ballotOptions}))
       .toStrictEqual(
-      [{"label": "Ballot Option 1: This is a description for Ballot Option 1", "value": "Ballot Option 1"}, 
-      {"label": "Ballot Option 2: This is a description for Ballot Option 2", "value": "Ballot Option 2"}])
+      [{"label": "Ballot Option 1", "value": "Ballot Option 1"}, 
+      {"label": "Ballot Option 2", "value": "Ballot Option 2"}])
 
   })
 
