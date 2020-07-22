@@ -1,5 +1,5 @@
 <template>
-  <q-card style="width:50%">
+  <q-card style="width:50%; min-width:380px">
     <q-card-section class='column items-center q-pa-md'>
       <div class="text-h5 q-ma-md"> Editing Decision... </div>
       <div class="text-subtitle2"> Decision Details </div>
@@ -7,13 +7,20 @@
       <q-input autogrow clearable type="textarea" class="q-mb-md" style="width: 100%" v-model="editableDecision.description" label="Description (Optional)" />
       <q-input v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
             <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy transition-show="scale" transition-hide="scale">
-                  <div class="q-gutter-md row items-start transparent">
-                    <q-date v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" today-btn />
-                    <q-time v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" now-btn />
-                  </div>
-                </q-popup-proxy>
+              <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
+                <q-dialog v-model="pickDatetimeDialog">
+                    <q-card class="date-picker">
+                      <q-card-section>
+                        <div class="q-gutter-sm row justify-center">
+                          <q-date today-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" />
+                          <q-time now-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" />
+                        </div>
+                      </q-card-section>
+                      <q-card-actions align="right">
+                        <q-btn color="green-8" @click="closeDatetimeDialog()" label="Confirm" />
+                      </q-card-actions>
+                    </q-card>
+                </q-dialog>
               </q-icon>
             </template>
       </q-input>
@@ -77,7 +84,8 @@ export default {
       allUsersList: [],
       filteredUsersList: [],
       newIncludedUser: '',
-      submissionValid: true
+      submissionValid: true,
+      pickDatetimeDialog: false
     }
   },
 
@@ -196,6 +204,14 @@ export default {
       if (!this.editableDecision.name) { return false }
       if (!this.checkValidDate(this.newExpirationDate)) { return false }
       return true
+    },
+
+    closeDatetimeDialog () {
+      this.pickDatetimeDialog = false
+    },
+
+    openDatetimeDialog () {
+      this.pickDatetimeDialog = true
     }
   }
 }
