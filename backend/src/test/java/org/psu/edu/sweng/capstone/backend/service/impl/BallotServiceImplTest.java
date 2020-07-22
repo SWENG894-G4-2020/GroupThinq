@@ -31,6 +31,7 @@ import org.psu.edu.sweng.capstone.backend.model.BallotResult;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
+import org.springframework.security.access.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 class BallotServiceImplTest extends ServiceImplTest {
@@ -180,17 +181,13 @@ class BallotServiceImplTest extends ServiceImplTest {
 	@Test
 	void castVote_happyPath() throws EntityNotFoundException {
 		// given
-		BallotResultDTO result = new BallotResultDTO();
-		
-		result.setBallotId(1L);
-		result.setBallotOptionId(2L);
-		result.setUserName("MBoyer");
+		BallotResultDTO resultDTO = createBallotResultDTO();
 		
 		// when
-		when(userDao.findByUserName(result.getUserName())).thenReturn(Optional.of(testUser));
-		when(ballotDao.findById(result.getBallotId())).thenReturn(Optional.of(testBallot));
-		when(ballotOptionDao.findById(result.getBallotOptionId())).thenReturn(Optional.of(testBallotOption));
-		ResponseEntity<String> response = ballotServiceImpl.castVote(result);
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(ballotOptionDao.findById(resultDTO.getBallotOptionId())).thenReturn(Optional.of(testBallotOption));
+		ResponseEntity<String> response = ballotServiceImpl.castVote(resultDTO);
 		
 		// then
 		assertCreatedSuccess(response);
@@ -200,49 +197,37 @@ class BallotServiceImplTest extends ServiceImplTest {
 	@Test
 	void castVote_noUser() throws EntityNotFoundException {
 		// given
-		BallotResultDTO result = new BallotResultDTO();
-		
-		result.setBallotId(1L);
-		result.setBallotOptionId(2L);
-		result.setUserName("MBoyer");
+		BallotResultDTO resultDTO = createBallotResultDTO();
 				
-		when(userDao.findByUserName(result.getUserName())).thenReturn(Optional.empty());
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.empty());
 		
 		// then
-		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.castVote(result); });
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.castVote(resultDTO); });
 	}
 	
 	@Test
 	void castVote_noBallot() throws EntityNotFoundException {
 		// given
-		BallotResultDTO result = new BallotResultDTO();
-		
-		result.setBallotId(1L);
-		result.setBallotOptionId(2L);
-		result.setUserName("MBoyer");
+		BallotResultDTO resultDTO = createBallotResultDTO();
 				
-		when(userDao.findByUserName(result.getUserName())).thenReturn(Optional.of(testUser));
-		when(ballotDao.findById(result.getBallotId())).thenReturn(Optional.empty());
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.empty());
 		
 		// then
-		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.castVote(result); });
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.castVote(resultDTO); });
 	}
 	
 	@Test
 	void castVote_noBallotOption() throws EntityNotFoundException {
 		// given
-		BallotResultDTO result = new BallotResultDTO();
-		
-		result.setBallotId(1L);
-		result.setBallotOptionId(2L);
-		result.setUserName("MBoyer");
+		BallotResultDTO resultDTO = createBallotResultDTO();
 				
-		when(userDao.findByUserName(result.getUserName())).thenReturn(Optional.of(testUser));
-		when(ballotDao.findById(result.getBallotId())).thenReturn(Optional.of(testBallot));
-		when(ballotOptionDao.findById(result.getBallotOptionId())).thenReturn(Optional.empty());
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(ballotOptionDao.findById(resultDTO.getBallotOptionId())).thenReturn(Optional.empty());
 		
 		// then
-		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.castVote(result); });
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.castVote(resultDTO); });
 	}
 	
 	@Test
@@ -278,5 +263,104 @@ class BallotServiceImplTest extends ServiceImplTest {
 		
 		// then
 		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.retrieveResults(testBallot.getId()); });
+	}
+	
+	@Test
+	void updateVote_happyPath() throws EntityNotFoundException {
+		// given
+		BallotResult result = new BallotResult(testBallot, testBallotOption, testUser);
+		BallotResultDTO resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotOptionDao.findById(resultDTO.getBallotOptionId())).thenReturn(Optional.of(testBallotOption));
+		when(ballotResultDao.findByUserAndBallot(testUser, testBallot)).thenReturn(Optional.of(result));
+		ResponseEntity<String> response = ballotServiceImpl.updateVote(resultDTO);
+		
+		// then
+		assertGenericSuccess(response);
+	}
+	
+	@Test
+	void updateVote_noBallotFound() throws EntityNotFoundException {
+		// given
+		BallotResultDTO resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.empty());
+
+		// then
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });
+	}
+	
+	@Test
+	void updateVote_noUserFound() throws EntityNotFoundException {
+		// given
+		BallotResultDTO resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.empty());
+		
+		// then
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });
+	}
+	
+	@Test
+	void updateVote_noBallotResultFound() throws EntityNotFoundException {
+		// given
+		BallotResultDTO resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotResultDao.findByUserAndBallot(testUser, testBallot)).thenReturn(Optional.empty());
+		
+		// then
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });
+	}
+	
+	@Test
+	void updateVote_noBallotOptionFound() throws EntityNotFoundException {
+		// given
+		BallotResult result = new BallotResult(testBallot, testBallotOption, testUser);
+		BallotResultDTO resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotOptionDao.findById(resultDTO.getBallotOptionId())).thenReturn(Optional.empty());
+		when(ballotResultDao.findByUserAndBallot(testUser, testBallot)).thenReturn(Optional.of(result));
+		
+		// then
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });
+	}
+	
+	@Test
+	void updateVote_ballotOption_notPartOfBallot() throws EntityNotFoundException {
+		// given
+		testBallot.getOptions().clear();
+		BallotResult result = new BallotResult(testBallot, testBallotOption, testUser);
+		BallotResultDTO resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(resultDTO.getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotOptionDao.findById(resultDTO.getBallotOptionId())).thenReturn(Optional.of(testBallotOption));
+		when(ballotResultDao.findByUserAndBallot(testUser, testBallot)).thenReturn(Optional.of(result));
+		
+		// then
+		assertThrows(AccessDeniedException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });
+	}
+
+	private BallotResultDTO createBallotResultDTO() {
+		BallotResultDTO resultDTO = new BallotResultDTO();
+		
+		resultDTO.setBallotId(1L);
+		resultDTO.setBallotOptionId(2L);
+		resultDTO.setUserName("MBoyer");
+		
+		return resultDTO;
 	}
 }
