@@ -104,11 +104,7 @@ export default {
         })
         total = total + this.resultTotals[option.id]
       }
-      data.sort((a, b) => b.votes - a.votes)
-      let rank = 1
       data.forEach(r => {
-        r.rank = rank
-        rank += 1
         r.total = total
         if (r.total === 0) {
           r.percentage = 0
@@ -116,6 +112,7 @@ export default {
           r.percentage = r.votes / r.total
         }
       })
+      data.sort((a, b) => b.percentage - a.percentage)
       return data
     },
 
