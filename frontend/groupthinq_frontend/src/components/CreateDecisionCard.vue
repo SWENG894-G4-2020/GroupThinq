@@ -50,32 +50,22 @@
       </div>
       <q-slide-transition>
         <div v-show="usersExpanded" style="width:100%">
-        <div class="row items-center">
-          <div class="col">
-            <q-select
-              label="Add User(s)"
-              filled fill-input use-input hide-selected
-              v-model="newIncludedUser"
-              input-debounce="0"
-              :options="filteredUsersList" @filter="filterFn"
-              class="q-my-md" style="width: 100%">
-              <template v-slot:no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
+          <div class="row items-center">
+            <div class="col">
+              <q-select
+                label="Select Participants"
+                hint="Who can vote on this decision?"
+                v-model="addedUsers"
+                use-input
+                use-chips
+                multiple
+                input-debounce="0"
+                :options="filteredUsersList"
+                @filter="filterFn"
+                class="q-my-md"
+                style="width: 100%"
+              />
           </div>
-          <q-btn round dense color="green-8" icon="add" class="col-shrink q-mx-md" @click="addIncludedUser()" />
-        </div>
-        <div class="row items-center" style="width: 100%">
-          <q-chip v-for="(addedUser,idx) in addedUsers" :key="idx"
-            removable
-            :label="addedUser"
-            @remove="removeUser(addedUser)"
-            class ="col-shrink" />
         </div>
         </div>
       </q-slide-transition>
@@ -229,7 +219,9 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredUsersList = this.allUsersList.filter(v => v.toLowerCase().indexOf(needle) > -1)
+        this.filteredUsersList = this.allUsersList
+          .filter(v => v !== this.currentUserName)
+          .filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
     },
 
