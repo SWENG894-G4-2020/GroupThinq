@@ -31,7 +31,7 @@ class BallotTest {
 	
 	@Test
 	void constructor_worksProperly() {
-		Ballot ballot = new Ballot(DECISION, new Date(1337L));
+		Ballot ballot = new Ballot(DECISION, new BallotType(), new Date(1337L));
 		
 		assertNotNull(ballot.getCreatedDate());
 		assertEquals("mboyer87", ballot.getDecision().getOwnerId().getUserName());

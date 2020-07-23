@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
@@ -30,6 +33,15 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private RoleDAO roleDao;
+	
+	@Autowired
+	private DecisionDAO decisionDao;
+	
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
+	
+	@Autowired
+	private BallotResultDAO ballotResultDao;
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -69,10 +81,11 @@ public class UserServiceImpl implements UserService {
 		final User user = userDao.findByUserName(username).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-
+		ballotResultDao.deleteByUser(user);
+		decisionUserDao.deleteByUser(user);		
+		decisionDao.deleteByOwnerId(user);
+		
 		user.getRoles().clear();
-		user.getDecisions().clear();
-		user.getVotes().clear();
 
 		userDao.delete(user);
 		
@@ -126,7 +139,13 @@ public class UserServiceImpl implements UserService {
 		
 		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
 				
-		user.getDecisions().stream().forEach(du -> response.getData().add(DecisionDTO.build(du.getDecision())));
+		decisionUserDao.findAllByUser(user).stream().forEach(du -> {
+			DecisionDTO dto = DecisionDTO.build(du.getDecision());
+			
+			dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(du.getDecision()), dto);
+			
+			response.getData().add(dto);
+		});
 		
 		response.attachGenericSuccess();
 		
