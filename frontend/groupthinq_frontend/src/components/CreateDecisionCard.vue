@@ -173,7 +173,7 @@ export default {
 
       this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
-
+      this.newDecision.ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
 
       try {
@@ -200,6 +200,7 @@ export default {
         name: '',
         description: '',
         ballots: [{ expirationDate: '', ballotOptions: [] }],
+        ballotTypeId: 1,
         ownerUsername: this.currentUserName,
         includedUsers: [
           { userName: this.currentUserName }
@@ -256,6 +257,7 @@ export default {
     checkValidSubmit () {
       if (this.newDecision.name === '') { return false }
       if (!this.checkValidDate(this.newExpirationDate)) { return false }
+      if (!this.ballotType || this.ballotType === '') { return false }
       if (this.optionsList.length < 1) { return false }
       return true
     },
