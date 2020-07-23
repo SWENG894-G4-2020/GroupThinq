@@ -20,10 +20,14 @@
           </q-menu>
         </q-btn>
       </div>
-      <div class="q-mb-sm">
+      <div class="q-mb-sm" v-if="description">
           <span class="text-overline q-mr-sm">Description:</span>
           <span class="text-body-1">{{description}}</span>
-        </div>
+      </div>
+      <div class="q-mb-sm" v-if="description">
+          <span class="text-overline q-mr-sm">Voting Method:</span>
+          <span class="text-body-1">{{description}}</span>
+      </div>
       <div class="text-negative" v-if="!expired">Time Remaining: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
       <div class="text-negative" v-else>Time Remaining: Voting has closed.</div>
     </q-card-section>
