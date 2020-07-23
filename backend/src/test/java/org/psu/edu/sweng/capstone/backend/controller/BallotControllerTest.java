@@ -141,6 +141,6 @@ class BallotControllerTest {
 				.andExpect(status().isOk());
 
 		// then
-		verify(ballotServiceImpl, times(1)).updateVote(Mockito.any(BallotResultDTO.class));
+		verify(ballotService, times(1)).updateVote(Mockito.any(BallotResultDTO.class));
 	}
 }
