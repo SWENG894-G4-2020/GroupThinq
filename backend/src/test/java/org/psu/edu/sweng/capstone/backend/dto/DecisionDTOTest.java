@@ -2,6 +2,8 @@ package org.psu.edu.sweng.capstone.backend.dto;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
@@ -16,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class DecisionDTOTest {
+	
+	@Mock
+	private static DecisionUserDAO decisionUserDao;
 
     private DecisionDTO testDecisionDTO;
     private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
@@ -30,15 +35,11 @@ public class DecisionDTOTest {
         decision.setCreatedDate(new Date(1101L));
         decision.setUpdatedDate(new Date(1011L));
         
-        DecisionUser du = new DecisionUser(decision, new User("tuser", "pw", "User", "Test", "testuser@foo.bar", new Date(1337L)));
-        decision.getDecisionUsers().add(du);
-        
         BallotType type = new BallotType();
         
         Ballot ballot = new Ballot(decision, type, new Date());
+
         decision.getBallots().add(ballot);
-        
-        decision.setDeleted(true);
         
         testDecisionDTO = DecisionDTO.build(decision);
     }
@@ -106,7 +107,17 @@ public class DecisionDTOTest {
     }
     
     @Test
-    void buildDTO_returnsDecisionUsers() {
+    void buildDecisionUserList_returnsAppropriateValues() {
+    	// given
+        Decision decision = new Decision("why is gamora?", testUser);
+
+    	ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
+    	decisionUsers.add(new DecisionUser(decision, testUser));
+    	
+    	// when
+    	testDecisionDTO = DecisionDTO.buildDecisionUserList(decisionUsers, testDecisionDTO);
+    	
+    	// then
     	assertEquals(1, testDecisionDTO.getIncludedUsers().size());
     }
 }

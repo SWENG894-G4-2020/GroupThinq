@@ -1,6 +1,5 @@
 package org.psu.edu.sweng.capstone.backend.dto;
 
-import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -20,7 +19,6 @@ public class DecisionDTO {
     private Date createdDate;
     private Date updatedDate;
     private String ownerUsername;
-    private Boolean deleted;
     
     private List<BallotDTO> ballots = new ArrayList<>();
     private List<UserDTO> includedUsers = new ArrayList<>();
@@ -72,14 +70,6 @@ public class DecisionDTO {
     public void setOwnerUsername(String ownerUsername) {
         this.ownerUsername = ownerUsername;
     }
-	
-    public Boolean getDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
-	}
 
 	public List<UserDTO> getIncludedUsers() {
         return includedUsers;
@@ -105,25 +95,25 @@ public class DecisionDTO {
         if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
-        if (d.getDeleted() != null) { dto.setDeleted(d.getDeleted()); }
         if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
-
-        for (DecisionUser decisionUser : d.getDecisionUsers()) {
+        
+        d.getBallots().stream().forEach(b -> dto.getBallots().add(BallotDTO.build(b)));
+        
+        return dto;
+    }
+	
+	public static DecisionDTO buildDecisionUserList(List<DecisionUser> decisionUsers, DecisionDTO dto) {
+        decisionUsers.stream().forEach(du -> {
         	UserDTO userDTO = new UserDTO();
-        	final User user = decisionUser.getUser();
+        	final User user = du.getUser();
         	
         	userDTO.setUserName(user.getUserName());
         	userDTO.setFirstName(user.getFirstName());
         	userDTO.setLastName(user.getLastName());
         	
             dto.getIncludedUsers().add(userDTO);
-        }
-        
-        for (Ballot b : d.getBallots()) {
-        	BallotDTO bDTO = BallotDTO.build(b);
-        	dto.getBallots().add(bDTO);
-        }
-
-        return dto;
-    }
+        });
+		
+		return dto;
+	}
 }
