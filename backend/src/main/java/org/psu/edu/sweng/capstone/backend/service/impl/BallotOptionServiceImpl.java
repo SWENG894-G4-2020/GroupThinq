@@ -6,11 +6,13 @@ import javax.transaction.Transactional;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class BallotOptionServiceImpl implements BallotOptionService {
 
+	@Autowired
+	private UserDAO userDao;
+	
 	@Autowired
 	private BallotDAO ballotDao;
 	
@@ -49,6 +54,29 @@ public class BallotOptionServiceImpl implements BallotOptionService {
 		ballotOptionDao.save(ballotOption);
 		
 		response.attachGenericSuccess();
+		
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<String> createBallotOption(BallotOptionDTO ballotOption) throws EntityNotFoundException {
+		ResponseEntity<String> response = new ResponseEntity<>();
+		
+		final Long ballotId = ballotOption.getBallotId();
+		final String ballotUsername = ballotOption.getUserName();
+		
+		if (ballotId == null) { throw new EntityNotFoundException("Ballot ID of Ballot Option"); }
+		if (ballotUsername == null) { throw new EntityNotFoundException("Username of Ballot Option Owner"); }
+		
+		final Ballot ballot = ballotDao.findById(ballotOption.getBallotId()).orElseThrow(
+				() -> new EntityNotFoundException("Ballot " + ballotId.toString()));
+		
+		final User user = userDao.findByUserName(ballotUsername).orElseThrow(
+				() -> new EntityNotFoundException("User " + ballotUsername));
+		
+		ballot.getOptions().add(new BallotOption(ballotOption.getTitle(), ballot, user));
+		
+		response.attachCreatedSuccess();
 		
 		return response;
 	}
