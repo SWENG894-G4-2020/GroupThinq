@@ -173,7 +173,7 @@ export default {
 
       this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
-      this.newDecision.ballotTypeId = this.ballotType
+      this.newDecision.ballots[0].ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
 
       try {
@@ -199,8 +199,7 @@ export default {
       this.newDecision = {
         name: '',
         description: '',
-        ballots: [{ expirationDate: '', ballotOptions: [] }],
-        ballotTypeId: 1,
+        ballots: [{ expirationDate: '', ballotTypeId: 1, ballotOptions: [] }],
         ownerUsername: this.currentUserName,
         includedUsers: [
           { userName: this.currentUserName }
