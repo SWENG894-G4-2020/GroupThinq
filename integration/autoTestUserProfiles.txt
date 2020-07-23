@@ -1,0 +1,16 @@
+TC1_1
+autotester1
+autotester1
+
+TC1_7
+uppercasecheck
+uppercasecheck
+
+TC1_9
+lockMyAccount
+lockMyAccount
+
+TC1_13
+LowercaseCHECK
+LowercaseCHECK
+
