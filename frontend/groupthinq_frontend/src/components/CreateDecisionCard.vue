@@ -1,6 +1,6 @@
 <template>
-  <q-card style="width:50%; min-width:400px">
-    <q-card-section class='column items-center q-pa-md'>
+  <q-card style="width:50%; min-width:380px">
+    <q-card-section class='column items-center q-pa-lg'>
       <div class="text-h5 q-ma-md"> Create A New Decision </div>
       <div class="text-subtitle2"> Decision Details
         <q-btn
@@ -17,13 +17,20 @@
           <q-input autogrow clearable type="textarea" class="q-my-md text-body2 text-grey-5" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description (Optional)" />
           <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
             <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy transition-show="scale" transition-hide="scale" :offset="[10, 10]">
-                  <div class="q-gutter-md row items-start transparent">
-                    <q-date v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" today-btn />
-                    <q-time v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" now-btn />
-                  </div>
-                </q-popup-proxy>
+              <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
+                <q-dialog v-model="pickDatetimeDialog">
+                    <q-card class="date-picker">
+                      <q-card-section>
+                        <div class="q-gutter-sm row justify-center">
+                          <q-date today-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" />
+                          <q-time now-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" />
+                        </div>
+                      </q-card-section>
+                      <q-card-actions align="right">
+                        <q-btn color="green-8" @click="closeDatetimeDialog()" label="Confirm" />
+                      </q-card-actions>
+                    </q-card>
+                </q-dialog>
               </q-icon>
             </template>
           </q-input>
@@ -130,7 +137,8 @@ export default {
       detailsExpanded: true,
       usersExpanded: false,
       optionsExpanded: false,
-      submissionValid: true
+      submissionValid: true,
+      pickDatetimeDialog: false
     }
   },
 
@@ -236,7 +244,27 @@ export default {
       if (!this.checkValidDate(this.newExpirationDate)) { return false }
       if (this.optionsList.length < 1) { return false }
       return true
+    },
+
+    closeDatetimeDialog () {
+      this.pickDatetimeDialog = false
+    },
+
+    openDatetimeDialog () {
+      this.pickDatetimeDialog = true
     }
   }
 }
 </script>
+
+<style lang="scss">
+.date-picker {
+  min-width: 620px;
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .date-picker {
+    min-width: 375px;
+  }
+}
+</style>
