@@ -25,40 +25,23 @@
             </template>
       </q-input>
       <q-separator class="q-my-md" />
-      <div class="text-subtitle2"> Add/Edit Members (by username) </div>
+      <div class="text-subtitle2"> Add Decision Participants (by username) </div>
       <div class="row items-center" style="width: 100%">
         <div class="col">
-      <q-select
-        filled
-        v-model="newIncludedUser"
-        use-input
-        hide-selected
-        fill-input
-        input-debounce="0"
-        label="Add User(s)"
-        :options="filteredUsersList"
-        @filter="filterFn"
-        class="q-my-md"
-        style="width: 100%">
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
+          <q-select
+            label="Select Participants"
+            hint="Who can vote on this decision?"
+            v-model="addedUsers"
+            use-input
+            use-chips
+            multiple
+            input-debounce="0"
+            :options="filteredUsersList"
+            @filter="filterFn"
+            class="q-my-md"
+            style="width: 100%"
+          />
       </div>
-      <div class="col-shrink q-px-sm">
-      <q-btn round dense color="green-8" icon="add" @click="addIncludedUser()" />
-      </div>
-      </div>
-      <div class="row items-center" style="width: 100%">
-      <q-chip v-for="(includedUser,idx) in includedUsers" :key="idx"
-        removable
-        :label="includedUser.userName"
-        @remove="removeUser(includedUser.userName)"
-        class ="col-shrink" />
       </div>
       <q-separator class="q-my-md" />
     </q-card-section>
@@ -85,7 +68,8 @@ export default {
       filteredUsersList: [],
       newIncludedUser: '',
       submissionValid: true,
-      pickDatetimeDialog: false
+      pickDatetimeDialog: false,
+      addedUsers: []
     }
   },
 
@@ -124,6 +108,9 @@ export default {
     this.currentUserName = auth.getTokenData().sub
     this.fillEditableDecision()
     this.getAllUsers()
+    this.includedUsers
+      .filter(v => v.userName !== this.currentUserName)
+      .forEach(i => this.addedUsers.push(i.userName))
   },
 
   methods: {
@@ -137,6 +124,9 @@ export default {
         return
       }
 
+      this.editableDecision.includedUsers = []
+      this.addedUsers.forEach((user) => this.editableDecision.includedUsers.push({ userName: user }))
+      this.editableDecision.includedUsers.push({ userName: this.currentUserName })
       this.editableDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       try {
         await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editableDecision)
@@ -190,7 +180,9 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredUsersList = this.allUsersList.filter(v => v.toLowerCase().indexOf(needle) > -1)
+        this.filteredUsersList = this.allUsersList
+          .filter(v => v !== this.currentUserName)
+          .filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
     },
 
