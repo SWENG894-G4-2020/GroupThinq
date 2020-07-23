@@ -56,8 +56,7 @@ describe('Create Decision Card tests', () => {
     vm.$data.optionsList = [
       {
         title: "Ballot Option 1",
-        userName: "testuser1",
-        description: "This is a description for Ballot Option 1"
+        userName: "testuser1"
       }]
     await vm.onCreate() // wait for the mounted function to finish
     expect(console.log).toHaveBeenCalledWith('Test Error')
@@ -84,8 +83,7 @@ describe('Create Decision Card tests', () => {
     vm.$data.optionsList = [
       {
         title: "Ballot Option 1",
-        userName: "testuser1",
-        description: "This is a description for Ballot Option 1"
+        userName: "testuser1"
       }]
     vm.$data.addedUsers = ['test1', 'test2']
     await vm.onCreate()
@@ -142,11 +140,9 @@ describe('Create Decision Card tests', () => {
     const vm = wrapper.vm
     
     vm.$data.newOption.title = "testTitle"
-    vm.$data.newOption.description = "testDescription"
     await vm.addDecisionOption()
     expect(vm.$data.optionsList.length).toBe(1)
 
-    vm.$data.newOption.description = ""
     await vm.addDecisionOption()
     expect(vm.$data.optionsList.length).toBe(1)
   })
@@ -155,8 +151,8 @@ describe('Create Decision Card tests', () => {
     const wrapper = shallowMount(CreateDecisionCard, { localVue })
     const vm = wrapper.vm
     
-    vm.$data.optionsList = [{title: 'testTitle', description: 'testDescription'}]
-    await vm.removeDecisionOption({title: 'testTitle', description: 'testDescription'})
+    vm.$data.optionsList = [{title: 'testTitle'}]
+    await vm.removeDecisionOption({title: 'testTitle'})
     expect(vm.$data.optionsList.length).toBe(0)
   })
 
@@ -169,15 +165,12 @@ describe('Create Decision Card tests', () => {
     vm.$data.optionsList = [
       {
         title: "Ballot Option 1",
-        userName: "testuser1",
-        description: "This is a description for Ballot Option 1"
+        userName: "testuser1"
       }]
     await vm.checkValidSubmit()
     vm.$data.optionsList = []
     await vm.checkValidSubmit()
     vm.$data.newExpirationDate = '20'
-    await vm.checkValidSubmit()
-    vm.$data.newDecision.description = ''
     await vm.checkValidSubmit()
     vm.$data.newDecision.name = ''
     await vm.checkValidSubmit()

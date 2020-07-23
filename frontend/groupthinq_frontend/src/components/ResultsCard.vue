@@ -16,16 +16,6 @@
         no-data-label="No results yet."
         :pagination="initialPagination"
       >
-      <template v-slot:body-cell-name="props">
-        <q-td :props="props">
-          <div>
-            {{props.value}}
-          </div>
-          <div class="option-desc">
-            {{ props.row.description }}
-          </div>
-        </q-td>
-      </template>
       <template v-slot:body-cell-winner="props">
         <q-td :props="props">
           <div v-if="props.row.winner">
@@ -115,7 +105,6 @@ export default {
       for (option of this.ballot.ballotOptions) {
         data.push({
           name: option.title,
-          description: option.description,
           votes: this.resultTotals[option.id],
           winner: this.winnerId.includes(option.id)
         })

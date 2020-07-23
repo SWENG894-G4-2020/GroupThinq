@@ -13,12 +13,12 @@
       </div>
       <q-slide-transition>
         <div v-show="detailsExpanded" style="width:100%">
-          <q-input filled class="q-my-md" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
-          <q-input filled type="textarea" class="q-mb-md" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description" :rules="[val => !!val || '*Required']"/>
-          <q-input filled v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
+          <q-input class="q-my-xs text-h5" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
+          <q-input autogrow clearable type="textarea" class="q-my-md text-body2 text-grey-5" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description (Optional)" />
+          <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                <q-popup-proxy transition-show="scale" transition-hide="scale" :offset="[10, 10]">
                   <div class="q-gutter-md row items-start transparent">
                     <q-date v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" today-btn />
                     <q-time v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" now-btn />
@@ -89,14 +89,13 @@
           <div class="row items-center">
             <div class="col">
               <q-input filled class="q-my-md" style="width: 100%" v-model="newOption.title" label="Option Title" />
-              <q-input filled class="q-mb-md" style="width: 100%" v-model="newOption.description" label="Option Description" />
             </div>
             <q-btn round dense class="col-shrink q-mx-md" color="green-8" icon="add" @click="addDecisionOption()" />
           </div>
           <div class="column">
             <q-card v-for="(option,idx) in optionsList" :key="idx" class="row items-center q-mb-sm" style="width: 100%">
               <span class="col-1 text-h6 q-pl-sm">{{idx + 1}}.</span>
-              <span class="col-10 text-body1">{{option.title}}:  {{option.description}}</span>
+              <span class="col-10 text-body1">{{option.title}}</span>
               <q-btn color="negative" round dense icon="close" size="xs" @click="removeDecisionOption(option)" />
             </q-card>
           </div>
@@ -104,7 +103,7 @@
       </q-slide-transition>
     </q-card-section>
     <q-card-section class="text-center text-body-1 text-negative" v-if="!submissionValid">
-      A new decision requires a title, description, valid expiration date, and at least one option.
+      A new decision requires a title, valid expiration date, and at least one option.
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
@@ -122,7 +121,7 @@ export default {
       currentUserName: '',
       newExpirationDate: '',
       newDecision: { ballots: [{}] },
-      newOption: { title: '', description: '', userName: this.currentUserName },
+      newOption: { title: '', userName: this.currentUserName },
       optionsList: [],
       allUsersList: [],
       filteredUsersList: [],
@@ -204,9 +203,9 @@ export default {
     },
 
     addDecisionOption () {
-      if (this.newOption.title !== '' && this.newOption.description !== '') {
+      if (this.newOption.title !== '') {
         this.optionsList.push(this.newOption)
-        this.newOption = { title: '', description: '', userName: this.currentUserName }
+        this.newOption = { title: '', userName: this.currentUserName }
       }
     },
 
@@ -234,7 +233,6 @@ export default {
 
     checkValidSubmit () {
       if (this.newDecision.name === '') { return false }
-      if (this.newDecision.description === '') { return false }
       if (!this.checkValidDate(this.newExpirationDate)) { return false }
       if (this.optionsList.length < 1) { return false }
       return true
