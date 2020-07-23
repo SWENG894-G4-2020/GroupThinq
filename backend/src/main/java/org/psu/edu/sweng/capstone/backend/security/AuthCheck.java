@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
@@ -27,6 +28,9 @@ public class AuthCheck {
 	
 	@Autowired
 	private DecisionDAO decisionDao;
+
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
 	
 	/** Determines whether the authenticated user can access the requested user. 
 	 *
@@ -85,7 +89,7 @@ public class AuthCheck {
 				() -> new EntityNotFoundException("Decision " + decisionId.toString()));
 		
 		boolean isDecisionUser = false;
-		for (DecisionUser du : decision.getDecisionUsers()) {
+		for (DecisionUser du : decisionUserDao.findAllByDecision(decision)) {
 			if (authUsername.equals(du.getUser().getUserName())) {
 				isDecisionUser = true;
 			}
