@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BallotOptionDTOTest {
 
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-    private Ballot ballot = new Ballot(null, new Date(1337L));
+    private Ballot ballot = new Ballot(null, null, new Date(1337L));
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
     private BallotOptionDTO testDTO;
 

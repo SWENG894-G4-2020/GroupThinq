@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class BallotResultDTOTest {
 
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
-    private Ballot ballot = new Ballot(null, new Date(1337L));
+    private Ballot ballot = new Ballot(null, null, new Date(1337L));
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
     private BallotResult ballotResult = new BallotResult(ballot, ballotOption, USER);
     private BallotResultDTO testDTO;

@@ -2,14 +2,12 @@ package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
-import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -21,7 +19,7 @@ import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
-import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -54,18 +52,19 @@ public class DecisionServiceImpl implements DecisionService {
 	private BallotOptionDAO ballotOptionDao;
 	
 	@Autowired
-	private BallotResultDAO ballotResultDao;
-	
-	private static final String ERROR_HEADER = "Decision ";
+	private BallotTypeDAO ballotTypeDao;
+		
+	private static final String USER_HEADER = "User ";
+	private static final String DECISION_HEADER = "Decision ";
 
 	@Override
 	public ResponseEntity<UserDTO> getUsers(final Long id) throws EntityNotFoundException {
 		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
 		final Decision dec = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
-		dec.getDecisionUsers().stream().forEach(du -> response.getData().add(UserDTO.build(du.getUser())));
+		decisionUserDao.findAllByDecision(dec).stream().forEach(du -> response.getData().add(UserDTO.build(du.getUser())));
 		
 		response.attachGenericSuccess();
 		
@@ -77,7 +76,7 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
 		if (decisionDto.getName() != null) { decision.setName(decisionDto.getName()); }
 		if (decisionDto.getDescription() != null) { decision.setDescription(decisionDto.getDescription()); }
@@ -103,29 +102,28 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final User user = userDao.findByUserName(decisionDto.getOwnerUsername()).orElseThrow(
-				() -> new EntityNotFoundException("User " + decisionDto.getOwnerUsername()));
+				() -> new EntityNotFoundException(USER_HEADER + decisionDto.getOwnerUsername()));
 		
 		// Create new Decision
-		Decision newDecision = new Decision(decisionDto.getName(), user);
-			
-		// Add Users
-		Set<DecisionUser> decisionUsers = new HashSet<>();
-		for (UserDTO dto : decisionDto.getIncludedUsers()) {
-			Optional<User> includedUser = userDao.findByUserName(dto.getUserName());
-			
-			if (includedUser.isPresent()) {
-				decisionUsers.add(new DecisionUser(newDecision, includedUser.get()));
-			}
-		}
-		
-		newDecision.setDecisionUsers(decisionUsers);
-
+		Decision newDecision = new Decision(decisionDto.getName(), user);		
 		decisionDao.save(newDecision);
+
+		// Add Users
+		for (UserDTO dto : decisionDto.getIncludedUsers()) {
+			final User includedUser = userDao.findByUserName(dto.getUserName()).orElseThrow(
+					() -> new EntityNotFoundException(USER_HEADER + dto.getUserName()));
+			
+			DecisionUser du = new DecisionUser(newDecision, includedUser);
+			decisionUserDao.save(du);
+		}
 	
 		if (!decisionDto.getBallots().isEmpty()) {
 			// Add Ballots
 			for (BallotDTO bDTO : decisionDto.getBallots()) {
-				Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate());
+				final BallotType type = ballotTypeDao.findById(bDTO.getBallotTypeId()).orElseThrow(
+						() -> new EntityNotFoundException("Ballot Type " + bDTO.getBallotTypeId()));
+				
+				Ballot ballot = new Ballot(newDecision, type, bDTO.getExpirationDate());
 				ballotDao.save(ballot);
 				
 				// Add Ballot Options
@@ -146,20 +144,13 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
-
-		// Delete results, if any
-		for (Ballot b : decision.getBallots()) {
-			ArrayList<BallotResult> results = ballotResultDao.findAllByBallot(b);
-			if (!results.isEmpty()) { ballotResultDao.deleteAll(results); }
-		}
-				
-		decision.getDecisionUsers().clear();
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
+		
 		decision.getBallots().clear();
+		
+		decisionUserDao.deleteByDecision(decision);
 
-		decision.setDeleted(true);
-		decisionDao.save(decision);
-//		decisionDao.delete(decision);
+		decisionDao.delete(decision);
 		
 		response.attachGenericSuccess();
 		
@@ -171,26 +162,30 @@ public class DecisionServiceImpl implements DecisionService {
 		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
-				() -> new EntityNotFoundException(ERROR_HEADER + id.toString()));
+				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
 		
-		response.getData().add(DecisionDTO.build(decision));
+		DecisionDTO dto = DecisionDTO.build(decision);
+		dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(decision), dto);
+			
+		response.getData().add(dto);
 		response.attachGenericSuccess();
 		
 		return response;
 	}
 	
 	private void wipeAndAddNewDecisionUsers(Decision decision, final List<UserDTO> includedUsers) throws EntityNotFoundException {
-		Set<DecisionUser> oldDecisionUserList = decision.getDecisionUsers();
+		ArrayList<DecisionUser> oldDecisionUserList = decisionUserDao.findAllByDecision(decision);
 		
 		for (UserDTO userDto : includedUsers) {
 			final User user = userDao.findByUserName(userDto.getUserName()).orElseThrow(
-					() -> new EntityNotFoundException("User " + userDto.getUserName()));
+					() -> new EntityNotFoundException(USER_HEADER + userDto.getUserName()));
 			
-			Optional<DecisionUser> du = decisionUserDao.findByUserAndDecision(user, decision);
+			Optional<DecisionUser> du = decisionUserDao.findByUserAndDecision(user, decision);			
 			
 			// Adds User to Decision that didn't previously exist on the Decision User list.
 			if (!du.isPresent()) {
-				decision.getDecisionUsers().add(new DecisionUser(decision, user)); 
+				DecisionUser newDu = new DecisionUser(decision, user);
+				decisionUserDao.save(newDu);
 			}
 		}
 		
@@ -203,7 +198,7 @@ public class DecisionServiceImpl implements DecisionService {
 			
 			for (UserDTO userDto : includedUsers) {
 				if (userDto.getUserName().equals(oldUser.getUserName())) { 
-					deleteUserFromList = false; 
+					deleteUserFromList = false;
 				}
 			}
 			

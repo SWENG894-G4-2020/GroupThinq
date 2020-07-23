@@ -84,7 +84,7 @@ class BallotControllerTest {
 	}
 
 	@Test
-	void updateDecision_callsRightServiceFunction() throws Exception {
+	void updateBallot_callsRightServiceFunction() throws Exception {
 		// when
 		mockMvc.perform(put("/ballot/{id}", BALLOT_ID, BALLOT_DTO)
 				.accept(MediaType.APPLICATION_JSON)
@@ -129,5 +129,18 @@ class BallotControllerTest {
 
 		// then
 		verify(ballotOptionService, times(1)).createBallotOption(Mockito.any(BallotOptionDTO.class));
+	}
+	
+	@Test
+	void updateVote_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(put("/ballot/{id}/vote", BALLOT_RESULT_DTO)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(BALLOT_RESULT_DTO)))
+				.andExpect(status().isOk());
+
+		// then
+		verify(ballotServiceImpl, times(1)).updateVote(Mockito.any(BallotResultDTO.class));
 	}
 }

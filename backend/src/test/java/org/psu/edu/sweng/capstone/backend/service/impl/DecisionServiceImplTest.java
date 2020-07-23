@@ -6,9 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -29,6 +28,7 @@ import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -50,6 +50,9 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	private BallotService ballotService;
 	
 	@Mock
+	private BallotTypeDAO ballotTypeDao;
+	
+	@Mock
 	private BallotOptionDAO ballotOptionDao;
 	
 	@Mock
@@ -65,7 +68,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	private User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	private Decision dec = new Decision("Test Decision", testUser);
 	private DecisionUser decUser = new DecisionUser(dec, new User("TestUser", "fakepw", "User", "Test", "TestUser@gmail.com", new Date(1337L)));
-	private Set<DecisionUser> decisionUsers = new HashSet<>();
+	private ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
 		
 	@BeforeEach
 	void setUp() {       
@@ -73,18 +76,22 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		decisionUsers.add(decUser);
 		
 		dec.setId(decisionId);
-		dec.setDecisionUsers(decisionUsers);
 	}
 		
 	@Test
 	void getUsers_returnsUsers_whenUsersExist() throws EntityNotFoundException {
+		// given
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		duList.add(new DecisionUser(dec, testUser));
+		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
+		when(decisionUserDao.findAllByDecision(dec)).thenReturn(duList);
 		ResponseEntity<UserDTO> response = decisionServiceImpl.getUsers(1337L);
 		
 		// then
 		assertEquals(1, response.getData().size());
-		assertEquals("TestUser", response.getData().get(0).getUserName());
+		assertEquals("pop pop", response.getData().get(0).getUserName());
 	}
 	
 	@Test
@@ -148,17 +155,22 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
+		User otherUser = new User("opp opp", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+		
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		duList.add(new DecisionUser(decision, otherUser));
+		
 		decisionDTO.setId(1L);
 		decisionDTO.getIncludedUsers().add(userDTO);
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
 		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(decisionUserDao.findAllByDecision(decision)).thenReturn(duList);
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
-		assertEquals(200, response.getStatus());
-		assertEquals(0, response.getErrors().size());
+		assertGenericSuccess(response);
 	}
 	
 	@Test
@@ -168,7 +180,9 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		Decision decision = new Decision(null, null);
 		DecisionDTO decisionDTO = DecisionDTO.build(decision);
 		
+		ArrayList<DecisionUser> duList = new ArrayList<>();
 		DecisionUser du = new DecisionUser(decision, testUser);
+		duList.add(du);
 		
 		decisionDTO.setId(1L);
 		decisionDTO.getIncludedUsers().add(userDTO);
@@ -177,6 +191,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(decision));
 		when(userDao.findByUserName(userDTO.getUserName())).thenReturn(Optional.ofNullable(testUser));
 		when(decisionUserDao.findByUserAndDecision(testUser, decision)).thenReturn(Optional.of(du));
+		when(decisionUserDao.findAllByDecision(decision)).thenReturn(duList);
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.updateDecision(decisionId, decisionDTO);
 		
 		// then
@@ -225,7 +240,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	void updateDecision_decisionExists_hasActualValues() throws EntityNotFoundException {
 		// given
 		Decision decision = new Decision("Test Decision", testUser);
-		decision.getBallots().add(new Ballot(decision, new Date()));
+		decision.getBallots().add(new Ballot(decision, new BallotType(), new Date()));
 		decision.setId(1L);
 		decision.setDescription("Test Description");
 		
@@ -246,14 +261,54 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.empty());
 	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.createDecision(DecisionDTO.build(dec)); });
 	}
+	
+	@Test
+	void createDecision_hasNoIncludedUser() throws EntityNotFoundException {
+		// given
+		DecisionDTO dto = DecisionDTO.build(dec);
+		dto = DecisionDTO.buildDecisionUserList(decisionUsers, dto);
+		final DecisionDTO finalDTO = dto;
+		
+		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(userDao.findByUserName(dto.getIncludedUsers().get(0).getUserName())).thenReturn(Optional.empty());
+
+	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.createDecision(finalDTO); });	    
+	}
 		
 	@Test
 	void createDecision_hasUser_addsDecisionUsersAndBallotWithOptions() throws EntityNotFoundException {
-		// given
-		dec.getDecisionUsers().add(new DecisionUser(dec, testUser));
-		
-		Ballot testBallot = new Ballot(dec, new Date());
+		// give		
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
+		User newTestUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+
 		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
+		
+		BallotType type = new BallotType(1L, "Single-Choice");
+		testBallot.setType(type);
+		
+		dec.getBallots().add(testBallot);
+		
+		DecisionDTO dto = DecisionDTO.build(dec);
+		dto = DecisionDTO.buildDecisionUserList(decisionUsers, dto);
+		
+		// when
+		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
+		when(ballotTypeDao.findById(type.getId())).thenReturn(Optional.of(type));
+		when(userDao.findByUserName(dto.getOwnerUsername())).thenReturn(Optional.ofNullable(testUser));
+		when(userDao.findByUserName(dto.getIncludedUsers().get(0).getUserName())).thenReturn(Optional.ofNullable(newTestUser));
+		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
+		
+		// then
+		assertCreatedSuccess(response);
+	}
+	
+	@Test
+	void createDecision_hasUser_addsDecisionUsersAndBallotNoType() throws EntityNotFoundException {
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
+		testBallot.getOptions().add(new BallotOption("Title", testBallot, testUser));
+		
+		BallotType type = new BallotType(1L, "Single-Choice");
+		testBallot.setType(type);
 		
 		dec.getBallots().add(testBallot);
 		
@@ -261,10 +316,10 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(userDao.findByUserName(testUser.getUserName())).thenReturn(Optional.ofNullable(testUser));
-		ResponseEntity<DecisionDTO> response = decisionServiceImpl.createDecision(dto);
+		when(ballotTypeDao.findById(type.getId())).thenReturn(Optional.empty());
 		
 		// then
-		assertCreatedSuccess(response);
+	    assertThrows(EntityNotFoundException.class, () -> { decisionServiceImpl.createDecision(dto); });
 	}
 	
 	@Test
@@ -297,7 +352,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void deleteDecision_decisionExists_withUserDecisionsAndBallotsAndResults() throws EntityNotFoundException {	
 		// then
-		Ballot testBallot = new Ballot(dec, new Date());
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
 		BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 		
 		testBallot.getOptions().add(testBallotOption);
@@ -310,7 +365,6 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		when(ballotResultDao.findAllByBallot(testBallot)).thenReturn(results);
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
 		// then
@@ -320,7 +374,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	@Test
 	void deleteDecision_decisionExists_withUserDecisionsAndBallots_noResults() throws EntityNotFoundException {	
 		// then
-		Ballot testBallot = new Ballot(dec, new Date());
+		Ballot testBallot = new Ballot(dec, new BallotType(), new Date());
 		BallotOption testBallotOption = new BallotOption("Title", testBallot, testUser);
 		
 		testBallot.getOptions().add(testBallotOption);
@@ -328,7 +382,6 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		
 		// when
 		when(decisionDao.findById(decisionId)).thenReturn(Optional.ofNullable(dec));
-		when(ballotResultDao.findAllByBallot(testBallot)).thenReturn(new ArrayList<>());
 		ResponseEntity<DecisionDTO> response = decisionServiceImpl.deleteDecision(dec.getId());
 
 		// then

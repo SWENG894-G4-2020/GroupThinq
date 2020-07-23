@@ -1,9 +1,14 @@
 package org.psu.edu.sweng.capstone.backend.security;
 
+import java.util.Date;
+
+import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -19,7 +24,13 @@ public class AuthCheck {
 	private UserDAO userDao;
 	
 	@Autowired
+	private BallotDAO ballotDao;
+	
+	@Autowired
 	private DecisionDAO decisionDao;
+
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
 	
 	/** Determines whether the authenticated user can access the requested user. 
 	 *
@@ -78,12 +89,27 @@ public class AuthCheck {
 				() -> new EntityNotFoundException("Decision " + decisionId.toString()));
 		
 		boolean isDecisionUser = false;
-		for (DecisionUser du : decision.getDecisionUsers()) {
+		for (DecisionUser du : decisionUserDao.findAllByDecision(decision)) {
 			if (authUsername.equals(du.getUser().getUserName())) {
 				isDecisionUser = true;
 			}
 		}
 		
 		return isDecisionUser;
+	}
+	
+	/** Determines if voting is still active on a given Ballot.
+	 * 
+	 * @param ballotId The unique identifier of the Ballot.
+	 * @return True if voting is still eligible, false if not
+	 * @throws EntityNotFoundException When a Ballot cannot be found
+	 */
+	public boolean votingActive(final Long ballotId) throws EntityNotFoundException {
+		final Date currentDate = new Date();
+		
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException("Ballot " + ballotId));
+		
+		return currentDate.before(ballot.getExpirationDate());
 	}
 }

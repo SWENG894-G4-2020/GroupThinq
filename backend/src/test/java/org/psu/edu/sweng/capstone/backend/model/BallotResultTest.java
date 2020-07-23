@@ -19,6 +19,7 @@ public class BallotResultTest {
 
     @BeforeEach
     void setUp() {
+    	testResult.setId(1L);
         testResult.setVoteUpdatedDate(new Date(321L));
     }
 
@@ -44,12 +45,14 @@ public class BallotResultTest {
         testResult.setVoteUpdatedDate(new Date(4444L));
         testResult.setUser(USER);
         testResult.setBallot(ballot);
+        testResult.setId(2L);
 
         assertEquals(ballotOption, testResult.getBallotOption());
         assertEquals(new Date(3333L), testResult.getVoteDate());
         assertEquals(new Date(4444L), testResult.getVoteUpdatedDate());
         assertEquals(ballot, testResult.getBallot());
         assertEquals(USER, testResult.getUser());
+        assertEquals(2L, testResult.getId());
     }
 
     @Test
@@ -60,7 +63,6 @@ public class BallotResultTest {
         assertNull(ballotResult.getBallotOption());
         assertNull(ballotResult.getVoteUpdatedDate());
         assertNull(ballotResult.getUser());
+        assertNull(ballotResult.getId());
     }
-
-
 }

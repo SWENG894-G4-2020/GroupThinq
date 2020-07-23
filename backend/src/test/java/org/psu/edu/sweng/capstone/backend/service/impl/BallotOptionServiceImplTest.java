@@ -23,6 +23,7 @@ import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.User;
 
@@ -45,7 +46,7 @@ class BallotOptionServiceImplTest extends ServiceImplTest {
 	private static final User TEST_USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	private static final Decision TEST_DECISION = new Decision("Test Decision", TEST_USER);
 
-	private static Ballot testBallot = new Ballot(TEST_DECISION, new Date(1337));
+	private static Ballot testBallot = new Ballot(TEST_DECISION, new BallotType(), new Date(1337));
 
 	private static final BallotOption TEST_BALLOT_OPTION = new BallotOption("Title", testBallot, TEST_USER);
 	
