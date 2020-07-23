@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
@@ -18,6 +19,7 @@ import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -49,6 +51,9 @@ public class DecisionServiceImpl implements DecisionService {
 	@Autowired
 	private BallotOptionDAO ballotOptionDao;
 	
+	@Autowired
+	private BallotTypeDAO ballotTypeDao;
+		
 	private static final String USER_HEADER = "User ";
 	private static final String DECISION_HEADER = "Decision ";
 
@@ -115,7 +120,10 @@ public class DecisionServiceImpl implements DecisionService {
 		if (!decisionDto.getBallots().isEmpty()) {
 			// Add Ballots
 			for (BallotDTO bDTO : decisionDto.getBallots()) {
-				Ballot ballot = new Ballot(newDecision, bDTO.getExpirationDate());
+				final BallotType type = ballotTypeDao.findById(bDTO.getBallotTypeId()).orElseThrow(
+						() -> new EntityNotFoundException("Ballot Type " + bDTO.getBallotTypeId()));
+				
+				Ballot ballot = new Ballot(newDecision, type, bDTO.getExpirationDate());
 				ballotDao.save(ballot);
 				
 				// Add Ballot Options

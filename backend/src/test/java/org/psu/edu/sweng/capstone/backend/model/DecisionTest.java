@@ -20,7 +20,7 @@ class DecisionTest {
 	private DecisionUser testUser3 = new DecisionUser(testDecision, new User("testuser", "fakepw", "User", "Test", "testuser@dev.gov", 
 			new Date(1337L)));
 	
-	private Ballot testBallot = new Ballot(testDecision, new Date());
+	private Ballot testBallot = new Ballot(testDecision, new BallotType(), new Date());
 	
 	private Set<DecisionUser> decisionUsers = new HashSet<>();
 	private Set<Ballot> decisionBallots = new HashSet<>();
@@ -76,7 +76,7 @@ class DecisionTest {
 		DecisionUser newUser = new DecisionUser(testDecision, new User("treyob", "fakepw", "Reyob", "Ttam", "TttamReyob@gmail.com", 
 				new Date(1337L)));
 		
-		Ballot newBallot = new Ballot(testDecision, new Date());
+		Ballot newBallot = new Ballot(testDecision, new BallotType(), new Date());
 		
 		decisionUsers.add(newUser);
 		decisionBallots.add(newBallot);

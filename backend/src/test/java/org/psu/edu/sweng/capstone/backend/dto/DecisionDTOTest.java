@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
@@ -33,10 +34,12 @@ public class DecisionDTOTest {
         decision.setDescription("what is gamora?");
         decision.setCreatedDate(new Date(1101L));
         decision.setUpdatedDate(new Date(1011L));
-                
-        Ballot ballot = new Ballot(decision, new Date());
-        decision.getBallots().add(ballot);
         
+        BallotType type = new BallotType();
+        
+        Ballot ballot = new Ballot(decision, type, new Date());
+
+        decision.getBallots().add(ballot);
         
         testDecisionDTO = DecisionDTO.build(decision);
     }
@@ -62,7 +65,7 @@ public class DecisionDTOTest {
     	includedUsers.add(userDto);
     	
     	List<BallotDTO> ballots = new ArrayList<>();
-    	BallotDTO ballotDTO = BallotDTO.build(new Ballot(decision, new Date()));
+    	BallotDTO ballotDTO = BallotDTO.build(new Ballot(decision, new BallotType(), new Date()));
     	ballots.add(ballotDTO);
     	
         // when
