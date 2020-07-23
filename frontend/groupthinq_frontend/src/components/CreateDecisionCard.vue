@@ -37,11 +37,12 @@
           <div class="q-py-md">
             <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
             <q-btn-toggle
+              spread
               v-model="ballotType"
               toggle-color="primary"
               :options="ballotTypeOptions"
             />
-            <div class="q-py-sm text-grey-7">{{ ballotTypeOptions.find(bt => bt.value === ballotType ).description }}</div>
+            <div class="q-py-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === ballotType ).description }}</div>
           </div>
         </div>
       </q-slide-transition>
