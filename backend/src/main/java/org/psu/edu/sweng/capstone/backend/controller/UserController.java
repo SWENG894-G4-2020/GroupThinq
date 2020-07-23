@@ -32,19 +32,19 @@ public class UserController {
 		return userService.getUsers();
 	}
 	
-	@PreAuthorize("@authCheck.hasUserAccess(#username)")
+	@PreAuthorize("@authCheck.hasUserAccess(#username) or @authCheck.isAdmin()")
 	@GetMapping("/user/{username}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
 		return userService.getUser(username);
 	}
 	
-	@PreAuthorize("@authCheck.hasUserAccess(#username)")
+	@PreAuthorize("@authCheck.hasUserAccess(#username) or @authCheck.isAdmin()")
 	@DeleteMapping("/user/{username}")
 	public ResponseEntity<UserDTO> deleteUser(@PathVariable(value = "username") final String username) throws EntityNotFoundException {
 		return userService.deleteUser(username);
 	}
 	
-	@PreAuthorize("@authCheck.hasUserAccess(#username)")
+	@PreAuthorize("@authCheck.hasUserAccess(#username) or @authCheck.isAdmin()")
 	@PutMapping("/user/{username}")
 	public ResponseEntity<UserDTO> updateUser(@PathVariable(value = "username") final String username, @RequestBody final UserDTO user) 
 			throws EntityNotFoundException {
