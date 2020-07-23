@@ -34,6 +34,16 @@
               </q-icon>
             </template>
           </q-input>
+          <div class="q-py-md">
+            <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
+            <q-btn-toggle
+              spread
+              v-model="ballotType"
+              toggle-color="primary"
+              :options="ballotTypeOptions"
+            />
+            <div class="q-py-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === ballotType ).description }}</div>
+          </div>
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -128,7 +138,20 @@ export default {
       usersExpanded: false,
       optionsExpanded: false,
       submissionValid: true,
-      pickDatetimeDialog: false
+      pickDatetimeDialog: false,
+      ballotType: 1,
+      ballotTypeOptions: [
+        {
+          label: 'First Past the Post',
+          value: 1,
+          description: 'The choice with the most votes win. Voters pick one choice.'
+        },
+        {
+          label: 'Ranked Pair',
+          value: 2,
+          description: 'Selects a single winner using votes that express preferences. Voters rank the choices.'
+        }
+      ]
     }
   },
 
@@ -151,7 +174,7 @@ export default {
 
       this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
-
+      this.newDecision.ballots[0].ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
 
       try {
@@ -177,7 +200,7 @@ export default {
       this.newDecision = {
         name: '',
         description: '',
-        ballots: [{ expirationDate: '', ballotOptions: [] }],
+        ballots: [{ expirationDate: '', ballotTypeId: 1, ballotOptions: [] }],
         ownerUsername: this.currentUserName,
         includedUsers: [
           { userName: this.currentUserName }
@@ -234,6 +257,7 @@ export default {
     checkValidSubmit () {
       if (this.newDecision.name === '') { return false }
       if (!this.checkValidDate(this.newExpirationDate)) { return false }
+      if (!this.ballotType || this.ballotType === '') { return false }
       if (this.optionsList.length < 1) { return false }
       return true
     },

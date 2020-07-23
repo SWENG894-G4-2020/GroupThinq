@@ -56,7 +56,8 @@ describe('Create Decision Card tests', () => {
     vm.$data.optionsList = [
       {
         title: "Ballot Option 1",
-        userName: "testuser1"
+        userName: "testuser1",
+        ballotTypeId: 1
       }]
     await vm.onCreate() // wait for the mounted function to finish
     expect(console.log).toHaveBeenCalledWith('Test Error')
@@ -172,6 +173,7 @@ describe('Create Decision Card tests', () => {
     vm.$data.newDecision.name = 'testTitle'
     vm.$data.newDecision.description = 'testDescription'
     vm.$data.newExpirationDate = '2020/10/10'
+    vm.$data.ballotType = 1
     vm.$data.optionsList = [
       {
         title: "Ballot Option 1",
@@ -183,6 +185,8 @@ describe('Create Decision Card tests', () => {
     vm.$data.newExpirationDate = '20'
     await vm.checkValidSubmit()
     vm.$data.newDecision.name = ''
+    await vm.checkValidSubmit()
+    vm.$data.ballotType = ''
     await vm.checkValidSubmit()
     await vm.onCreate()
   })

@@ -37,6 +37,7 @@ describe('Decision Card tests', () => {
     ballots: [{
       id: 10,
       expirationDate: "2020-10-10T04:00:00.000Z",
+      ballotTypeId: 1,
       ballotOptions: [
         {
           title: "Ballot Option 1",
@@ -113,6 +114,7 @@ describe('Decision Card tests', () => {
         currentUserName: 'testUser', 
         resultsList: testData.data.data,
         ballots: [{
+          ballotTypeId: 1,
           ballotOptions: [
             {
               id: 1,
