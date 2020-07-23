@@ -34,6 +34,15 @@
               </q-icon>
             </template>
           </q-input>
+          <div class="q-py-md">
+            <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
+            <q-btn-toggle
+              v-model="ballotType"
+              toggle-color="primary"
+              :options="ballotTypeOptions"
+            />
+            <div class="q-py-sm text-grey-7">{{ ballotTypeOptions.find(bt => bt.value === ballotType ).description }}</div>
+          </div>
         </div>
       </q-slide-transition>
     </q-card-section>
@@ -128,7 +137,20 @@ export default {
       usersExpanded: false,
       optionsExpanded: false,
       submissionValid: true,
-      pickDatetimeDialog: false
+      pickDatetimeDialog: false,
+      ballotType: 1,
+      ballotTypeOptions: [
+        {
+          label: 'First Past the Post',
+          value: 1,
+          description: 'The choice with the most votes win. Voters pick one choice.'
+        },
+        {
+          label: 'Ranked Pair',
+          value: 2,
+          description: 'Selects a single winner using votes that express preferences. Voters rank the choices.'
+        }
+      ]
     }
   },
 
