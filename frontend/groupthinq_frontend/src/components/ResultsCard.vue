@@ -1,29 +1,22 @@
 <template>
-  <q-card style="">
+  <q-card style="min-width: 360px; max-width: 600px">
     <q-card-section class="q-pa-md column">
       <span class="text-h4">{{decisionInfo.name}}</span>
       <span class="text-subtitle1 text-grey">{{decisionInfo.description}}</span>
       <span class="text-caption">Decided on: {{this.prettyDate}}</span>
     </q-card-section>
     <q-card-section class="q-pa-md column items-center" v-if="resultsList">
-      <q-table
-        title="Results"
-        dense
-        :data="tabulatedResults"
-        :columns="columns"
-        color="primary"
-        row-key="title"
-        no-data-label="No results yet."
-        :pagination="initialPagination"
-      >
-      <template v-slot:body-cell-winner="props">
-        <q-td :props="props">
-          <div v-if="props.row.winner">
-            <q-icon name="done" class="text-green"/>
+      <div class="text-h5" style="text-align: left; width: 100%">Results</div>
+      <q-separator class="q-mb-md"/>
+      <div class="bg-grey-2 q-pa-sm" style="width: 100%">
+        <div v-for="result in tabulatedResults" :key="result.rank" class="q-pa-sm">
+          <div class="row">
+            <div class="q-pa-xs"><q-icon name="done" class="text-green q-pa-xs" v-if="result.winner"/>{{ result.name }}</div>
+            <div class="col-grow q-pa-xs" style="text-align: right">{{ Math.round(result.percentage * 100)}}% ({{ result.votes }})</div>
           </div>
-        </q-td>
-      </template>
-    </q-table>
+          <div class="q-pa-xs"><q-linear-progress rounded size="14px" :value="result.percentage" /></div>
+        </div>
+      </div>
     </q-card-section>
     <q-card-section v-else>
       No results to show.
@@ -102,13 +95,24 @@ export default {
     tabulatedResults: function () {
       const data = []
       let option
+      let total = 0
       for (option of this.ballot.ballotOptions) {
         data.push({
           name: option.title,
           votes: this.resultTotals[option.id],
           winner: this.winnerId.includes(option.id)
         })
+        total = total + this.resultTotals[option.id]
       }
+      data.forEach(r => {
+        r.total = total
+        if (r.total === 0) {
+          r.percentage = 0
+        } else {
+          r.percentage = r.votes / r.total
+        }
+      })
+      data.sort((a, b) => b.percentage - a.percentage)
       return data
     },
 
