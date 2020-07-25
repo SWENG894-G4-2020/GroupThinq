@@ -161,7 +161,7 @@ export default {
         return
       }
 
-      this.newDecision.ballots[0].expirationDate = this.$refs.datetime.datetime
+      this.newDecision.ballots[0].expirationDate = new Date(this.$refs.datetime.datetime)
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
       this.newDecision.ballots[0].ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
