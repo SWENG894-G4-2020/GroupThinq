@@ -15,25 +15,7 @@
         <div v-show="detailsExpanded" style="width:100%">
           <q-input class="q-my-xs text-h5" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
           <q-input autogrow clearable type="textarea" class="q-my-md text-body2 text-grey-5" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description (Optional)" />
-          <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
-                <q-dialog v-model="pickDatetimeDialog">
-                    <q-card class="date-picker">
-                      <q-card-section>
-                        <div class="q-gutter-sm row justify-center">
-                          <q-date today-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" />
-                          <q-time now-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" />
-                        </div>
-                      </q-card-section>
-                      <q-card-actions align="right">
-                        <q-btn color="green-8" @click="closeDatetimeDialog()" label="Confirm" />
-                      </q-card-actions>
-                    </q-card>
-                </q-dialog>
-              </q-icon>
-            </template>
-          </q-input>
+          <DatetimePicker v-bind:initialDatetime="newExpirationDate" ref="datetime" />
           <div class="q-py-md">
             <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
             <q-btn-toggle
@@ -121,12 +103,19 @@
 
 <script>
 import auth from 'src/store/auth'
+import DatetimePicker from 'src/components/decision/DatetimePicker'
+
 export default {
   name: 'CreateDecisionModal',
+
+  components: {
+    DatetimePicker
+  },
+
   data () {
     return {
       currentUserName: '',
-      newExpirationDate: '',
+      newExpirationDate: new Date(Date.now()).toISOString(),
       newDecision: { ballots: [{}] },
       newOption: { title: '', userName: this.currentUserName },
       optionsList: [],
@@ -172,7 +161,7 @@ export default {
         return
       }
 
-      this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
+      this.newDecision.ballots[0].expirationDate = this.$refs.datetime.datetime
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
       this.newDecision.ballots[0].ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
@@ -256,7 +245,7 @@ export default {
 
     checkValidSubmit () {
       if (this.newDecision.name === '') { return false }
-      if (!this.checkValidDate(this.newExpirationDate)) { return false }
+      if (!this.$refs.datetime.checkValidDate(this.$refs.datetime.datetime)) { return false }
       if (!this.ballotType || this.ballotType === '') { return false }
       if (this.optionsList.length < 1) { return false }
       return true
@@ -272,15 +261,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.date-picker {
-  min-width: 620px;
-}
-
-@media (max-width: $breakpoint-xs-max) {
-  .date-picker {
-    min-width: 375px;
-  }
-}
-</style>
