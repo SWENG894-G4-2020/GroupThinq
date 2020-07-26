@@ -1,63 +1,52 @@
 <template>
-  <q-card style="width:50%">
+  <q-card style="width:50%; min-width:380px">
     <q-card-section class='column items-center q-pa-md'>
       <div class="text-h5 q-ma-md"> Editing Decision... </div>
       <div class="text-subtitle2"> Decision Details </div>
-      <q-input filled class="q-mb-md" style="width: 100%" v-model="editableDecision.name" label="Title" />
-      <q-input filled type="textarea" class="q-mb-md" style="width: 100%" v-model="editableDecision.description" label="Description" />
-      <q-input filled v-model="editableDecision.ballots[0].expirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" style="width: 100%">
-        <template v-slot:prepend>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-date v-model="editableDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-        <template v-slot:append>
-          <q-icon name="access_time" class="cursor-pointer">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-time v-model="editableDecision.ballots[0].expirationDate" mask="YYYY-MM-DD HH:mm" />
-            </q-popup-proxy>
-          </q-icon>
-        </template>
+      <q-input fclass="q-my-xs text-h5" style="width: 100%" v-model="editableDecision.name" label="Title" :rules="[val => !!val || '*Required']"/>
+      <q-input autogrow clearable type="textarea" class="q-mb-md" style="width: 100%" v-model="editableDecision.description" label="Description (Optional)" />
+      <q-input v-model="newExpirationDate" label="Expiration Date" hint="YYYY/MM/DD HH:mm" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask='datetime' style="width: 100%">
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
+                <q-dialog v-model="pickDatetimeDialog">
+                    <q-card class="date-picker">
+                      <q-card-section>
+                        <div class="q-gutter-sm row justify-center">
+                          <q-date today-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" />
+                          <q-time now-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" />
+                        </div>
+                      </q-card-section>
+                      <q-card-actions align="right">
+                        <q-btn color="green-8" @click="closeDatetimeDialog()" label="Confirm" />
+                      </q-card-actions>
+                    </q-card>
+                </q-dialog>
+              </q-icon>
+            </template>
       </q-input>
       <q-separator class="q-my-md" />
-      <div class="text-subtitle2"> Add/Edit Members (by username) </div>
+      <div class="text-subtitle2"> Add Decision Participants (by username) </div>
       <div class="row items-center" style="width: 100%">
         <div class="col">
-      <q-select
-        filled
-        v-model="newIncludedUser"
-        use-input
-        hide-selected
-        fill-input
-        input-debounce="0"
-        label="Add User(s)"
-        :options="filteredUsersList"
-        @filter="filterFn"
-        class="q-my-md"
-        style="width: 100%">
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
+          <q-select
+            label="Select Participants"
+            hint="Who can vote on this decision?"
+            v-model="addedUsers"
+            use-input
+            use-chips
+            multiple
+            input-debounce="0"
+            :options="filteredUsersList"
+            @filter="filterFn"
+            class="q-my-md"
+            style="width: 100%"
+          />
       </div>
-      <div class="col-shrink q-px-sm">
-      <q-btn round dense color="green-8" icon="add" @click="addIncludedUser()" />
-      </div>
-      </div>
-      <div class="row items-center" style="width: 100%">
-      <q-chip v-for="(includedUser,idx) in includedUsers" :key="idx"
-        removable
-        :label="includedUser.userName"
-        @remove="removeUser(includedUser.userName)"
-        class ="col-shrink" />
       </div>
       <q-separator class="q-my-md" />
+    </q-card-section>
+    <q-card-section class="text-center text-body-1 text-negative" v-if="!submissionValid">
+      An edited decision requires a title, and valid expiration date.
     </q-card-section>
     <q-card-actions align="right">
       <q-btn label="cancel" @click="onCancel()" />
@@ -73,10 +62,14 @@ export default {
   data () {
     return {
       currentUserName: '',
+      newExpirationDate: '',
       editableDecision: { ballots: [{}] },
       allUsersList: [],
       filteredUsersList: [],
-      newIncludedUser: ''
+      newIncludedUser: '',
+      submissionValid: true,
+      pickDatetimeDialog: false,
+      addedUsers: []
     }
   },
 
@@ -115,6 +108,9 @@ export default {
     this.currentUserName = auth.getTokenData().sub
     this.fillEditableDecision()
     this.getAllUsers()
+    this.includedUsers
+      .filter(v => v.userName !== this.currentUserName)
+      .forEach(i => this.addedUsers.push(i.userName))
   },
 
   methods: {
@@ -123,15 +119,22 @@ export default {
     },
 
     async onEditConfirm () {
-      this.editableDecision.ballots[0].expirationDate = new Date(this.editableDecision.ballots[0].expirationDate).toISOString()
+      if (!this.checkValidSubmit()) {
+        this.submissionValid = false
+        return
+      }
 
+      this.editableDecision.includedUsers = []
+      this.addedUsers.forEach((user) => this.editableDecision.includedUsers.push({ userName: user }))
+      this.editableDecision.includedUsers.push({ userName: this.currentUserName })
+      this.editableDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
       try {
         await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.id}`, this.editableDecision)
-        this.$emit('editClose')
       } catch (error) {
         console.log(error)
         this.$emit('error')
       }
+      this.$emit('editClose')
     },
 
     async getAllUsers () {
@@ -152,6 +155,7 @@ export default {
         includedUsers: this.includedUsers,
         ballots: this.ballots
       }
+      this.newExpirationDate = new Date(this.editableDecision.ballots[0].expirationDate).toISOString()
     },
 
     addIncludedUser () {
@@ -176,8 +180,30 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase()
-        this.filteredUsersList = this.allUsersList.filter(v => v.toLowerCase().indexOf(needle) > -1)
+        this.filteredUsersList = this.allUsersList
+          .filter(v => v !== this.currentUserName)
+          .filter(v => v.toLowerCase().indexOf(needle) > -1)
       })
+    },
+
+    checkValidDate (d) {
+      const check = Date.parse(d)
+      if (check) { return true }
+      return false
+    },
+
+    checkValidSubmit () {
+      if (!this.editableDecision.name) { return false }
+      if (!this.checkValidDate(this.newExpirationDate)) { return false }
+      return true
+    },
+
+    closeDatetimeDialog () {
+      this.pickDatetimeDialog = false
+    },
+
+    openDatetimeDialog () {
+      this.pickDatetimeDialog = true
     }
   }
 }

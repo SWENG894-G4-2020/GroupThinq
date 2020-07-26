@@ -13,8 +13,11 @@
 
         <q-toolbar-title vertical-bottom>
           <div class="row items-end">
-            <div style="font-size: 1.5em">GroupThinq</div>
-            <div style="font-size: .75em">&nbsp;&nbsp;Make Better Decisions. Together.</div>
+            <div style="font-size: 1.25em">GroupThinq</div>
+            <q-icon name="img:statics/img/groupthinq.svg" style="font-size: 1.5em" />
+          </div>
+          <div class="row items-end">
+            <div class="text-weight-light" style="font-size: .6em">Make Better Decisions. Together.</div>
           </div>
         </q-toolbar-title>
 

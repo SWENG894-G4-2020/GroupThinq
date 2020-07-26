@@ -26,6 +26,7 @@ const testData = { data: { data: [
     name: "Title",
     description: "Description",
     ownerUsername: "test",
+    deleted: false,
     ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
     includedUsers: [{userName: 'test'}]
   },
@@ -34,6 +35,16 @@ const testData = { data: { data: [
     name: "AnotherTitle",
     description: "AnotherDescription",
     ownerUsername: "testUser",
+    deleted: true,
+    ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
+    includedUsers: [{userName: 'testUser'}]
+  },
+  {
+    id: 6,
+    name: "AnotherTitle",
+    description: "AnotherDescription",
+    ownerUsername: "testUser",
+    deleted: false,
     ballots: [{expirationDate: '2020-09-02T09:26:00-04:00'}],
     includedUsers: [{userName: 'testUser'}]
   }

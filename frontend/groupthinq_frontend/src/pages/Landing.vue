@@ -1,7 +1,7 @@
 <template>
   <q-page class="column items-center justify-center bg-primary">
-    <div class="text-h2 text-grey-3 text-center">Welcome to GroupThinq</div>
-    <div class="text-h4 text-grey-3 text-weight-thin text-center q-mb-md">Make better decisions. Together!</div>
+    <div class="text-h3 text-grey-3 text-center">GroupThinq<q-icon name="img:statics/img/groupthinq.svg" style="font-size: 1em" /></div>
+    <div class="text-h6 text-grey-3 text-weight-light text-center q-mb-md">Make better decisions. Together!</div>
     <div class="row justify-around">
     <q-btn
       to="/signup"

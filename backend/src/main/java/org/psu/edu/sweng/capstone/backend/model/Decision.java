@@ -39,18 +39,14 @@ public class Decision {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "OWNER_ID")
 	private User ownerId;
-
-	@OneToMany(mappedBy = "decision", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
-	private Set<DecisionUser> decisionUsers = new HashSet<>();
 	
 	@OneToMany(mappedBy = "decision", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Ballot.class)
 	private Set<Ballot> ballots = new HashSet<>();
 
 	protected Decision() {}
 
-	public Decision(String name, String description, User ownerId) {
+	public Decision(String name, User ownerId) {
 		this.name = name;
-		this.description = description;
 		this.ownerId = ownerId;
 		
 		this.setCreatedDate(new Date());
@@ -96,12 +92,12 @@ public class Decision {
 		this.createdDate = createdDate;
 	}
 
-	public Set<DecisionUser> getDecisionUsers() {
-		return decisionUsers;
+	public Date getUpdatedDate() {
+		return updatedDate;
 	}
 
-	public void setDecisionUsers(Set<DecisionUser> users) {
-		this.decisionUsers = users;
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 
 	public Set<Ballot> getBallots() {
@@ -110,13 +106,5 @@ public class Decision {
 
 	public void setBallots(Set<Ballot> ballots) {
 		this.ballots = ballots;
-	}
-
-	public Date getUpdatedDate() {
-		return updatedDate;
-	}
-
-	public void setUpdatedDate(Date updatedDate) {
-		this.updatedDate = updatedDate;
 	}
 }

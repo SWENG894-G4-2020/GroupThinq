@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -27,6 +28,10 @@ public class Ballot {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "DECISION_ID")
 	private Decision decision;
+	
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "BALLOT_TYPE_ID")
+	private BallotType type;
 	
 	@Column(name = "EXPIRATION_DATE")
 	private Date expirationDate;
@@ -42,8 +47,9 @@ public class Ballot {
 	
 	protected Ballot() {}
 	
-	public Ballot(Decision decision, Date expirationDate) {
+	public Ballot(Decision decision, BallotType type, Date expirationDate) {
 		this.decision = decision;
+		this.type = type;
 		this.expirationDate = expirationDate;
 		
 		this.setCreatedDate(new Date());
@@ -63,6 +69,14 @@ public class Ballot {
 
 	public void setDecision(Decision decision) {
 		this.decision = decision;
+	}
+
+	public BallotType getType() {
+		return type;
+	}
+
+	public void setType(BallotType type) {
+		this.type = type;
 	}
 
 	public Date getExpirationDate() {

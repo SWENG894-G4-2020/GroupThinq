@@ -26,6 +26,7 @@ describe('Create Decision Card tests', () => {
   beforeEach( () => {
     jest.clearAllMocks()
     auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
+    auth.removeTokens = jest.fn()
   })
 
   it('catches axios get errors', async () => {
@@ -49,7 +50,15 @@ describe('Create Decision Card tests', () => {
     const wrapper = shallowMount(CreateDecisionCard, { localVue })
     const vm = wrapper.vm
 
-    vm.$data.newDecision.ballots = [{expirationDate: '2020-09-01T09:26:00-04:00'}]
+    vm.$data.newDecision.name = 'testTitle'
+    vm.$data.newDecision.description = 'testDescription'
+    vm.$data.newExpirationDate = '2020-09-01T09:26:00-04:00'
+    vm.$data.optionsList = [
+      {
+        title: "Ballot Option 1",
+        userName: "testuser1",
+        ballotTypeId: 1
+      }]
     await vm.onCreate() // wait for the mounted function to finish
     expect(console.log).toHaveBeenCalledWith('Test Error')
   })
@@ -69,7 +78,14 @@ describe('Create Decision Card tests', () => {
     const wrapper = shallowMount(CreateDecisionCard, { localVue })
     const vm = wrapper.vm
     
-    vm.$data.newDecision.ballots = [{expirationDate: '2020-09-01T09:26:00-04:00'}]
+    vm.$data.newDecision.name = "testTitle"
+    vm.$data.newDecision.description = "testDescription"
+    vm.$data.newExpirationDate="2020-09-01T09:26:00-04:00"
+    vm.$data.optionsList = [
+      {
+        title: "Ballot Option 1",
+        userName: "testuser1"
+      }]
     vm.$data.addedUsers = ['test1', 'test2']
     await vm.onCreate()
     expect(axios.post).toHaveBeenCalledTimes(1)
@@ -118,5 +134,60 @@ describe('Create Decision Card tests', () => {
     vm.$data.addedUsers = ['test1', 'test2']
     await vm.removeUser('test1')
     expect(vm.$data.addedUsers).toStrictEqual(['test2'])
+  })
+
+  it('adds a decision option', async () => {
+    const wrapper = shallowMount(CreateDecisionCard, { localVue })
+    const vm = wrapper.vm
+    
+    vm.$data.newOption.title = "testTitle"
+    await vm.addDecisionOption()
+    expect(vm.$data.optionsList.length).toBe(1)
+
+    await vm.addDecisionOption()
+    expect(vm.$data.optionsList.length).toBe(1)
+  })
+
+  it('removes a decision option', async () => {
+    const wrapper = shallowMount(CreateDecisionCard, { localVue })
+    const vm = wrapper.vm
+    
+    vm.$data.optionsList = [{title: 'testTitle'}]
+    await vm.removeDecisionOption({title: 'testTitle'})
+    expect(vm.$data.optionsList.length).toBe(0)
+  })
+
+  it('opens and closes the datetime picker dialog', async () => {
+    const wrapper = shallowMount(CreateDecisionCard, { localVue })
+    const vm = wrapper.vm
+    expect(vm.pickDatetimeDialog).toBe(false)
+    await vm.openDatetimeDialog()
+    expect(vm.pickDatetimeDialog).toBe(true)
+    await vm.closeDatetimeDialog()
+    expect(vm.pickDatetimeDialog).toBe(false)
+  })
+
+  it('handles invalid submission information', async () => {
+    const wrapper = shallowMount(CreateDecisionCard, { localVue })
+    const vm = wrapper.vm
+    vm.$data.newDecision.name = 'testTitle'
+    vm.$data.newDecision.description = 'testDescription'
+    vm.$data.newExpirationDate = '2020/10/10'
+    vm.$data.ballotType = 1
+    vm.$data.optionsList = [
+      {
+        title: "Ballot Option 1",
+        userName: "testuser1"
+      }]
+    await vm.checkValidSubmit()
+    vm.$data.optionsList = []
+    await vm.checkValidSubmit()
+    vm.$data.newExpirationDate = '20'
+    await vm.checkValidSubmit()
+    vm.$data.newDecision.name = ''
+    await vm.checkValidSubmit()
+    vm.$data.ballotType = ''
+    await vm.checkValidSubmit()
+    await vm.onCreate()
   })
 })

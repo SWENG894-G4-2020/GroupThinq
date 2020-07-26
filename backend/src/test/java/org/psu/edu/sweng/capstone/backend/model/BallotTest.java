@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Date;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +12,11 @@ import org.junit.jupiter.api.Test;
 class BallotTest {
 
 	private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
-	private static final Decision DECISION = new Decision("Test Decision", "This is used for testing", USER);
-	
+	private static final Decision DECISION = new Decision("Test Decision", USER);
 	private Ballot testBallot = new Ballot();
+	private BallotOption ballotOption = new BallotOption("BK Lounge", testBallot, USER);
+
+	Set<BallotOption> ballotOptions = new HashSet<>();
 	
 	@BeforeEach
 	void setUp() {
@@ -23,11 +25,13 @@ class BallotTest {
 		testBallot.setExpirationDate(new Date(1337L));
 		testBallot.setCreatedDate(new Date(1111L));
 		testBallot.setUpdatedDate(new Date(2222L));
+		ballotOptions.add(ballotOption);
+		testBallot.setOptions(ballotOptions);
 	}
 	
 	@Test
 	void constructor_worksProperly() {
-		Ballot ballot = new Ballot(DECISION, new Date(1337L));
+		Ballot ballot = new Ballot(DECISION, new BallotType(), new Date(1337L));
 		
 		assertNotNull(ballot.getCreatedDate());
 		assertEquals("mboyer87", ballot.getDecision().getOwnerId().getUserName());
@@ -41,6 +45,7 @@ class BallotTest {
 		assertEquals(new Date(1337L), testBallot.getExpirationDate());
 		assertEquals(new Date(1111L), testBallot.getCreatedDate());
 		assertEquals(new Date(2222L), testBallot.getUpdatedDate());
+		assertEquals(ballotOption, testBallot.getOptions().toArray()[0]);
 	}
 	
 	@Test

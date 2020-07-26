@@ -1,7 +1,10 @@
 package org.psu.edu.sweng.capstone.backend.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -31,20 +35,19 @@ public class BallotOption {
 	@Column(name = "TITLE")
 	private String title;
 	
-	@Column(name = "DESCRIPTION")
-	private String description;
-	
 	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 	
 	@Column(name = "UPDATED_DATE")
 	private Date updatedDate;
 
+	@OneToMany(mappedBy = "ballotOption", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotResult.class)
+	private Set<BallotResult> results = new HashSet<>();
+	
 	protected BallotOption() {}
 	
-	public BallotOption(String title, String description, Ballot ballot, User user) {
+	public BallotOption(String title, Ballot ballot, User user) {
 		this.title = title;
-		this.description = description;
 		this.ballot = ballot;
 		this.user = user;
 		
@@ -83,14 +86,6 @@ public class BallotOption {
 		this.title = title;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -105,5 +100,13 @@ public class BallotOption {
 
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public Set<BallotResult> getResults() {
+		return results;
+	}
+
+	public void setResults(Set<BallotResult> results) {
+		this.results = results;
 	}
 }

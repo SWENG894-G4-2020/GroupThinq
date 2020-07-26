@@ -14,13 +14,18 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DecisionUserDAO extends JpaRepository<DecisionUser, Long> {
+	Optional<DecisionUser> findByUserAndDecision(User user, Decision decision);
+	
 	ArrayList<DecisionUser> findAllByUser(User user);
 	ArrayList<DecisionUser> findAllByDecision(Decision decision);
-	Optional<DecisionUser> findByUserAndDecision(User user, Decision decision);
 
 	@Modifying
+	@Query("delete from DecisionUser du where du.user = :user")
+	void deleteByUser(@Param("user") User user);
+	
+	@Modifying
 	@Query("delete from DecisionUser du where du.decision = :decision")
-	void deleteAllByDecision(@Param("decision") Decision decision);
+	void deleteByDecision(@Param("decision") Decision decision);
 	
 	@Modifying
 	@Query("delete from DecisionUser du where du.user = :user and du.decision = :decision")

@@ -52,12 +52,6 @@ public class User {
 	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
 	private Set<UserRole> roles = new HashSet<>();
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DecisionUser.class)
-	private Set<DecisionUser> decisions = new HashSet<>();
-	
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotResult.class)
-	private Set<BallotResult> votes = new HashSet<>();
-	
 	protected User() {}
 	
 	public User(String userName, String password, String lastName, String firstName, String emailAddress, Date birthDate) {
@@ -67,6 +61,14 @@ public class User {
 		this.firstName = firstName;
 		this.emailAddress = emailAddress;
 		this.birthDate = birthDate;
+	}
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getUserName() {
@@ -148,31 +150,7 @@ public class User {
 	public void setRoles(Set<UserRole> userRoles) {
 		this.roles = userRoles;
 	}
-
-	public Set<DecisionUser> getDecisions() {
-		return decisions;
-	}
-
-	public void setDecisions(Set<DecisionUser> decisions) {
-		this.decisions = decisions;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Set<BallotResult> getVotes() {
-		return votes;
-	}
-
-	public void setVotes(Set<BallotResult> votes) {
-		this.votes = votes;
-	}
-
+	
 	public String getFullName() {
 		StringBuilder builder = new StringBuilder();
 		
