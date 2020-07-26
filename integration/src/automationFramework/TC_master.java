@@ -11,9 +11,7 @@ public class TC_master {
 		Object file, result;
 		
 		file = CreateOutput.main(args);
-		
 
-		
 		doNow = false;
 		if(doNow){ // run sign-up automated tests
 			result = TC2_1.main(args);

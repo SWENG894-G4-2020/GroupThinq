@@ -36,7 +36,7 @@ public class TC1_2 {
 		
 		String tcNumber = "TC2_2 ";
 		
-		System.setProperty("webdriver.gecko.driver", "lib/drivers/geckodriver.exe");     
+		System.setProperty("webdriver.gecko.driver", "lib/drivers/win32/geckodriver.exe");
 		FirefoxOptions capabilities = new FirefoxOptions(); //DesiredCapabilities.firefox()
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 		firefoxOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
@@ -61,7 +61,7 @@ public class TC1_2 {
         String result = "unchanged";
         Screen screen = new Screen();
         Pattern img = new Pattern("invalidLogin.png");
-        
+
         try {
             Region region = screen.find(img);
             region.highlight(2);
@@ -69,7 +69,7 @@ public class TC1_2 {
         } catch (Exception e) {
         	result = (tcNumber + "= FAIL");
         }
-        
+
 		//Wait for 5 Sec
 		Thread.sleep(1000);
 		 
