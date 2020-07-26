@@ -17,12 +17,12 @@
             {{ user.userName }}
           </q-chip>
         </div>
-        <div v-if="overUsers">...</div>
+        <div v-if="overUsers" class="q-py-xs text-grey-7">... + {{ overUsers }} more</div>
       </div>
     </q-card-section>
     <q-card-section class="q-py-xs col-grow">
-      <div class="text-grey-7" v-if="!expired">Time left: {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
-      <div class="text-grey-7" v-else>Decided on: {{ prettyDate }}</div>
+      <div v-if="!expired"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
+      <div v-else><q-icon name="alarm_off" class="text-negative" /> {{ prettyDate }}</div>
     </q-card-section>
     <q-card-actions vertical >
       <q-btn
@@ -81,16 +81,16 @@ export default {
     },
 
     overUsers: function () {
-      if (this.decision.includedUsers.length > 10) {
-        return true
+      if (this.decision.includedUsers.length > 3) {
+        return this.decision.includedUsers.length - 3
       } else {
-        return false
+        return 0
       }
     },
 
     truncatedUsers: function () {
-      if (this.decision.includedUsers.length > 10) {
-        return this.decision.includedUsers.slice(0, 9)
+      if (this.decision.includedUsers.length > 3) {
+        return this.decision.includedUsers.slice(0, 3)
       } else {
         return this.decision.includedUsers
       }
