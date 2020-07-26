@@ -1,20 +1,24 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +30,9 @@ public class BallotOptionServiceImpl implements BallotOptionService {
 	
 	@Autowired
 	private BallotDAO ballotDao;
+	
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
 	
 	@Autowired
 	private BallotOptionDAO ballotOptionDao;
@@ -70,9 +77,16 @@ public class BallotOptionServiceImpl implements BallotOptionService {
 		
 		final Ballot ballot = ballotDao.findById(ballotOption.getBallotId()).orElseThrow(
 				() -> new EntityNotFoundException("Ballot " + ballotId.toString()));
-		
+				
 		final User user = userDao.findByUserName(ballotUsername).orElseThrow(
 				() -> new EntityNotFoundException("User " + ballotUsername));
+		
+		Optional<DecisionUser> du = decisionUserDao.findByUserAndDecision(user, ballot.getDecision());
+		
+		if (!du.isPresent()) {
+			throw new AccessDeniedException("User " + ballotUsername + 
+					" is not on the Decision User list for Decision " + ballot.getDecision().getId() + ".");
+		}
 		
 		ballot.getOptions().add(new BallotOption(ballotOption.getTitle(), ballot, user));
 		
