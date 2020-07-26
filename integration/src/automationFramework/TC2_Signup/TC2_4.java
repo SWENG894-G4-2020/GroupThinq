@@ -1,4 +1,4 @@
-package automationFramework;
+package automationFramework.TC2_Signup;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -29,7 +29,7 @@ import java.util.*;
 import java.io.File;  
 import java.io.IOException; 
 	
-public class TC2_8 {
+public class TC2_4 {
 
 	public static Object main(String[] args) throws InterruptedException, FindFailed {
 		ImagePath.setBundlePath("C:\\Users\\non-admin\\groupthinq\\integration\\src\\imgDictionary");
@@ -53,27 +53,27 @@ public class TC2_8 {
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).sendKeys("auto");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).sendKeys("tester");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).sendKeys("");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).sendKeys("autotester@gmail.com");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).sendKeys("1990/01/01");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[5]/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[5]/div/div/div/input")).sendKeys("autotester1");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[6]/div/div/div/input")).sendKeys("");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[6]/div/div/div/input")).sendKeys("autotester1");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[3]/div/button[2]/span[2]/span/span")).click();
 	    Thread.sleep(2000);
 	    
         String result = "unchanged";
         Screen screen = new Screen();
-        Pattern img = new Pattern("missingPassword.png");
+        Pattern img = new Pattern("missingLastName.png");
         
         try {
             Region region = screen.find(img);
             region.highlight(2);
-            result = "TC2_8 = PASS";
+            result = "TC2_4 = PASS";
         } catch (Exception e) {
-        	result = "TC2_8 = FAIL";
+        	result = "TC2_4 = FAIL";
         }
         
 		//Wait for 5 Sec

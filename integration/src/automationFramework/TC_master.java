@@ -2,8 +2,8 @@ package automationFramework;
 
 import java.io.FileWriter;   
 import java.io.IOException;
-import org.sikuli.script.FindFailed;  
-	
+import org.sikuli.script.FindFailed;
+
 public class TC_master {
 
 	public static void main(String[] args) throws InterruptedException, FindFailed {

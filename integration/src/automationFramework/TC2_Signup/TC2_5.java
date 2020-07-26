@@ -1,4 +1,4 @@
-package automationFramework;
+package automationFramework.TC2_Signup;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;

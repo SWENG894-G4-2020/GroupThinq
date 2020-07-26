@@ -1,4 +1,4 @@
-package automationFramework;
+package automationFramework.TC2_Signup;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -29,10 +29,12 @@ import java.util.*;
 import java.io.File;  
 import java.io.IOException; 
 	
-public class TC2_6 {
+public class TC2_1 {
 
 	public static Object main(String[] args) throws InterruptedException, FindFailed {
 		ImagePath.setBundlePath("C:\\Users\\non-admin\\groupthinq\\integration\\src\\imgDictionary");
+		
+		String tcNumber = "TC2_1 ";
 		
 		System.setProperty("webdriver.gecko.driver","C:\\Users\\non-admin\\groupthinq\\integration\\lib\\drivers\\geckodriver.exe");
 		FirefoxOptions capabilities = new FirefoxOptions(); //DesiredCapabilities.firefox()
@@ -57,23 +59,34 @@ public class TC2_6 {
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).sendKeys("autotester@gmail.com");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).sendKeys("");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).sendKeys("1990/01/01");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[5]/div/div/div/input")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[5]/div/div/div/input")).sendKeys("autotester1");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[6]/div/div/div/input")).sendKeys("autotester1");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[3]/div/button[2]/span[2]/span/span")).click();
-	    Thread.sleep(2000);
-	    
+
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".q-btn__content > .material-icons:nth-child(1)")));
+        //List<WebElement> elements = driver.findElements(By.cssSelector(".q-btn__content > .material-icons:nth-child(1)"));
+        //assert(elements.size() > 0);
+        
+        //driver.findElement(By.xpath("//div[@id=\'q-app\']/div/header/div/div[2]/button/span[2]/span/i")).click();
+
+        //wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".q-menu .q-item:nth-child(3)")));
+
+        //driver.findElement(By.cssSelector(".q-menu .q-item:nth-child(3)")).click();
+        // Print a Log In message to the screen
+        //System.out.println("Success");
         String result = "unchanged";
         Screen screen = new Screen();
-        Pattern img = new Pattern("missingBirthDate.png");
+        Pattern img = new Pattern("successfulLogin.png");
         
         try {
             Region region = screen.find(img);
             region.highlight(2);
-            result = "TC2_6 = PASS";
+            result = (tcNumber + "= PASS");
         } catch (Exception e) {
-        	result = "TC2_6 = FAIL";
+        	result = (tcNumber + "= FAIL");
         }
         
 		//Wait for 5 Sec
