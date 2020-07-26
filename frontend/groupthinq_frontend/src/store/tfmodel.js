@@ -28,6 +28,10 @@ const tfModel = {
       results.push(score[0])
     }
     return results
+  },
+
+  setModelBackend (backendString) {
+    tf.setBackend(backendString)
   }
 }
 
