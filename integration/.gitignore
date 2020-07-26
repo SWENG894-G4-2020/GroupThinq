@@ -4,7 +4,7 @@ build/
 bin/
 !gradle/wrapper/gradle-wrapper.jar
 !sikuliapi/*
-!lib/*/*
+!lib/*
 !**/src/main/**
 !**/src/test/**
 *testResults.txt

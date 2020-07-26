@@ -12,6 +12,8 @@ public class TC_master {
 		
 		file = CreateOutput.main(args);
 		
+
+		
 		doNow = false;
 		if(doNow){ // run sign-up automated tests
 			result = TC2_1.main(args);
@@ -32,7 +34,10 @@ public class TC_master {
 			UpdateResultsFile.main(file, result);		
 		}
 			
-		doNow = true;
+		result = TC1_2.main(args);
+		UpdateResultsFile.main(file, result);
+		
+		doNow = false;
 		if(doNow){ // run login automated tests
 			result = TC1_1.main(args);
 			UpdateResultsFile.main(file, result);

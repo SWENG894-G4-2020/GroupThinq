@@ -32,11 +32,11 @@ import java.io.IOException;
 public class TC1_2 {
 
 	public static Object main(String[] args) throws InterruptedException, FindFailed {
-		ImagePath.setBundlePath("C:\\Users\\non-admin\\groupthinq\\integration\\src\\imgDictionary");
+		ImagePath.setBundlePath("src/imgDictionary");
 		
 		String tcNumber = "TC2_2 ";
 		
-		System.setProperty("webdriver.gecko.driver","C:\\Users\\non-admin\\groupthinq\\integration\\lib\\drivers\\geckodriver.exe");
+		System.setProperty("webdriver.gecko.driver", "lib/drivers/geckodriver.exe");     
 		FirefoxOptions capabilities = new FirefoxOptions(); //DesiredCapabilities.firefox()
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 		firefoxOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
