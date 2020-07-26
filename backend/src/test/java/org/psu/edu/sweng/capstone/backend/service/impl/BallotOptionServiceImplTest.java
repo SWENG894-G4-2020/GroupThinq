@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
@@ -25,7 +26,9 @@ import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.User;
+import org.springframework.security.access.AccessDeniedException;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,9 @@ class BallotOptionServiceImplTest extends ServiceImplTest {
 	
 	@Mock
 	private BallotDAO ballotDao;
+	
+	@Mock
+	private DecisionUserDAO decisionUserDao;
 	
 	@Mock
 	private BallotOptionDAO ballotOptionDao;
@@ -123,13 +129,28 @@ class BallotOptionServiceImplTest extends ServiceImplTest {
 	
 	@Test
 	void createBallotOption_happyPath() throws EntityNotFoundException {
+		// given
+		DecisionUser du = new DecisionUser(TEST_DECISION, TEST_USER);
+		
 		// when
 		when(ballotDao.findById(dto.getBallotId())).thenReturn(Optional.of(testBallot));
 		when(userDao.findByUserName(dto.getUserName())).thenReturn(Optional.of(TEST_USER));
+		when(decisionUserDao.findByUserAndDecision(TEST_USER, TEST_DECISION)).thenReturn(Optional.of(du));
 		ResponseEntity<String> response = ballotOptionServiceImpl.createBallotOption(dto);
 		
 		// then
 		assertCreatedSuccess(response);
+	}
+	
+	@Test
+	void createBallotOption_notOnDecisionUserList() throws EntityNotFoundException {		
+		// when
+		when(ballotDao.findById(dto.getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(dto.getUserName())).thenReturn(Optional.of(TEST_USER));
+		when(decisionUserDao.findByUserAndDecision(TEST_USER, TEST_DECISION)).thenReturn(Optional.empty());
+		
+		// then
+	    assertThrows(AccessDeniedException.class, () -> { ballotOptionServiceImpl.createBallotOption(dto); });
 	}
 	
 	@Test
