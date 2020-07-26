@@ -7,6 +7,10 @@
         <q-icon v-else name="event_busy" class="text-negative"/>
         {{ decision.name }}
       </div>
+      <div class="text-caption">
+        <span v-if="!expired" class="text-positive">&nbsp;Voting Open</span>
+        <span v-else class="text-negative">&nbsp;Voting Closed</span>
+      </div>
     </q-card-section>
     <q-card-section class="q-py-xs">
       <div class="row">
