@@ -12,13 +12,12 @@ public class TC_master {
 		
 		file = CreateOutput.main(args);
 		
-
+		doNow = false;
+		if(doNow){ // run sign-up automated tests
 			result = TC2_1.main(args);
 			UpdateResultsFile.main(file, result);
 			result = TC2_2.main(args);
 			UpdateResultsFile.main(file, result);
-			doNow = false;
-			if(doNow){ // run sign-up automated tests
 			result = TC2_3.main(args);
 			UpdateResultsFile.main(file, result);
 			result = TC2_4.main(args);
