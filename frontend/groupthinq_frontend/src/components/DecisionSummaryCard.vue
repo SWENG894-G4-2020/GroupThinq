@@ -85,16 +85,16 @@ export default {
     },
 
     overUsers: function () {
-      if (this.decision.includedUsers.length > 3) {
-        return this.decision.includedUsers.length - 3
+      if (this.decision.includedUsers.length > 9) {
+        return this.decision.includedUsers.length - 9
       } else {
         return 0
       }
     },
 
     truncatedUsers: function () {
-      if (this.decision.includedUsers.length > 3) {
-        return this.decision.includedUsers.slice(0, 3)
+      if (this.decision.includedUsers.length > 9) {
+        return this.decision.includedUsers.slice(0, 9)
       } else {
         return this.decision.includedUsers
       }
@@ -114,10 +114,6 @@ export default {
   },
 
   methods: {
-    goToDecision () {
-
-    },
-
     calculateRemainingTime () {
       const secondsTiemr = setInterval(() => {
         const diff = (new Date(this.decision.ballots[0].expirationDate) - Date.now()) / 1000
