@@ -56,7 +56,7 @@
 
 <script>
 import auth from 'src/store/auth'
-import DecisionSummaryCard from 'src/components/decision/DecisionSummaryCard'
+import DecisionSummaryCard from 'src/components/DecisionSummaryCard'
 
 export default {
   name: 'PageIndex',
