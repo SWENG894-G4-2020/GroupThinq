@@ -109,8 +109,8 @@ export default {
         }
       })
 
-      active = active.sort((a, b) => b.ballots[0].expirationDate - a.ballots[0].expirationDate)
-      expired = expired.sort((a, b) => b.ballots[0].expirationDate - a.ballots[0].expirationDate)
+      active = active.sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
+      expired = expired.sort((a, b) => new Date(b.ballots[0].expirationDate) - new Date(a.ballots[0].expirationDate))
 
       if (this.currentSort.value === 'upcoming') {
         return active.concat(expired)
