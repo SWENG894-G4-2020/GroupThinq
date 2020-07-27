@@ -85,7 +85,7 @@ export default {
           title: 'Decisions',
           caption: 'View All Decisions',
           icon: 'speaker_notes',
-          link: '/main/decisions'
+          link: '/decisions/new'
         },
         {
           title: 'Results',

@@ -35,6 +35,7 @@
         label="Vote"
         class="q-mx-xs"
         color="primary"
+        :to="'/decisions/' + decision.id"
          />
       <q-btn
         v-else
@@ -42,6 +43,7 @@
         label="View Results"
         class="q-mx-xs"
         color="primary"
+        :to="'/decisions/' + decision.id"
          />
     </q-card-actions>
   </q-card>

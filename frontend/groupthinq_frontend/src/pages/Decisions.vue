@@ -3,6 +3,7 @@
       <div v-if="isLoaded">
         <div class="full-width row justify-between">
           <q-btn color="green-8" label="New Decision" icon-right="add" @click="createDecision()"/>
+          {{ $route.params.id }}
           <q-select
             outlined
             dense

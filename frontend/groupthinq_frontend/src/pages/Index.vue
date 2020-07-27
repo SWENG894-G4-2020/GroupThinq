@@ -49,7 +49,7 @@
         </div>
       </div>
       <q-page-sticky position="bottom-right" :offset="[18, 18]">
-        <q-btn fab icon="add" color="primary" label="Decision" />
+        <q-btn fab icon="add" color="primary" label="Decision" to="/decisions/new"/>
       </q-page-sticky>
     </q-page>
 </template>
