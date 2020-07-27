@@ -1,5 +1,6 @@
 <template>
   <div class="q-pa-md full-width">
+    {{ decision.name }}
   </div>
 </template>
 
@@ -11,8 +12,9 @@ export default {
 
   data () {
     return {
+      isLoaded: false,
+      isError: false,
       currentUserName: '',
-      decisionId: '',
       mode: 'view',
       modeData: {
         view: {
@@ -24,12 +26,40 @@ export default {
         create: {
 
         }
-      }
+      },
+      decision: {},
+      results: {}
+    }
+  },
+
+  props: {
+    id: {
+      type: String,
+      required: false
     }
   },
 
   mounted () {
     this.currentUserName = auth.getTokenData().sub
+    this.getDecision()
+  },
+
+  methods: {
+    async getDecision () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/decision/${this.id}`)
+
+        if (response.data.data.length < 1) {
+          throw new Error('No Decision Found')
+        }
+
+        this.decision = response.data.data[0]
+        this.isLoaded = true
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
+    }
   }
 }
 </script>
