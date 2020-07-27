@@ -5,7 +5,7 @@
         <div class="col-grow q-pa-sm">
           <q-input
             v-model="search"
-            debounce="500"
+            debounce="0"
             filled
             placeholder="Search"
             >
@@ -23,11 +23,11 @@
             />
         </div>
       </div>
+        <div class="text-caption text-grey-7 q-pa-sm">{{filteredDecisions.length}} decisions found</div>
         <div class="text-h5 text-primary text-center" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
-        <div class="text-caption text-grey-7 q-pa-sm">{{sortedDecisions.length}} decisions found</div>
         <div class="row q-mt-md">
           <DecisionSummaryCard
-            v-for="(decision, idx) in sortedDecisions"
+            v-for="(decision, idx) in filteredDecisions"
             :key="idx"
             v-bind:decision="decision"
             class="col-xs-12 col-sm-6 col-lg-3"
@@ -91,21 +91,35 @@ export default {
   },
 
   computed: {
-    sortedDecisions: function () {
-      // Temporary solution for ballot - decision deletion display
-      // Make sure to change tempDecisionList back to this.DecsionList when issue is resolved
-      const active = []
-      // const expired = []
-      let decisionIterator
-      for (decisionIterator of this.decisionList) {
-        if (!decisionIterator.deleted) {
-          active.push(decisionIterator)
-        }
+    filteredDecisions: function () {
+      const decisions = this.decisionList.filter(d => d.name.toLowerCase().includes(this.search.toLowerCase()))
+
+      if (this.currentSort.value === 'mine') {
+        return decisions.filter(d => d.ownerUsername === this.currentUserName)
       }
 
-      return active
-    },
+      let active = []
+      let expired = []
 
+      decisions.forEach(decision => {
+        if (this.isDecisionExpired(decision)) {
+          expired.push(decision)
+        } else {
+          active.push(decision)
+        }
+      })
+
+      active = active.sort((a, b) => b.ballots[0].expirationDate - a.ballots[0].expirationDate)
+      expired = expired.sort((a, b) => b.ballots[0].expirationDate - a.ballots[0].expirationDate)
+
+      if (this.currentSort.value === 'upcoming') {
+        return active.concat(expired)
+      } else if (this.currentSort.value === 'recent') {
+        return expired.concat(active)
+      }
+
+      return decisions
+    },
 
     decisionCounts: function () {
       const result = {
@@ -139,22 +153,11 @@ export default {
   },
 
   methods: {
-    createDecision () {
-      this.createDecisionDialog = true
-    },
 
     isDecisionExpired (decision) {
       const diff = (new Date(decision.ballots[0].expirationDate) - Date.now()) / 1000
       if (diff < 0) { return true }
       return false
-    },
-
-    toggleSort () {
-
-    },
-
-    goToNewDecision () {
-
     },
 
     async getData () {

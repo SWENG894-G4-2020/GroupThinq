@@ -81,7 +81,7 @@ export default {
     },
 
     prettyDate: function () {
-      return new Date(this.decision.ballots[0].expirationDate).toString()
+      return new Date(this.decision.ballots[0].expirationDate).toLocaleString()
     },
 
     overUsers: function () {
