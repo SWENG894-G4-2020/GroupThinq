@@ -112,38 +112,15 @@ export default {
       active = active.sort((a, b) => new Date(a.ballots[0].expirationDate) - new Date(b.ballots[0].expirationDate))
       expired = expired.sort((a, b) => new Date(b.ballots[0].expirationDate) - new Date(a.ballots[0].expirationDate))
 
+      let sorted = []
+
       if (this.currentSort.value === 'upcoming') {
-        return active.concat(expired)
+        sorted = active.concat(expired)
       } else if (this.currentSort.value === 'recent') {
-        return expired.concat(active)
+        sorted = expired.concat(active)
       }
 
-      return decisions
-    },
-
-    decisionCounts: function () {
-      const result = {
-        total: 0,
-        open: 0,
-        closed: 0,
-        mine: 0
-      }
-
-      this.decisionList.forEach(decision => {
-        result.total++
-
-        if (this.isDecisionExpired(decision)) {
-          result.open++
-        } else {
-          result.closed++
-        }
-
-        if (decision.ownerUsername === this.currentUserName) {
-          result.mine++
-        }
-      })
-
-      return result
+      return sorted
     }
   },
 
