@@ -35,14 +35,14 @@
         label="Vote"
         class="q-mx-xs"
         color="primary"
-        @click="goToDecision" />
+         />
       <q-btn
         v-else
         icon="poll"
         label="View Results"
         class="q-mx-xs"
         color="primary"
-        @click="goToDecision" />
+         />
     </q-card-actions>
   </q-card>
 </div>
