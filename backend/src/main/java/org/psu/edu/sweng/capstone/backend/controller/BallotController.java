@@ -73,6 +73,7 @@ public class BallotController {
 		return ballotService.retrieveResults(ballotId);
 	}
 	
+	@PreAuthorize("#ballotOption.getUserName() == authentication.getName()")
 	@PostMapping("/ballot/{id}/option")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<String> createBallotOption(@RequestBody final BallotOptionDTO ballotOption) throws EntityNotFoundException {
