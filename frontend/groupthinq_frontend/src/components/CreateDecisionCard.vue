@@ -15,14 +15,14 @@
         <div v-show="detailsExpanded" style="width:100%">
           <q-input class="q-my-xs text-h5" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
           <q-input autogrow clearable type="textarea" class="q-my-md text-body2 text-grey-5" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description (Optional)" />
-          <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
+            <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
                 <q-dialog v-model="pickDatetimeDialog">
                     <q-card class="date-picker">
                       <q-card-section>
                         <div class="q-gutter-sm row justify-center">
-                          <q-date today-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/07" />
+                          <q-date today-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/08" />
                           <q-time now-btn v-model="newExpirationDate" mask="YYYY/MM/DD HH:mm" />
                         </div>
                       </q-card-section>
@@ -121,12 +121,14 @@
 
 <script>
 import auth from 'src/store/auth'
+
 export default {
   name: 'CreateDecisionModal',
+
   data () {
     return {
       currentUserName: '',
-      newExpirationDate: '',
+      newExpirationDate: new Date(Date.now()).toISOString(),
       newDecision: { ballots: [{}] },
       newOption: { title: '', userName: this.currentUserName },
       optionsList: [],
@@ -172,7 +174,7 @@ export default {
         return
       }
 
-      this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate).toISOString()
+      this.newDecision.ballots[0].expirationDate = new Date(this.newExpirationDate)
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
       this.newDecision.ballots[0].ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
