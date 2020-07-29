@@ -32,6 +32,9 @@ public class BallotResult {
 	@JoinColumn(name = "USER_ID")
 	private User user;
 	
+	@Column(name = "RANK")
+	private Long rank;
+	
 	@Column(name = "VOTE_DATE")
 	private Date voteDate;
 	
@@ -78,6 +81,14 @@ public class BallotResult {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public Long getRank() {
+		return rank;
+	}
+
+	public void setRank(Long rank) {
+		this.rank = rank;
 	}
 
 	public Date getVoteDate() {
