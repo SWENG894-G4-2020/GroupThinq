@@ -141,6 +141,9 @@ public class BallotServiceImpl implements BallotService {
 					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
 			
 			BallotResult result = new BallotResult(ballot, ballotOption, user);
+
+			if (vote.getRank() != null) { result.setRank(vote.getRank()); }
+			
 			ballotResultDao.save(result);
 		}
 				
@@ -170,6 +173,8 @@ public class BallotServiceImpl implements BallotService {
 			if (ballot.getOptions().contains(ballotOption)) {
 				result.setBallotOption(ballotOption);
 				result.setVoteUpdatedDate(new Date());
+				
+				if (vote.getRank() != null) { result.setRank(vote.getRank()); }
 				
 				ballotResultDao.save(result);
 			}
