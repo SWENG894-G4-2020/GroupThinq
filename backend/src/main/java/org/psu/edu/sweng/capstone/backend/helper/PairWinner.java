@@ -1,6 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.helper;
 
 public class PairWinner {
+	
 	private String option;
 	private int voteDifference;
 	

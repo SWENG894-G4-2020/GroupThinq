@@ -3,7 +3,6 @@ package org.psu.edu.sweng.capstone.backend.helper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 public class RankedPairCalculator {
 	
@@ -13,7 +12,7 @@ public class RankedPairCalculator {
 		ArrayList<ArrayList<String>> votes = establishVotes();		
 		
 		ArrayList<UniquePair> uniquePairs = createUniquePairs(options);
-		
+				
 		HashMap<UniquePair, PairWinner> winners = determinePairWinners(uniquePairs, votes);
 	}
 
