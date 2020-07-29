@@ -1,5 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
+import java.util.List;
+
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
@@ -58,13 +60,13 @@ public class BallotController {
 	@PreAuthorize("@authCheck.votingActive(#vote.getBallotId())")
 	@PostMapping("/ballot/{id}/vote")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<String> castVote(@RequestBody final BallotResultDTO vote) throws EntityNotFoundException {
+	public ResponseEntity<String> castVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
 		return ballotService.castVote(vote);
 	}
 	
 	@PreAuthorize("@authCheck.votingActive(#vote.getBallotId())")
 	@PutMapping("/ballot/{id}/vote")
-	public ResponseEntity<String> updateVote(@RequestBody final BallotResultDTO vote) throws EntityNotFoundException {
+	public ResponseEntity<String> updateVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
 		return ballotService.updateVote(vote);
 	}
 	
