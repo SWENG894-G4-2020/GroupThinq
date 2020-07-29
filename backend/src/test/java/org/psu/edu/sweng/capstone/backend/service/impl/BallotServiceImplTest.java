@@ -213,6 +213,23 @@ class BallotServiceImplTest extends ServiceImplTest {
 	}
 	
 	@Test
+	void castVote_happyPath_rankIncluded() throws EntityNotFoundException {
+		// given
+		ArrayList<BallotResultDTO> resultDTO = createBallotResultDTO();
+		resultDTO.get(0).setRank(2L);
+		
+		// when
+		when(userDao.findByUserName(resultDTO.get(0).getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotDao.findById(resultDTO.get(0).getBallotId())).thenReturn(Optional.of(testBallot));
+		when(ballotOptionDao.findById(resultDTO.get(0).getBallotOptionId())).thenReturn(Optional.of(testBallotOption));
+		ResponseEntity<String> response = ballotServiceImpl.castVote(resultDTO);
+		
+		// then
+		assertCreatedSuccess(response);
+		verify(ballotResultDao, times(1)).save(Mockito.any(BallotResult.class));
+	}
+	
+	@Test
 	void castVote_noUser() throws EntityNotFoundException {
 		// given
 		ArrayList<BallotResultDTO> resultDTO = createBallotResultDTO();
@@ -288,6 +305,24 @@ class BallotServiceImplTest extends ServiceImplTest {
 		// given
 		BallotResult result = new BallotResult(testBallot, testBallotOption, testUser);
 		ArrayList<BallotResultDTO> resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotDao.findById(resultDTO.get(0).getBallotId())).thenReturn(Optional.of(testBallot));
+		when(userDao.findByUserName(resultDTO.get(0).getUserName())).thenReturn(Optional.of(testUser));
+		when(ballotOptionDao.findById(resultDTO.get(0).getBallotOptionId())).thenReturn(Optional.of(testBallotOption));
+		when(ballotResultDao.findByUserAndBallot(testUser, testBallot)).thenReturn(Optional.of(result));
+		ResponseEntity<String> response = ballotServiceImpl.updateVote(resultDTO);
+		
+		// then
+		assertGenericSuccess(response);
+	}
+	
+	@Test
+	void updateVote_rankIncluded() throws EntityNotFoundException {
+		// given
+		BallotResult result = new BallotResult(testBallot, testBallotOption, testUser);
+		ArrayList<BallotResultDTO> resultDTO = createBallotResultDTO();
+		resultDTO.get(0).setRank(1L);
 		
 		// when
 		when(ballotDao.findById(resultDTO.get(0).getBallotId())).thenReturn(Optional.of(testBallot));
