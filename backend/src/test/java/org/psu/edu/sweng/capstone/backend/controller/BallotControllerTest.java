@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +46,7 @@ class BallotControllerTest {
 	private static final Long BALLOT_ID = 1L;
 	private static final BallotDTO BALLOT_DTO = new BallotDTO();
 	private static final BallotOptionDTO BALLOT_OPTION_DTO = new BallotOptionDTO();
-	private static final BallotResultDTO BALLOT_RESULT_DTO = new BallotResultDTO();
+	private static final ArrayList<BallotResultDTO> BALLOT_RESULT_DTO = new ArrayList<>();
 
 	@BeforeEach
 	void setUp() {
@@ -115,7 +117,7 @@ class BallotControllerTest {
 				.andExpect(status().isCreated());
 
 		// then
-		verify(ballotService, times(1)).castVote(Mockito.any(BallotResultDTO.class));
+		verify(ballotService, times(1)).castVote(Mockito.<BallotResultDTO>anyList());
 	}
 	
 	@Test
@@ -141,6 +143,6 @@ class BallotControllerTest {
 				.andExpect(status().isOk());
 
 		// then
-		verify(ballotService, times(1)).updateVote(Mockito.any(BallotResultDTO.class));
+		verify(ballotService, times(1)).updateVote(Mockito.<BallotResultDTO>anyList());
 	}
 }

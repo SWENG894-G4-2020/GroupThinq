@@ -1,6 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -126,20 +127,25 @@ public class BallotServiceImpl implements BallotService {
 	}
 
 	@Override
-	public ResponseEntity<String> castVote(final BallotResultDTO vote) throws EntityNotFoundException {
+	public ResponseEntity<String> castVote(final List<BallotResultDTO> votes) throws EntityNotFoundException {
 		ResponseEntity<String> response = new ResponseEntity<>();
 		
-		final User user = userDao.findByUserName(vote.getUserName()).orElseThrow(
-				() -> new EntityNotFoundException("User " + vote.getUserName()));
-		
-		final Ballot ballot = ballotDao.findById(vote.getBallotId()).orElseThrow(
-				() -> new EntityNotFoundException(BALLOT_HEADER + vote.getBallotId()));
+		for (BallotResultDTO vote : votes) {
+			final User user = userDao.findByUserName(vote.getUserName()).orElseThrow(
+					() -> new EntityNotFoundException("User " + vote.getUserName()));
+			
+			final Ballot ballot = ballotDao.findById(vote.getBallotId()).orElseThrow(
+					() -> new EntityNotFoundException(BALLOT_HEADER + vote.getBallotId()));
 
-		final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
-				() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
-		
-		BallotResult result = new BallotResult(ballot, ballotOption, user);
-		ballotResultDao.save(result);
+			final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
+					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
+			
+			BallotResult result = new BallotResult(ballot, ballotOption, user);
+
+			if (vote.getRank() != null) { result.setRank(vote.getRank()); }
+			
+			ballotResultDao.save(result);
+		}
 				
 		response.attachCreatedSuccess();
 		
@@ -147,31 +153,35 @@ public class BallotServiceImpl implements BallotService {
 	}
 	
 	@Override
-	public ResponseEntity<String> updateVote(BallotResultDTO vote) throws EntityNotFoundException {
+	public ResponseEntity<String> updateVote(List<BallotResultDTO> votes) throws EntityNotFoundException {
 		ResponseEntity<String> response = new ResponseEntity<>();
+		
+		for (BallotResultDTO vote : votes) {		
+			final Ballot ballot = ballotDao.findById(vote.getBallotId()).orElseThrow(
+					() -> new EntityNotFoundException(BALLOT_HEADER + vote.getBallotId()));
 			
-		final Ballot ballot = ballotDao.findById(vote.getBallotId()).orElseThrow(
-				() -> new EntityNotFoundException(BALLOT_HEADER + vote.getBallotId()));
-		
-		final User user = userDao.findByUserName(vote.getUserName()).orElseThrow(
-				() -> new EntityNotFoundException("User " + vote.getUserName()));		
-
-		BallotResult result = ballotResultDao.findByUserAndBallot(user, ballot)
-				.orElseThrow( () -> new EntityNotFoundException("Ballot Result with Ballot " + vote.getBallotId() +
-						", and User " + vote.getUserName()));
-		
-		final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
-				() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
-		
-		if (ballot.getOptions().contains(ballotOption)) {
-			result.setBallotOption(ballotOption);
-			result.setVoteUpdatedDate(new Date());
+			final User user = userDao.findByUserName(vote.getUserName()).orElseThrow(
+					() -> new EntityNotFoundException("User " + vote.getUserName()));		
+	
+			BallotResult result = ballotResultDao.findByUserAndBallot(user, ballot)
+					.orElseThrow( () -> new EntityNotFoundException("Ballot Result with Ballot " + vote.getBallotId() +
+							", and User " + vote.getUserName()));
 			
-			ballotResultDao.save(result);
-		}
-		else {
-			throw new AccessDeniedException(BALLOT_OPTION_HEADER + vote.getBallotOptionId() + 
-					" is not part of Ballot " + vote.getBallotId());
+			final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
+					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
+			
+			if (ballot.getOptions().contains(ballotOption)) {
+				result.setBallotOption(ballotOption);
+				result.setVoteUpdatedDate(new Date());
+				
+				if (vote.getRank() != null) { result.setRank(vote.getRank()); }
+				
+				ballotResultDao.save(result);
+			}
+			else {
+				throw new AccessDeniedException(BALLOT_OPTION_HEADER + vote.getBallotOptionId() + 
+						" is not part of Ballot " + vote.getBallotId());
+			}
 		}
 		
 		response.attachGenericSuccess();
