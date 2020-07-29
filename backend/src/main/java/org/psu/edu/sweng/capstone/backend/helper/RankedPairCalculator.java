@@ -12,9 +12,9 @@ public class RankedPairCalculator {
 		
 		ArrayList<ArrayList<String>> votes = establishVotes();		
 		
-		ArrayList<ArrayList<String>> uniquePairs = createUniquePairs(options);
+		ArrayList<UniquePair> uniquePairs = createUniquePairs(options);
 		
-		HashMap<ArrayList<String>, HashMap<String, Long>> winners = determinePairWinners(uniquePairs, votes);
+		HashMap<UniquePair, PairWinner> winners = determinePairWinners(uniquePairs, votes);
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
@@ -48,22 +48,18 @@ public class RankedPairCalculator {
 	/** Creates unique pairs based upon the a list of Ballot Options.
 	 * @param options The list of Ballot options (sorted alphabetically).
 	 */
-	private static ArrayList<ArrayList<String>> createUniquePairs(ArrayList<String> options) {
-		ArrayList<ArrayList<String>> uniquePairs = new ArrayList<>();
+	private static ArrayList<UniquePair> createUniquePairs(ArrayList<String> options) {
+		ArrayList<UniquePair> uniquePairs = new ArrayList<>();
 		
 		for (int x = 0; x < options.size(); x++) {
 			if (x < options.size() - 1) {
 				int y = 1;
 				
 				while (y < options.size()) {
-					ArrayList<String> pair = new ArrayList<>();
-					
 					int nextPotentialOption = x + y;
 					if (nextPotentialOption < options.size()) {
-						pair.add(options.get(x));
-						pair.add(options.get(nextPotentialOption));
-						
-						uniquePairs.add(pair);
+						UniquePair up = new UniquePair(options.get(x), options.get(nextPotentialOption));						
+						uniquePairs.add(up);
 					}
 					
 					y++;
@@ -83,19 +79,17 @@ public class RankedPairCalculator {
 	 * @param votes A list of all the votes casted.
 	 * @return A HashMap containing the winning difference between one unique pair.
 	 */
-	private static HashMap<ArrayList<String>, HashMap<String, Long>> determinePairWinners(ArrayList<ArrayList<String>> uniquePairs, 
+	private static HashMap<UniquePair, PairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, 
 			ArrayList<ArrayList<String>> votes) {
 		
-		HashMap<ArrayList<String>, HashMap<String, Long>> winners = new HashMap<>();
+		HashMap<UniquePair, PairWinner> winners = new HashMap<>();
 		
-		uniquePairs.forEach(pair -> {
-			HashMap<String, Long> winner = new HashMap<>();
-			
+		uniquePairs.forEach(pair -> {			
 			int firstOptionTallies = 0;
 			int secondOptionTallies = 0;
 			
-			String firstOption = pair.get(0);
-			String secondOption = pair.get(1);
+			String firstOption = pair.getOptionOne();
+			String secondOption = pair.getOptionTwo();
 			
 			for (ArrayList<String> vote : votes) {
 				int firstOptionIndex = 0;
@@ -120,22 +114,25 @@ public class RankedPairCalculator {
 			}
 			
 			int difference;
+			PairWinner winner = new PairWinner();
 			if (firstOptionTallies > secondOptionTallies) {
 				difference = firstOptionTallies - secondOptionTallies;
-				winner.put(firstOption, Long.valueOf(difference));
+				winner.setOption(firstOption);
 			}
 			else {
 				difference = secondOptionTallies - firstOptionTallies;
-				winner.put(secondOption, Long.valueOf(difference));
+				winner.setOption(secondOption);
 			}
+			
+			winner.setVoteDifference(difference);
 			
 			winners.put(pair, winner);
 		});
-		
-		for (Entry<ArrayList<String>, HashMap<String, Long>> winner : winners.entrySet()) {
-			System.out.println("Winner between " + winner.getKey() + " is " + winner.getValue().keySet() + 
-					" with a difference of " + winner.getValue().values());
-		}
+
+		winners.entrySet().forEach(winner -> {
+			System.out.println("Winner between " + winner.getKey() + " is " + winner.getValue().getOption() + 
+					" with a difference of " + winner.getValue().getVoteDifference());
+		});
 		
 		return winners;
 	}
