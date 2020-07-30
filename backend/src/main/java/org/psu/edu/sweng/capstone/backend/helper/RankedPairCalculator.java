@@ -173,7 +173,6 @@ public class RankedPairCalculator {
 				losingOption = winner.getUniquePair().getOptionOne();
 				
 				lockedPairs.add(new UniquePair(winningOption, losingOption));
-
 			}
 			else {
 				winningOption = winner.getUniquePair().getOptionOne();
