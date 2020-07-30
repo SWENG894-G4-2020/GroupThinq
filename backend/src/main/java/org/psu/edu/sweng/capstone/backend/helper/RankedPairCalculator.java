@@ -191,6 +191,12 @@ public class RankedPairCalculator {
 		return lockedPairs;
 	}
 	
+	/** Calculates the winner from the locked sorted list of unique pair winners.
+	 * 
+	 * @param lockedWinners A list containing all the locked winners
+	 * @param optionListSize An integer containing the list size of all ballot options.
+	 * @return The winning Ballot Option
+	 */
 	private static String calculateWinner(ArrayList<UniquePair> lockedWinners, int optionListSize) {
 		List<String> sourceList = new ArrayList<>();
 		List<String> uniqueDestinations = new ArrayList<>();
