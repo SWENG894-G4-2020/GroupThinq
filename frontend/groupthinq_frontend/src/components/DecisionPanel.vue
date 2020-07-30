@@ -59,7 +59,7 @@
         </q-card>
       </div>
       <div class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered>
+        <q-card bordered style="height: 100%">
           <q-card-section>
             <div class="text-h5"><q-icon name="person" /> Participants</div>
             <q-select
@@ -81,20 +81,22 @@
       <div class="q-pa-sm col-xs-12 col-md-6">
         <q-card bordered>
           <q-card-section v-if="!expired">
-            <div class="text-h5"><q-icon name="poll" /> Results</div>
+            <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
             <div v-if="mode === 'view'"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s remaining</div>
+            <div v-if="mode === create"></div>
+            <div v-else> </div>
           </q-card-section>
           <q-card-section v-else>
-            <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
+            <div class="text-h5"><q-icon name="poll" /> Results</div>
             <div><q-icon name="alarm_off" class="text-negative" /> Decided on {{ prettyDate }}</div>
           </q-card-section>
         </q-card>
       </div>
       <div class="q-pa-sm col-xs-12 col-md-6">
-      <q-card bordered>
+      <q-card v-if="!expired && mode === 'view'" bordered>
         <q-card-section>
           <div class="text-h5"><q-icon name="psychology" /> Groupthinq Brain&trade;</div>
-          <div v-if="!expired && mode === 'view'">Perdiction: Option 1</div>
+          <div>Perdiction: Option 1</div>
         </q-card-section>
       </q-card>
       </div>
@@ -144,7 +146,19 @@ export default {
       daysRemaining: '',
       hoursRemaining: '',
       minutesRemaining: '',
-      secondsRemaining: ''
+      secondsRemaining: '',
+      ballotTypeOptions: [
+        {
+          label: 'First Past the Post',
+          value: 1,
+          description: 'The choice with the most votes win. Voters pick one choice.'
+        },
+        {
+          label: 'Ranked Pair',
+          value: 2,
+          description: 'Selects a single winner using votes that express preferences. Voters rank the choices.'
+        }
+      ]
     }
   },
 
@@ -341,6 +355,28 @@ export default {
         this.resultsList = response.data.data
       } catch (error) {
         console.log(error)
+      }
+    },
+
+    async onCreate () {
+      if (!this.checkValidSubmit()) {
+        this.submissionValid = false
+        return
+      }
+
+      this.decision.ballots[0].expirationDate = new Date(this.newExpirationDate)
+      this.selectedUsers.forEach((user) => this.decision.includedUsers.push({ userName: user }))
+      this.decision.ballots[0].ballotTypeId = this.ballotType
+      this.decision.ballots[0].ballotOptions = this.optionsList
+
+      console.log(this.newDecision)
+
+      try {
+        await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
+        this.$emit('createClose')
+      } catch (error) {
+        console.log(error)
+        this.$emit('error')
       }
     }
   }
