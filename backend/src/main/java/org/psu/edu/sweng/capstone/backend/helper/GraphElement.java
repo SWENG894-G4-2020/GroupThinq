@@ -2,27 +2,31 @@ package org.psu.edu.sweng.capstone.backend.helper;
 
 public class GraphElement {
 
-	private Node source;
-	private Node destination;
+	private String source;
+	private GraphElement destination;
 	
-	public GraphElement(Node source, Node destination) {
+	public GraphElement(String source) {
+		this.source = source;
+	}
+	
+	public GraphElement(String source, GraphElement destination) {
 		this.source = source;
 		this.destination = destination;
 	}
 
-	public Node getSource() {
+	public String getSource() {
 		return source;
 	}
 
-	public void setSource(Node source) {
+	public void setSource(String source) {
 		this.source = source;
 	}
 
-	public Node getDestination() {
+	public GraphElement getDestination() {
 		return destination;
 	}
 
-	public void setDestination(Node destination) {
+	public void setDestination(GraphElement destination) {
 		this.destination = destination;
 	}
 }

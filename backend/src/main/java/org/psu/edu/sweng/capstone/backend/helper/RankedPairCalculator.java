@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class RankedPairCalculator {
 	
@@ -16,7 +17,11 @@ public class RankedPairCalculator {
 				
 		ArrayList<RankedPairWinner> winners = determinePairWinners(uniquePairs, votes);
 		
-		ArrayList<GraphElement> lockedWinners = sortAndLockWinners(winners);
+		ArrayList<UniquePair> lockedWinners = sortAndLockWinners(winners);
+		
+		String winner = calculateWinner(lockedWinners, options.size());
+		
+		System.out.println("\nWinner is " + winner + "!");
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
@@ -31,15 +36,27 @@ public class RankedPairCalculator {
 	private static ArrayList<ArrayList<String>> establishVotes() {
 		ArrayList<ArrayList<String>> votes = new ArrayList<>();
 		
-		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Charlie", "Alice")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Charlie", "Alice")));
+		// Scenario #1
+//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
+//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
+//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
+//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Charlie", "Alice")));
+//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Charlie", "Alice")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+		
+		// Scenario #2
+		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
+		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
+		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
 		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
 		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
 		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Bob", "Alice")));
 		
 		System.out.println("\nNumber of Votes: " + votes.size());
 		votes.forEach(vote -> System.out.println(vote));
@@ -138,38 +155,65 @@ public class RankedPairCalculator {
 	 * @param winners A list of winner objects, containing the unique pair, the winner, and margin of votes in victory.
 	 * @return A list of the locked winners, sorted in order.
 	 */
-	private static ArrayList<GraphElement> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
+	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
 		Collections.sort(winners, new Comparator<RankedPairWinner>() {
 		    public int compare(RankedPairWinner o1, RankedPairWinner o2) {
 		        return o2.getVoteDifference() - o1.getVoteDifference();
 		    }
 		});
 		
-		ArrayList<GraphElement> lockedPairs = new ArrayList<>();
+		ArrayList<UniquePair> lockedPairs = new ArrayList<>();
 		
 		winners.forEach(winner -> {
-			String graphSource;
-			String graphDestination;
+			String winningOption;
+			String losingOption;
 			
 			if (winner.getWinningOption() == winner.getUniquePair().getOptionTwo()) {
-				graphSource = winner.getWinningOption();
-				graphDestination = winner.getUniquePair().getOptionOne();
+				winningOption = winner.getWinningOption();
+				losingOption = winner.getUniquePair().getOptionOne();
+				
+				lockedPairs.add(new UniquePair(winningOption, losingOption));
 
-				lockedPairs.add(new GraphElement(new Node(graphSource), new Node(graphDestination)));
 			}
 			else {
-				graphSource = winner.getUniquePair().getOptionOne();
-				graphDestination = winner.getUniquePair().getOptionTwo();
+				winningOption = winner.getUniquePair().getOptionOne();
+				losingOption = winner.getUniquePair().getOptionTwo();
 				
-				lockedPairs.add(new GraphElement(new Node(graphSource), new Node(graphDestination)));
+				lockedPairs.add(new UniquePair(winningOption, losingOption));
 			}
 		});
 		
 		System.out.println("Locked in:");
 		lockedPairs.forEach(pair -> {
-			System.out.println(pair.getSource() + " over " + pair.getDestination());
+			System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo());
 		});
 		
 		return lockedPairs;
+	}
+	
+	private static String calculateWinner(ArrayList<UniquePair> lockedWinners, int optionListSize) {
+		List<GraphElement> graph = new ArrayList<>();
+		List<String> sourceList = new ArrayList<>();
+		List<String> uniqueDestinations = new ArrayList<>();
+		
+		for (UniquePair up : lockedWinners) {
+			GraphElement element = new GraphElement(up.getOptionOne(), new GraphElement(up.getOptionTwo()));
+
+			uniqueDestinations.add(up.getOptionTwo());
+
+			if (uniqueDestinations.size() < optionListSize) {
+				sourceList.add(up.getOptionOne());
+				graph.add(element);
+			}
+		}
+		
+		List<String> winners = new ArrayList<>(sourceList);
+		for (String s : winners) {
+			if (uniqueDestinations.contains(s)) {
+				winners.remove(s);
+			}
+		}
+		
+		return winners.get(0);
 	}
 }
