@@ -266,36 +266,25 @@ class BallotServiceImplTest extends ServiceImplTest {
 	}
 	
 	@Test
-	void retrieveResults_happyPath() throws EntityNotFoundException {
+	void retrieveSingleChoiceResults_happyPath() throws EntityNotFoundException {
 		// given
 		ArrayList<BallotVote> ballotResults = new ArrayList<>();
 		ballotResults.add(new BallotVote(testBallot, testBallotOption, testUser));
 		
 		// when
-		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
-		ResponseEntity<?> response = ballotServiceImpl.retrieveResults(testBallot.getId());
+		ResponseEntity<?> response = ballotServiceImpl.retrieveSingleChoiceResults(testBallot);
 		
 		// then
 		assertGenericSuccess(response);
 	}
 	
 	@Test
-	void retrieveResults_noResults() throws EntityNotFoundException {
+	void retrieveSingleChoiceResults_noResults() throws EntityNotFoundException {
 		// when
-		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
-		ResponseEntity<?> response = ballotServiceImpl.retrieveResults(testBallot.getId());
+		ResponseEntity<BallotResultDTO> response = ballotServiceImpl.retrieveSingleChoiceResults(testBallot);
 		
 		// then
 		assertGenericSuccess(response);
-	}
-	
-	@Test
-	void retrieveResults_noBallot() throws EntityNotFoundException {
-		// when
-		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.empty());
-		
-		// then
-		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.retrieveResults(testBallot.getId()); });
 	}
 	
 	@Test

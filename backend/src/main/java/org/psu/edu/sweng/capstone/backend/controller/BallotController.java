@@ -2,11 +2,14 @@ package org.psu.edu.sweng.capstone.backend.controller;
 
 import java.util.List;
 
+import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.enumeration.BallotTypeEnum;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BallotController {
 
+	@Autowired
+	private BallotDAO ballotDao;
+	
 	@Autowired
 	private BallotService ballotService;
 	
@@ -72,7 +78,15 @@ public class BallotController {
 	
 	@GetMapping("/ballot/{id}/results")
 	public ResponseEntity<?> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
-		return ballotService.retrieveResults(ballotId);
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException("Ballot " + ballotId));
+		
+		if (BallotTypeEnum.SINGLE_CHOICE.getDescription().equals(ballot.getType().getName())) {
+			return ballotService.retrieveSingleChoiceResults(ballot);
+		}
+		else {
+			return ballotService.retrieveRankedChoiceResults(ballot);
+		}
 	}
 	
 	@PreAuthorize("#ballotOption.getUserName() == authentication.getName()")

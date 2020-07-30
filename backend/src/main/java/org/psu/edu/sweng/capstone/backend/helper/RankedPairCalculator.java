@@ -6,9 +6,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class RankedPairCalculator {
 	
-	public static void main(String[]args) {
+	public String runAlgorithm() {
 		ArrayList<String> options = establishBallotOptions();
 		
 		ArrayList<ArrayList<String>> votes = establishVotes();		
@@ -19,9 +22,7 @@ public class RankedPairCalculator {
 		
 		ArrayList<UniquePair> lockedWinners = sortAndLockWinners(winners);
 		
-		String winner = calculateWinner(lockedWinners, options.size());
-		
-		System.out.println("\nWinner is " + winner + "!");
+		return calculateWinner(lockedWinners, options.size());
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
@@ -141,11 +142,8 @@ public class RankedPairCalculator {
 		});
 		
 		System.out.println();
-		winners.forEach(winner -> {
-			System.out.println("Winner between " + winner.getUniquePair() + " is " + winner.getWinningOption() +
-					" by a margin of " + winner.getVoteDifference() + " votes.");
-		});
-		
+		winners.forEach(winner -> System.out.println("Winner between " + winner.getUniquePair() + " is " + winner.getWinningOption() +
+					" by a margin of " + winner.getVoteDifference() + " votes."));
 		System.out.println();
 		
 		return winners;
@@ -169,7 +167,7 @@ public class RankedPairCalculator {
 			String winningOption;
 			String losingOption;
 			
-			if (winner.getWinningOption() == winner.getUniquePair().getOptionTwo()) {
+			if (winner.getWinningOption().equals(winner.getUniquePair().getOptionTwo())) {
 				winningOption = winner.getWinningOption();
 				losingOption = winner.getUniquePair().getOptionOne();
 				
@@ -184,9 +182,7 @@ public class RankedPairCalculator {
 		});
 		
 		System.out.println("Locked in:");
-		lockedPairs.forEach(pair -> {
-			System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo());
-		});
+		lockedPairs.forEach(pair -> System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo()));
 		
 		return lockedPairs;
 	}
