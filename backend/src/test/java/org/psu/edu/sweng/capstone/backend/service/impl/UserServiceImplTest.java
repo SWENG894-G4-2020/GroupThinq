@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
@@ -53,7 +53,7 @@ class UserServiceImplTest extends ServiceImplTest {
 	private UserRoleDAO userRoleDao;
 	
 	@Mock
-	private BallotResultDAO ballotResultDao;
+	private BallotVoteDAO ballotVoteDao;
 	
 	@Mock
 	private DecisionUserDAO decisionUserDao;

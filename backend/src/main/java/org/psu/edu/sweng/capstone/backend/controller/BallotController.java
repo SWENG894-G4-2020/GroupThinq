@@ -57,21 +57,21 @@ public class BallotController {
 		return ballotService.updateBallot(ballotId, ballot);
 	}
 	
-	@PreAuthorize("@authCheck.votingActive(#vote.getBallotId())")
+	@PreAuthorize("@authCheck.votingActive(#vote.get(0).getBallotId())")
 	@PostMapping("/ballot/{id}/vote")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<String> castVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
 		return ballotService.castVote(vote);
 	}
 	
-	@PreAuthorize("@authCheck.votingActive(#vote.getBallotId())")
+	@PreAuthorize("@authCheck.votingActive(#vote.get(0).getBallotId())")
 	@PutMapping("/ballot/{id}/vote")
 	public ResponseEntity<String> updateVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
 		return ballotService.updateVote(vote);
 	}
 	
 	@GetMapping("/ballot/{id}/results")
-	public ResponseEntity<BallotResultDTO> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
+	public ResponseEntity<?> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.retrieveResults(ballotId);
 	}
 	
