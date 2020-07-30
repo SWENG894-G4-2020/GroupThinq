@@ -192,18 +192,14 @@ public class RankedPairCalculator {
 	}
 	
 	private static String calculateWinner(ArrayList<UniquePair> lockedWinners, int optionListSize) {
-		List<GraphElement> graph = new ArrayList<>();
 		List<String> sourceList = new ArrayList<>();
 		List<String> uniqueDestinations = new ArrayList<>();
 		
 		for (UniquePair up : lockedWinners) {
-			GraphElement element = new GraphElement(up.getOptionOne(), new GraphElement(up.getOptionTwo()));
-
 			uniqueDestinations.add(up.getOptionTwo());
 
 			if (uniqueDestinations.size() < optionListSize) {
 				sourceList.add(up.getOptionOne());
-				graph.add(element);
 			}
 		}
 		
