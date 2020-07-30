@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 
 public class RankedPairCalculator {
 	
@@ -17,7 +16,7 @@ public class RankedPairCalculator {
 				
 		ArrayList<RankedPairWinner> winners = determinePairWinners(uniquePairs, votes);
 		
-		ArrayList<UniquePair> graphedWinners = sortAndLockWinners(winners);
+		ArrayList<GraphElement> lockedWinners = sortAndLockWinners(winners);
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
@@ -139,29 +138,38 @@ public class RankedPairCalculator {
 	 * @param winners A list of winner objects, containing the unique pair, the winner, and margin of votes in victory.
 	 * @return A list of the locked winners, sorted in order.
 	 */
-	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
+	private static ArrayList<GraphElement> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
 		Collections.sort(winners, new Comparator<RankedPairWinner>() {
 		    public int compare(RankedPairWinner o1, RankedPairWinner o2) {
 		        return o2.getVoteDifference() - o1.getVoteDifference();
 		    }
 		});
 		
-		ArrayList<UniquePair> lockedPairs = new ArrayList<>();
+		ArrayList<GraphElement> lockedPairs = new ArrayList<>();
 		
 		winners.forEach(winner -> {
+			String graphSource;
+			String graphDestination;
+			
 			if (winner.getWinningOption() == winner.getUniquePair().getOptionTwo()) {
-				lockedPairs.add(new UniquePair(winner.getWinningOption(), winner.getUniquePair().getOptionOne()));
+				graphSource = winner.getWinningOption();
+				graphDestination = winner.getUniquePair().getOptionOne();
+
+				lockedPairs.add(new GraphElement(new Node(graphSource), new Node(graphDestination)));
 			}
 			else {
-				lockedPairs.add(winner.getUniquePair());
+				graphSource = winner.getUniquePair().getOptionOne();
+				graphDestination = winner.getUniquePair().getOptionTwo();
+				
+				lockedPairs.add(new GraphElement(new Node(graphSource), new Node(graphDestination)));
 			}
 		});
 		
 		System.out.println("Locked in:");
 		lockedPairs.forEach(pair -> {
-			System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo());
+			System.out.println(pair.getSource() + " over " + pair.getDestination());
 		});
 		
-		return null;
+		return lockedPairs;
 	}
 }
