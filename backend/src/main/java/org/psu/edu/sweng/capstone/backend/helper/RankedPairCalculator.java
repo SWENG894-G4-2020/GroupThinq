@@ -2,7 +2,9 @@ package org.psu.edu.sweng.capstone.backend.helper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 
 public class RankedPairCalculator {
 	
@@ -13,7 +15,9 @@ public class RankedPairCalculator {
 		
 		ArrayList<UniquePair> uniquePairs = createUniquePairs(options);
 				
-		HashMap<UniquePair, PairWinner> winners = determinePairWinners(uniquePairs, votes);
+		ArrayList<RankedPairWinner> winners = determinePairWinners(uniquePairs, votes);
+		
+		LinkedList<RankedPairWinner> graphedWinners = sortAndGraphWinners(winners);
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
@@ -78,10 +82,10 @@ public class RankedPairCalculator {
 	 * @param votes A list of all the votes casted.
 	 * @return A HashMap containing the winning difference between one unique pair.
 	 */
-	private static HashMap<UniquePair, PairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, 
+	private static ArrayList<RankedPairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, 
 			ArrayList<ArrayList<String>> votes) {
 		
-		HashMap<UniquePair, PairWinner> winners = new HashMap<>();
+		ArrayList<RankedPairWinner> winners = new ArrayList<>();
 		
 		uniquePairs.forEach(pair -> {			
 			int firstOptionTallies = 0;
@@ -112,27 +116,29 @@ public class RankedPairCalculator {
 				}
 			}
 			
-			int difference;
-			PairWinner winner = new PairWinner();
-			if (firstOptionTallies > secondOptionTallies) {
-				difference = firstOptionTallies - secondOptionTallies;
-				winner.setOption(firstOption);
-			}
-			else {
-				difference = secondOptionTallies - firstOptionTallies;
-				winner.setOption(secondOption);
-			}
+			String winningOption = (firstOptionTallies > secondOptionTallies) ? firstOption : secondOption;
 			
-			winner.setVoteDifference(difference);
+			int difference = (winningOption.equals(firstOption) ? 
+					(firstOptionTallies - secondOptionTallies) : (secondOptionTallies - firstOptionTallies));
 			
-			winners.put(pair, winner);
+			winners.add(new RankedPairWinner(pair, winningOption, difference));
 		});
-
-		winners.entrySet().forEach(winner -> {
-			System.out.println("Winner between " + winner.getKey() + " is " + winner.getValue().getOption() + 
-					" with a difference of " + winner.getValue().getVoteDifference());
+		
+		winners.forEach(winner -> {
+			System.out.println("Winner between " + winner.getUniquePair() + " is " + winner.getWinningOption() +
+					" by a margin of " + winner.getVoteDifference() + " votes.");
 		});
 		
 		return winners;
+	}
+	
+	private static LinkedList<RankedPairWinner> sortAndGraphWinners(ArrayList<RankedPairWinner> winners) {
+		Collections.sort(winners, new Comparator<RankedPairWinner>() {
+		    public int compare(RankedPairWinner o1, RankedPairWinner o2) {
+		        return o2.getVoteDifference() - o1.getVoteDifference();
+		    }
+		});
+		
+		return null;
 	}
 }
