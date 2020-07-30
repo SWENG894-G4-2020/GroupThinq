@@ -17,13 +17,13 @@ public class RankedPairCalculator {
 				
 		ArrayList<RankedPairWinner> winners = determinePairWinners(uniquePairs, votes);
 		
-		LinkedList<RankedPairWinner> graphedWinners = sortAndGraphWinners(winners);
+		ArrayList<UniquePair> graphedWinners = sortAndLockWinners(winners);
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
 		ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie"));
 		
-		System.out.println("Ballot Options: \n");
+		System.out.println("Ballot Options:");
 		options.forEach(option -> System.out.println(option));
 		
 		return options;
@@ -42,7 +42,7 @@ public class RankedPairCalculator {
 		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
 		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
 		
-		System.out.println("\nNumber of Votes: " + votes.size() + "\n");
+		System.out.println("\nNumber of Votes: " + votes.size());
 		votes.forEach(vote -> System.out.println(vote));
 		
 		return votes;
@@ -70,9 +70,8 @@ public class RankedPairCalculator {
 			}
 		}
 		
-		System.out.println("\nUnique Pairs: \n");
+		System.out.println("\nUnique Pairs:");
 		uniquePairs.forEach(pair -> System.out.println(pair));
-		System.out.println();
 		
 		return uniquePairs;
 	}
@@ -124,19 +123,43 @@ public class RankedPairCalculator {
 			winners.add(new RankedPairWinner(pair, winningOption, difference));
 		});
 		
+		System.out.println();
 		winners.forEach(winner -> {
 			System.out.println("Winner between " + winner.getUniquePair() + " is " + winner.getWinningOption() +
 					" by a margin of " + winner.getVoteDifference() + " votes.");
 		});
 		
+		System.out.println();
+		
 		return winners;
 	}
 	
-	private static LinkedList<RankedPairWinner> sortAndGraphWinners(ArrayList<RankedPairWinner> winners) {
+	/** Sorts and locks the winners of the one on one matchups for each unique pair. 
+	 * 
+	 * @param winners A list of winner objects, containing the unique pair, the winner, and margin of votes in victory.
+	 * @return A list of the locked winners, sorted in order.
+	 */
+	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
 		Collections.sort(winners, new Comparator<RankedPairWinner>() {
 		    public int compare(RankedPairWinner o1, RankedPairWinner o2) {
 		        return o2.getVoteDifference() - o1.getVoteDifference();
 		    }
+		});
+		
+		ArrayList<UniquePair> lockedPairs = new ArrayList<>();
+		
+		winners.forEach(winner -> {
+			if (winner.getWinningOption() == winner.getUniquePair().getOptionTwo()) {
+				lockedPairs.add(new UniquePair(winner.getWinningOption(), winner.getUniquePair().getOptionOne()));
+			}
+			else {
+				lockedPairs.add(winner.getUniquePair());
+			}
+		});
+		
+		System.out.println("Locked in:");
+		lockedPairs.forEach(pair -> {
+			System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo());
 		});
 		
 		return null;
