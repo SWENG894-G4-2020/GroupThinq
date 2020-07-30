@@ -25,6 +25,7 @@ public class RankedPairCalculator {
 	}
 
 	private static ArrayList<String> establishBallotOptions() {
+		// Scenario #1, #2
 		ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie"));
 		
 		System.out.println("Ballot Options:");
