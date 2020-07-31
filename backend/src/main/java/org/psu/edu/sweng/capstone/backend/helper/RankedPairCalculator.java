@@ -27,7 +27,10 @@ public class RankedPairCalculator {
 
 	private static ArrayList<String> establishBallotOptions() {
 		// Scenario #1, #2
-		ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie"));
+		// ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie"));
+
+		// Scenario #3
+		ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie", "Daniel"));
 		
 		System.out.println("Ballot Options:");
 		options.forEach(option -> System.out.println(option));
@@ -50,15 +53,26 @@ public class RankedPairCalculator {
 //		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
 		
 		// Scenario #2
-		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Bob", "Alice")));
+//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
+//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
+//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
+//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Bob", "Alice")));
+
+		// Scenario #3 - Has a cycle
+		votes.add(new ArrayList<>(Arrays.asList("Alice", "Daniel", "Charlie", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Daniel", "Alice", "Charlie", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Daniel", "Charlie")));
+		votes.add(new ArrayList<>(Arrays.asList("Bob", "Daniel", "Alice", "Charlie")));
+		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Daniel", "Charlie")));
+		votes.add(new ArrayList<>(Arrays.asList("Daniel", "Charlie", "Alice", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Daniel", "Charlie", "Alice", "Bob")));
+		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob", "Daniel")));
+		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Bob", "Daniel", "Alice")));
 		
 		System.out.println("\nNumber of Votes: " + votes.size());
 		votes.forEach(vote -> System.out.println(vote));
@@ -155,36 +169,36 @@ public class RankedPairCalculator {
 	 * @return A list of the locked winners, sorted in order.
 	 */
 	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
-		Collections.sort(winners, new Comparator<RankedPairWinner>() {
-		    public int compare(RankedPairWinner o1, RankedPairWinner o2) {
-		        return o2.getVoteDifference() - o1.getVoteDifference();
-		    }
+		winners.sort(new Comparator<RankedPairWinner>() {
+			public int compare(RankedPairWinner o1, RankedPairWinner o2) {
+				return o2.getVoteDifference() - o1.getVoteDifference();
+			}
 		});
 		
-		ArrayList<UniquePair> lockedPairs = new ArrayList<>();
+		ArrayList<UniquePair> lockedGraph = new ArrayList<>();
 		
 		winners.forEach(winner -> {
 			String winningOption;
 			String losingOption;
+			ArrayList<UniquePair> potentialGraph = (ArrayList<UniquePair>) lockedGraph.clone();
 			
 			if (winner.getWinningOption().equals(winner.getUniquePair().getOptionTwo())) {
 				winningOption = winner.getWinningOption();
 				losingOption = winner.getUniquePair().getOptionOne();
-				
-				lockedPairs.add(new UniquePair(winningOption, losingOption));
-			}
-			else {
+			} else {
 				winningOption = winner.getUniquePair().getOptionOne();
 				losingOption = winner.getUniquePair().getOptionTwo();
-				
-				lockedPairs.add(new UniquePair(winningOption, losingOption));
 			}
+
+			potentialGraph.add(new UniquePair(winningOption, losingOption));
+			if (isAcyclic(potentialGraph)) { lockedGraph.add(new UniquePair(winningOption, losingOption)); }
+
 		});
 		
 		System.out.println("Locked in:");
-		lockedPairs.forEach(pair -> System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo()));
+		lockedGraph.forEach(pair -> System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo()));
 		
-		return lockedPairs;
+		return lockedGraph;
 	}
 	
 	/** Calculates the winner from the locked sorted list of unique pair winners.
@@ -213,5 +227,55 @@ public class RankedPairCalculator {
 		}
 		
 		return winners.get(0);
+	}
+
+	/** Determines if a potential locked graph contains a cycle.
+	 *
+	 * @param graph A graph to test for cyclicity, represented by an ArrayList of edges
+	 * @return If graph is acyclic (does not contain any cycles)
+	 */
+	private static boolean isAcyclic(ArrayList<UniquePair> graph) {
+		// A Graph containing 0 or 1 edges is by nature acyclic
+		if (graph.size() == 0 || graph.size() == 1) { return true; }
+
+		// A graph with non-zero edges but no leafs is by nature cyclic
+		Optional<String> leaf = findLeaf(graph);
+		if (graph.size() > 0 && leaf.isEmpty()) {
+		//	System.out.print("IS CYCLIC!: ");
+		//	System.out.println(graph);
+			return false;
+		}
+
+		// Otherwise, find and remove a leaf and test again
+		ArrayList<UniquePair> reducedGraph = (ArrayList<UniquePair>) graph.clone();
+		reducedGraph.removeIf(edge -> edge.getOptionTwo().equals(leaf.orElse("")));
+		//System.out.println("***");
+		//System.out.println(graph);
+		//System.out.println(reducedGraph);
+		return isAcyclic(reducedGraph);
+	}
+
+	/** Determines a leaf node for a given graph, if one exists.
+	 *
+	 * @param graph The graph for which a leaf node should be found from.
+	 * @return An Optional containing a String of a leaf node, if it exists.
+	 */
+	private static Optional<String> findLeaf(ArrayList<UniquePair> graph) {
+		// A leaf is a node which has incoming edges but no outgoing edges (ie. only a sink)
+		// First, collect all sources and sinks
+		Set<String> sources = new HashSet<>();
+		Set<String> sinks = new HashSet<>();
+		graph.forEach(pair -> {
+			sources.add(pair.getOptionOne());
+			sinks.add(pair.getOptionTwo());
+		});
+
+		// Then, find a node which is a sink but not a source, that is a leaf
+		String leaf = null;
+		for (String sink : sinks) {
+			if (!sources.contains(sink)) { leaf = sink; }
+		}
+
+		return Optional.ofNullable(leaf);
 	}
 }
