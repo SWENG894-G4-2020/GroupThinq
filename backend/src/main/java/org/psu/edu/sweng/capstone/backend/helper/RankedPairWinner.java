@@ -37,4 +37,14 @@ public class RankedPairWinner {
 	public void setVoteDifference(int voteDifference) {
 		this.voteDifference = voteDifference;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append(this.uniquePair).append(": Winner is ").append(this.winningOption.toString()).
+			append(" by ").append(voteDifference).append(" votes.");
+		
+		return builder.toString();
+	}
 }

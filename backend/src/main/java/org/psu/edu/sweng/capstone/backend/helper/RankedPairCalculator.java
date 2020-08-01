@@ -1,17 +1,20 @@
 package org.psu.edu.sweng.capstone.backend.helper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RankedPairCalculator {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RankedPairCalculator.class);
 	
 	public Long runAlgorithm(List<Long> options, List<ArrayList<Long>> votes) {
 		ArrayList<UniquePair> uniquePairs = createUniquePairs(options);
@@ -20,61 +23,6 @@ public class RankedPairCalculator {
 		
 		return calculateWinner(lockedWinners, options.size());
 	}
-
-//	private static ArrayList<Long> establishBallotOptions() {
-//		// Scenario #1, #2
-//		// ArrayList<String> options = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
-//
-//		// Scenario #3
-//		ArrayList<Long> options = new ArrayList<>(Arrays.asList(1L, 2L, 3L, 4L));
-//		
-//		System.out.println("Ballot Options:");
-//		options.forEach(option -> System.out.println(option));
-//		
-//		return options;
-//	}
-
-//	private static ArrayList<ArrayList<Long>> establishVotes() {
-//		ArrayList<ArrayList<Long>> votes = new ArrayList<>();
-//		
-//		// Scenario #1
-////		votes.add(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
-////		votes.add(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
-////		votes.add(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
-////		votes.add(new ArrayList<>(Arrays.asList(2L, 3L, 1L)));
-////		votes.add(new ArrayList<>(Arrays.asList(2L, 3L, 1L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-//		
-//		// Scenario #2
-////		votes.add(new ArrayList<>(Arrays.asList(1L, 3L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(1L, 3L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 3L)));
-////		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 3L)));
-////		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 3L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
-////		votes.add(new ArrayList<>(Arrays.asList(3L, 2L, 1L)));
-//
-//		// Scenario #3 - Has a cycle
-//		votes.add(new ArrayList<>(Arrays.asList(1L, 4L, 3L, 2L)));
-//		votes.add(new ArrayList<>(Arrays.asList(4L, 1L, 3L, 2L)));
-//		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 4L, 3L)));
-//		votes.add(new ArrayList<>(Arrays.asList(2L, 4L, 1L, 3L)));
-//		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 4L, 3L)));
-//		votes.add(new ArrayList<>(Arrays.asList(4L, 3L, 1L, 2L)));
-//		votes.add(new ArrayList<>(Arrays.asList(4L, 3L, 1L, 2L)));
-//		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L, 4L)));
-//		votes.add(new ArrayList<>(Arrays.asList(3L, 2L, 4L, 1L)));
-//		
-//		System.out.println("\nNumber of Votes: " + votes.size());
-//		votes.forEach(vote -> System.out.println(vote));
-//		
-//		return votes;
-//	}
 
 	/** Creates unique pairs based upon the a list of Ballot Options.
 	 * @param options The list of Ballot options (sorted alphabetically).
@@ -98,8 +46,8 @@ public class RankedPairCalculator {
 			}
 		}
 		
-		System.out.println("\nUnique Pairs:");
-		uniquePairs.forEach(pair -> System.out.println(pair));
+		LOGGER.info("Unique Pairs:");
+		uniquePairs.forEach(pair -> LOGGER.info(pair.toString()));
 		
 		return uniquePairs;
 	}
@@ -110,7 +58,6 @@ public class RankedPairCalculator {
 	 * @return A HashMap containing the winning difference between one unique pair.
 	 */
 	private static ArrayList<RankedPairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, List<ArrayList<Long>> votes) {
-		
 		ArrayList<RankedPairWinner> winners = new ArrayList<>();
 		
 		uniquePairs.forEach(pair -> {			
@@ -150,10 +97,8 @@ public class RankedPairCalculator {
 			winners.add(new RankedPairWinner(pair, winningOption, difference));
 		});
 		
-		System.out.println();
-		winners.forEach(winner -> System.out.println("Winner between " + winner.getUniquePair() + " is " + winner.getWinningOption() +
-					" by a margin of " + winner.getVoteDifference() + " votes."));
-		System.out.println();
+		winners.forEach(winner -> LOGGER.info("Winner between {} is {} by a margin of {} votes.", 
+				winner.getUniquePair(), winner.getWinningOption(), winner.getVoteDifference()));
 		
 		return winners;
 	}
@@ -163,12 +108,9 @@ public class RankedPairCalculator {
 	 * @param winners A list of winner objects, containing the unique pair, the winner, and margin of votes in victory.
 	 * @return A list of the locked winners, sorted in order.
 	 */
-	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {
-		winners.sort(new Comparator<RankedPairWinner>() {
-			public int compare(RankedPairWinner o1, RankedPairWinner o2) {
-				return o2.getVoteDifference() - o1.getVoteDifference();
-			}
-		});
+	@SuppressWarnings("unchecked")
+	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {	
+		Collections.sort(winners, (RankedPairWinner r1, RankedPairWinner r2) -> r2.getVoteDifference() - r1.getVoteDifference());
 		
 		ArrayList<UniquePair> lockedGraph = new ArrayList<>();
 		
@@ -191,8 +133,8 @@ public class RankedPairCalculator {
 
 		});
 		
-		System.out.println("Locked in:");
-		lockedGraph.forEach(pair -> System.out.println(pair.getOptionOne() + " over " + pair.getOptionTwo()));
+		LOGGER.info("Locked in:");
+		lockedGraph.forEach(pair -> LOGGER.info("{} over {}", pair.getOptionOne(), pair.getOptionTwo()));
 		
 		return lockedGraph;
 	}
@@ -230,24 +172,21 @@ public class RankedPairCalculator {
 	 * @param graph A graph to test for cyclicity, represented by an ArrayList of edges
 	 * @return If graph is acyclic (does not contain any cycles)
 	 */
+	@SuppressWarnings("unchecked")
 	private static boolean isAcyclic(ArrayList<UniquePair> graph) {
 		// A Graph containing 0 or 1 edges is by nature acyclic
-		if (graph.size() == 0 || graph.size() == 1) { return true; }
+		if (graph.isEmpty() || graph.size() == 1) { return true; }
 
 		// A graph with non-zero edges but no leafs is by nature cyclic
 		Optional<Long> leaf = findLeaf(graph);
-		if (graph.size() > 0 && !leaf.isPresent()) {
-		//	System.out.print("IS CYCLIC!: ");
-		//	System.out.println(graph);
+		if (!graph.isEmpty() && !leaf.isPresent()) {
 			return false;
 		}
 
 		// Otherwise, find and remove a leaf and test again
 		ArrayList<UniquePair> reducedGraph = (ArrayList<UniquePair>) graph.clone();
 		reducedGraph.removeIf(edge -> edge.getOptionTwo().equals(leaf.orElse(null)));
-		//System.out.println("***");
-		//System.out.println(graph);
-		//System.out.println(reducedGraph);
+
 		return isAcyclic(reducedGraph);
 	}
 
