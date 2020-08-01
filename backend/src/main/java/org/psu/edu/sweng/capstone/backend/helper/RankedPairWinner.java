@@ -3,10 +3,10 @@ package org.psu.edu.sweng.capstone.backend.helper;
 public class RankedPairWinner {
 	
 	private UniquePair uniquePair;
-	private String winningOption;
+	private Long winningOption;
 	private int voteDifference;
 	
-	public RankedPairWinner(UniquePair uniquePair, String option, int voteDifference) {
+	public RankedPairWinner(UniquePair uniquePair, Long option, int voteDifference) {
 		this.uniquePair = uniquePair;
 		this.winningOption = option;
 		this.voteDifference = voteDifference;
@@ -22,11 +22,11 @@ public class RankedPairWinner {
 		this.uniquePair = uniquePair;
 	}
 
-	public String getWinningOption() {
+	public Long getWinningOption() {
 		return winningOption;
 	}
 
-	public void setWinningOption(String option) {
+	public void setWinningOption(Long option) {
 		this.winningOption = option;
 	}
 

@@ -2,88 +2,84 @@ package org.psu.edu.sweng.capstone.backend.helper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class RankedPairCalculator {
 	
-	public String runAlgorithm() {
-		ArrayList<String> options = establishBallotOptions();
-		
-		ArrayList<ArrayList<String>> votes = establishVotes();		
-		
+	public Long runAlgorithm(List<Long> options, List<ArrayList<Long>> votes) {
 		ArrayList<UniquePair> uniquePairs = createUniquePairs(options);
-				
 		ArrayList<RankedPairWinner> winners = determinePairWinners(uniquePairs, votes);
-		
 		ArrayList<UniquePair> lockedWinners = sortAndLockWinners(winners);
 		
 		return calculateWinner(lockedWinners, options.size());
 	}
 
-	private static ArrayList<String> establishBallotOptions() {
-		// Scenario #1, #2
-		// ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie"));
+//	private static ArrayList<Long> establishBallotOptions() {
+//		// Scenario #1, #2
+//		// ArrayList<String> options = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
+//
+//		// Scenario #3
+//		ArrayList<Long> options = new ArrayList<>(Arrays.asList(1L, 2L, 3L, 4L));
+//		
+//		System.out.println("Ballot Options:");
+//		options.forEach(option -> System.out.println(option));
+//		
+//		return options;
+//	}
 
-		// Scenario #3
-		ArrayList<String> options = new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie", "Daniel"));
-		
-		System.out.println("Ballot Options:");
-		options.forEach(option -> System.out.println(option));
-		
-		return options;
-	}
-
-	private static ArrayList<ArrayList<String>> establishVotes() {
-		ArrayList<ArrayList<String>> votes = new ArrayList<>();
-		
-		// Scenario #1
-//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
-//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
-//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Bob", "Charlie")));
-//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Charlie", "Alice")));
-//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Charlie", "Alice")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-		
-		// Scenario #2
-//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Alice", "Charlie", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
-//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
-//		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Charlie")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob")));
-//		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Bob", "Alice")));
-
-		// Scenario #3 - Has a cycle
-		votes.add(new ArrayList<>(Arrays.asList("Alice", "Daniel", "Charlie", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Daniel", "Alice", "Charlie", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Daniel", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Daniel", "Alice", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Bob", "Alice", "Daniel", "Charlie")));
-		votes.add(new ArrayList<>(Arrays.asList("Daniel", "Charlie", "Alice", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Daniel", "Charlie", "Alice", "Bob")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob", "Daniel")));
-		votes.add(new ArrayList<>(Arrays.asList("Charlie", "Bob", "Daniel", "Alice")));
-		
-		System.out.println("\nNumber of Votes: " + votes.size());
-		votes.forEach(vote -> System.out.println(vote));
-		
-		return votes;
-	}
+//	private static ArrayList<ArrayList<Long>> establishVotes() {
+//		ArrayList<ArrayList<Long>> votes = new ArrayList<>();
+//		
+//		// Scenario #1
+////		votes.add(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
+////		votes.add(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
+////		votes.add(new ArrayList<>(Arrays.asList(1L, 2L, 3L)));
+////		votes.add(new ArrayList<>(Arrays.asList(2L, 3L, 1L)));
+////		votes.add(new ArrayList<>(Arrays.asList(2L, 3L, 1L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+//		
+//		// Scenario #2
+////		votes.add(new ArrayList<>(Arrays.asList(1L, 3L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(1L, 3L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 3L)));
+////		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 3L)));
+////		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 3L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L)));
+////		votes.add(new ArrayList<>(Arrays.asList(3L, 2L, 1L)));
+//
+//		// Scenario #3 - Has a cycle
+//		votes.add(new ArrayList<>(Arrays.asList(1L, 4L, 3L, 2L)));
+//		votes.add(new ArrayList<>(Arrays.asList(4L, 1L, 3L, 2L)));
+//		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 4L, 3L)));
+//		votes.add(new ArrayList<>(Arrays.asList(2L, 4L, 1L, 3L)));
+//		votes.add(new ArrayList<>(Arrays.asList(2L, 1L, 4L, 3L)));
+//		votes.add(new ArrayList<>(Arrays.asList(4L, 3L, 1L, 2L)));
+//		votes.add(new ArrayList<>(Arrays.asList(4L, 3L, 1L, 2L)));
+//		votes.add(new ArrayList<>(Arrays.asList(3L, 1L, 2L, 4L)));
+//		votes.add(new ArrayList<>(Arrays.asList(3L, 2L, 4L, 1L)));
+//		
+//		System.out.println("\nNumber of Votes: " + votes.size());
+//		votes.forEach(vote -> System.out.println(vote));
+//		
+//		return votes;
+//	}
 
 	/** Creates unique pairs based upon the a list of Ballot Options.
 	 * @param options The list of Ballot options (sorted alphabetically).
 	 */
-	private static ArrayList<UniquePair> createUniquePairs(ArrayList<String> options) {
+	private static ArrayList<UniquePair> createUniquePairs(List<Long> options) {
 		ArrayList<UniquePair> uniquePairs = new ArrayList<>();
 		
 		for (int x = 0; x < options.size(); x++) {
@@ -113,8 +109,7 @@ public class RankedPairCalculator {
 	 * @param votes A list of all the votes casted.
 	 * @return A HashMap containing the winning difference between one unique pair.
 	 */
-	private static ArrayList<RankedPairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, 
-			ArrayList<ArrayList<String>> votes) {
+	private static ArrayList<RankedPairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, List<ArrayList<Long>> votes) {
 		
 		ArrayList<RankedPairWinner> winners = new ArrayList<>();
 		
@@ -122,10 +117,10 @@ public class RankedPairCalculator {
 			int firstOptionTallies = 0;
 			int secondOptionTallies = 0;
 			
-			String firstOption = pair.getOptionOne();
-			String secondOption = pair.getOptionTwo();
+			Long firstOption = pair.getOptionOne();
+			Long secondOption = pair.getOptionTwo();
 			
-			for (ArrayList<String> vote : votes) {
+			for (ArrayList<Long> vote : votes) {
 				int firstOptionIndex = 0;
 				int secondOptionIndex = 0;
 				
@@ -147,7 +142,7 @@ public class RankedPairCalculator {
 				}
 			}
 			
-			String winningOption = (firstOptionTallies > secondOptionTallies) ? firstOption : secondOption;
+			Long winningOption = (firstOptionTallies > secondOptionTallies) ? firstOption : secondOption;
 			
 			int difference = (winningOption.equals(firstOption) ? 
 					(firstOptionTallies - secondOptionTallies) : (secondOptionTallies - firstOptionTallies));
@@ -178,8 +173,9 @@ public class RankedPairCalculator {
 		ArrayList<UniquePair> lockedGraph = new ArrayList<>();
 		
 		winners.forEach(winner -> {
-			String winningOption;
-			String losingOption;
+			Long winningOption;
+			Long losingOption;
+			
 			ArrayList<UniquePair> potentialGraph = (ArrayList<UniquePair>) lockedGraph.clone();
 			
 			if (winner.getWinningOption().equals(winner.getUniquePair().getOptionTwo())) {
@@ -207,9 +203,9 @@ public class RankedPairCalculator {
 	 * @param optionListSize An integer containing the list size of all ballot options.
 	 * @return The winning Ballot Option
 	 */
-	private static String calculateWinner(ArrayList<UniquePair> lockedWinners, int optionListSize) {
-		List<String> sourceList = new ArrayList<>();
-		List<String> uniqueDestinations = new ArrayList<>();
+	private static Long calculateWinner(ArrayList<UniquePair> lockedWinners, int optionListSize) {
+		List<Long> sourceList = new ArrayList<>();
+		List<Long> uniqueDestinations = new ArrayList<>();
 		
 		for (UniquePair up : lockedWinners) {
 			uniqueDestinations.add(up.getOptionTwo());
@@ -219,8 +215,8 @@ public class RankedPairCalculator {
 			}
 		}
 		
-		List<String> winners = new ArrayList<>(sourceList);
-		for (String s : winners) {
+		List<Long> winners = new ArrayList<>(sourceList);
+		for (Long s : winners) {
 			if (uniqueDestinations.contains(s)) {
 				winners.remove(s);
 			}
@@ -239,8 +235,8 @@ public class RankedPairCalculator {
 		if (graph.size() == 0 || graph.size() == 1) { return true; }
 
 		// A graph with non-zero edges but no leafs is by nature cyclic
-		Optional<String> leaf = findLeaf(graph);
-		if (graph.size() > 0 && leaf.isEmpty()) {
+		Optional<Long> leaf = findLeaf(graph);
+		if (graph.size() > 0 && !leaf.isPresent()) {
 		//	System.out.print("IS CYCLIC!: ");
 		//	System.out.println(graph);
 			return false;
@@ -248,7 +244,7 @@ public class RankedPairCalculator {
 
 		// Otherwise, find and remove a leaf and test again
 		ArrayList<UniquePair> reducedGraph = (ArrayList<UniquePair>) graph.clone();
-		reducedGraph.removeIf(edge -> edge.getOptionTwo().equals(leaf.orElse("")));
+		reducedGraph.removeIf(edge -> edge.getOptionTwo().equals(leaf.orElse(null)));
 		//System.out.println("***");
 		//System.out.println(graph);
 		//System.out.println(reducedGraph);
@@ -260,19 +256,20 @@ public class RankedPairCalculator {
 	 * @param graph The graph for which a leaf node should be found from.
 	 * @return An Optional containing a String of a leaf node, if it exists.
 	 */
-	private static Optional<String> findLeaf(ArrayList<UniquePair> graph) {
+	private static Optional<Long> findLeaf(ArrayList<UniquePair> graph) {
 		// A leaf is a node which has incoming edges but no outgoing edges (ie. only a sink)
 		// First, collect all sources and sinks
-		Set<String> sources = new HashSet<>();
-		Set<String> sinks = new HashSet<>();
+		Set<Long> sources = new HashSet<>();
+		Set<Long> sinks = new HashSet<>();
+		
 		graph.forEach(pair -> {
 			sources.add(pair.getOptionOne());
 			sinks.add(pair.getOptionTwo());
 		});
 
 		// Then, find a node which is a sink but not a source, that is a leaf
-		String leaf = null;
-		for (String sink : sinks) {
+		Long leaf = null;
+		for (Long sink : sinks) {
 			if (!sources.contains(sink)) { leaf = sink; }
 		}
 

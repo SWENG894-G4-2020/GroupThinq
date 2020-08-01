@@ -1,5 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
@@ -24,6 +26,7 @@ import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.RankedWinner;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
@@ -56,6 +59,9 @@ public class BallotServiceImpl implements BallotService {
 	
 	@Autowired
 	private RankedWinnerDAO rankedWinnerDao;
+	
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
 	
 	@Autowired
 	private RankedPairCalculator rankedPairCalculator;
@@ -203,7 +209,7 @@ public class BallotServiceImpl implements BallotService {
 	public ResponseEntity<BallotResultDTO> retrieveSingleChoiceResults(final Ballot ballot) throws EntityNotFoundException {
 		ResponseEntity<BallotResultDTO> response = new ResponseEntity<>();
 		
-		ballot.getResults().forEach(br -> response.getData().add(BallotResultDTO.build(br)));
+		ballot.getVotes().forEach(br -> response.getData().add(BallotResultDTO.build(br)));
 		
 		response.attachGenericSuccess();
 		
@@ -220,7 +226,24 @@ public class BallotServiceImpl implements BallotService {
 			response.getData().add(rankedWinner.get().getWinner().getTitle());
 		}
 		else {
-			response.getData().add(rankedPairCalculator.runAlgorithm());
+			List<Long> ballotOptionIds = new ArrayList<>();
+			List<ArrayList<Long>> votes = new ArrayList<>();
+
+			ballot.getOptions().forEach(option -> ballotOptionIds.add(option.getId()));
+			
+			ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByDecision(ballot.getDecision());
+			
+			decisionUsers.forEach(du -> {
+				ArrayList<BallotVote> userVotes = ballotVoteDao.findAllByUserAndBallotOrderByRankAsc(du.getUser(), ballot);
+				
+				ArrayList<Long> vote = new ArrayList<>();
+				
+				userVotes.forEach(v -> vote.add(v.getBallotOption().getId()));
+				
+				votes.add(vote);
+			});
+			
+			response.getData().add(rankedPairCalculator.runAlgorithm(ballotOptionIds, votes).toString());
 		}
 		
 		response.attachGenericSuccess();

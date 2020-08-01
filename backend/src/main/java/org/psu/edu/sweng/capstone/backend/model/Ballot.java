@@ -46,7 +46,7 @@ public class Ballot {
 	private Set<BallotOption> options = new HashSet<>();
 	
 	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotVote.class)
-	private Set<BallotVote> results = new HashSet<>();
+	private Set<BallotVote> votes = new HashSet<>();
 	
 	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = RankedPairWinner.class)
 	private Set<RankedPairWinner> rankedPairWinners = new HashSet<>();
@@ -117,12 +117,12 @@ public class Ballot {
 		this.options = ballotOptions;
 	}
 
-	public Set<BallotVote> getResults() {
-		return results;
+	public Set<BallotVote> getVotes() {
+		return votes;
 	}
 
-	public void setResults(Set<BallotVote> results) {
-		this.results = results;
+	public void setVotes(Set<BallotVote> results) {
+		this.votes = results;
 	}
 
 	public Set<RankedPairWinner> getRankedPairWinners() {

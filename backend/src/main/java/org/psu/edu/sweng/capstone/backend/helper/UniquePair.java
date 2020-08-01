@@ -2,27 +2,27 @@ package org.psu.edu.sweng.capstone.backend.helper;
 
 public class UniquePair {
 
-	private String optionOne;
-	private String optionTwo;
+	private Long optionOne;
+	private Long optionTwo;
 	
-	public UniquePair(String optionOne, String optionTwo) {
+	public UniquePair(Long optionOne, Long optionTwo) {
 		this.optionOne = optionOne;
 		this.optionTwo = optionTwo;
 	}
 
-	public String getOptionOne() {
+	public Long getOptionOne() {
 		return optionOne;
 	}
 
-	public void setOptionOne(String optionOne) {
+	public void setOptionOne(Long optionOne) {
 		this.optionOne = optionOne;
 	}
 
-	public String getOptionTwo() {
+	public Long getOptionTwo() {
 		return optionTwo;
 	}
 
-	public void setOptionTwo(String optionTwo) {
+	public void setOptionTwo(Long optionTwo) {
 		this.optionTwo = optionTwo;
 	}
 	
@@ -30,7 +30,7 @@ public class UniquePair {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("[" + this.getOptionOne() + ", " + this.getOptionTwo() + "]");
+		builder.append("[" + this.getOptionOne().toString() + ", " + this.getOptionTwo().toString() + "]");
 		
 		return builder.toString();
 	}
