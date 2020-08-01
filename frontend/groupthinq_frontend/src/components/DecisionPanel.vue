@@ -35,6 +35,7 @@
             name="datetime-input"
             label="When should voting close?"
             :rules="[val => checkValidDate(val) || '*Valid Date Required']"
+            :readonly="(mode === 'create' || mode === 'edit') ? false : true"
             mask="datetime"
             hint="YYYY/MM/DD HH:mm">
               <template v-if="(mode === 'create' || mode === 'edit')" v-slot:append>
@@ -83,7 +84,7 @@
           <q-card-section v-if="!expired">
             <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
             <div v-if="mode === 'view'"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s remaining</div>
-            <div v-if="mode === create"></div>
+            <div v-if="mode === 'create'"></div>
             <div v-else> </div>
           </q-card-section>
           <q-card-section v-else>
@@ -103,8 +104,15 @@
       <div class="q-pa-sm col-xs-12 col-md-6">
         <q-card bordered>
           <q-card-section>
-            <div class="text-h5"><q-icon name="psychology" /> Actions</div>
-            <div>Perdiction: Option 1</div>
+            <div class="text-h5"><q-icon name="edit" /> Actions</div>
+            <div class="row reverse q-gutter-sm">
+              <q-btn v-if="!expired && mode === 'create'" icon="add" color="positive" label="Create" />
+              <q-btn v-if="!expired && mode === 'edit'" icon="check" color="positive" label="Confirm" />
+              <q-btn v-if="!expired && mode === 'view'" icon="edit" label="Edit" />
+              <q-btn v-if="!expired && (mode === 'view' || mode === 'edit')" icon="delete" color="negative" label="Delete" />
+              <q-btn v-if="!expired && mode === 'edit'" icon="clear" color="primary" label="Cancel" />
+              <q-btn v-if="!expired && mode === 'create'" icon="clear" label="Cancel" to="/main" />
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -146,6 +154,7 @@ export default {
         }
       },
       decision: { ballots: [{}], includedUsers: [] },
+      savedDecision: { ballots: [{}], includedUsers: [] },
       resultsList: [],
       allUsersList: [],
       filteredUsersList: [],
