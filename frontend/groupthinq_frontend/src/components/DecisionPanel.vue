@@ -97,6 +97,12 @@
               <div class="q-py-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === decision.ballots[0].ballotTypeId ).description }}</div>
             </div>
           </q-card-section>
+          <q-card-section v-if="mode === 'create'">
+
+          </q-card-section>
+          <q-card-section v-else>
+
+          </q-card-section>
         </q-card>
       </div>
       <div v-else class="q-pa-sm col-xs-12 col-md-6">
@@ -156,19 +162,10 @@ export default {
       errorMsg: '',
       currentUserName: '',
       mode: 'view',
-      modeData: {
-        view: {
-
-        },
-        edit: {
-
-        },
-        create: {
-
-        }
-      },
-      decision: { ballots: [{ ballotTypeId: 1 }], includedUsers: [] },
-      savedDecision: { ballots: [{}], includedUsers: [] },
+      voteMode: false,
+      decision: { ballots: [{ ballotTypeId: 1, ballotOptions: [] }], includedUsers: [] },
+      savedDecision: { ballots: [{ ballotTypeId: 1, ballotOptions: [] }], includedUsers: [] },
+      newOption: { title: '', userName: this.currentUserName },
       resultsList: [],
       allUsersList: [],
       filteredUsersList: [],
@@ -344,6 +341,18 @@ export default {
         this.errorMsg = error.message
         this.$emit('error')
       }
+    },
+
+    addDecisionOption () {
+      if (this.newOption.title !== '') {
+        this.decision.ballots[0].ballotOptions.push(this.newOption)
+        this.newOption = { title: '', userName: this.currentUserName }
+      }
+    },
+
+    removeDecisionOption (option) {
+      const pos = this.decision.ballots[0].ballotOptions.indexOf(option)
+      this.decision.ballots[0].ballotOptions.splice(pos, 1)
     },
 
     filterFn (val, update, abort) {
