@@ -79,15 +79,29 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="q-pa-sm col-xs-12 col-md-6">
+      <div v-if="!expired" class="q-pa-sm col-xs-12 col-md-6">
         <q-card bordered>
-          <q-card-section v-if="!expired">
+          <q-card-section>
             <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
             <div v-if="mode === 'view'"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s remaining</div>
-            <div v-if="mode === 'create'"></div>
-            <div v-else> </div>
+            <div>
+              <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
+              <q-btn-toggle
+                v-if="mode === 'create'"
+                spread
+                v-model="decision.ballots[0].ballotTypeId"
+                toggle-color="primary"
+                :options="ballotTypeOptions"
+              />
+              <div v-else class="q-py-sm">{{ ballotTypeOptions.find(bt => bt.value === decision.ballots[0].ballotTypeId ).label }}</div>
+              <div class="q-py-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === decision.ballots[0].ballotTypeId ).description }}</div>
+            </div>
           </q-card-section>
-          <q-card-section v-else>
+        </q-card>
+      </div>
+      <div v-else class="q-pa-sm col-xs-12 col-md-6">
+        <q-card bordered>
+          <q-card-section>
             <div class="text-h5"><q-icon name="poll" /> Results</div>
             <div><q-icon name="alarm_off" class="text-negative" /> Decided on {{ prettyDate }}</div>
           </q-card-section>
@@ -153,7 +167,7 @@ export default {
 
         }
       },
-      decision: { ballots: [{}], includedUsers: [] },
+      decision: { ballots: [{ ballotTypeId: 1 }], includedUsers: [] },
       savedDecision: { ballots: [{}], includedUsers: [] },
       resultsList: [],
       allUsersList: [],
@@ -198,14 +212,6 @@ export default {
       const diff = (new Date(this.decision.ballots[0].expirationDate) - Date.now()) / 1000
       if (diff < 0) { return true }
       return false
-    },
-
-    isOpen: function () {
-      if (!this.expired) {
-        return true
-      } else {
-        return false
-      }
     },
 
     prettyDate: function () {
@@ -267,7 +273,7 @@ export default {
   },
 
   methods: {
-    async setInitialMode () {
+    setInitialMode () {
       if (this.id === 'new') {
         this.mode = 'create'
         this.isLoaded = true
@@ -275,6 +281,13 @@ export default {
         this.mode = 'view'
         this.getDecision()
       }
+    },
+
+    isMode (mode) {
+      if (this.mode === mode) {
+        return true
+      }
+      return false
     },
 
     async getDecision () {
