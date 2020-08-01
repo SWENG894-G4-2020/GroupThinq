@@ -24,7 +24,7 @@
         </div>
       </div>
         <div class="text-caption text-grey-7 q-pa-sm">{{filteredDecisions.length}} decisions found</div>
-        <div class="text-h5 text-primary text-center" v-if="decisionList.length == 0">No decisions? Make a new one!</div>
+        <div class="text-h5 text-primary text-center" v-if="decisionList.length == 0">No decisions? Make a new one! <q-btn icon="add" color="primary" label="Decision" to="/decisions/new"/></div>
         <div class="row q-mt-md">
           <DecisionSummaryCard
             v-for="(decision, idx) in filteredDecisions"

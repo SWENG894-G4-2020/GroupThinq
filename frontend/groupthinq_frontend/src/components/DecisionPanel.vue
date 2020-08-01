@@ -92,13 +92,21 @@
           </q-card-section>
         </q-card>
       </div>
+      <div v-if="!expired && mode === 'view'" class="q-pa-sm col-xs-12 col-md-6">
+        <q-card bordered>
+          <q-card-section>
+            <div class="text-h5"><q-icon name="psychology" /> Groupthinq Brain&trade;</div>
+            <div>Perdiction: Option 1</div>
+          </q-card-section>
+        </q-card>
+      </div>
       <div class="q-pa-sm col-xs-12 col-md-6">
-      <q-card v-if="!expired && mode === 'view'" bordered>
-        <q-card-section>
-          <div class="text-h5"><q-icon name="psychology" /> Groupthinq Brain&trade;</div>
-          <div>Perdiction: Option 1</div>
-        </q-card-section>
-      </q-card>
+        <q-card bordered>
+          <q-card-section>
+            <div class="text-h5"><q-icon name="psychology" /> Actions</div>
+            <div>Perdiction: Option 1</div>
+          </q-card-section>
+        </q-card>
       </div>
     </div>
     <div v-else-if="!isError">
