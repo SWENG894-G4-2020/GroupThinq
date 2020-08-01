@@ -2,6 +2,8 @@ package org.psu.edu.sweng.capstone.backend.controller;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +22,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
+import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.format.support.FormattingConversionService;
@@ -34,6 +43,9 @@ class BallotControllerTest {
 
 	@InjectMocks
 	private BallotController ballotController;
+	
+	@Mock
+	private BallotDAO ballotDao;
 	
 	@Mock
 	private BallotService ballotService;
@@ -100,11 +112,19 @@ class BallotControllerTest {
 	
 	@Test
 	void retrieveResults_callsRightServiceFunction() throws Exception {
+		// given
+		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+		Decision testDecision = new Decision("Test Decision", testUser);
+		BallotType testBallotType = new BallotType(1L, "Single-Choice");
+		Ballot testBallot = new Ballot(testDecision, testBallotType, new Date(1337));
+		testBallot.setId(1L);
+
 		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
 		mockMvc.perform(get("/ballot/{id}/results", BALLOT_ID)).andExpect(status().isOk());
 		
 		// then
-		verify(ballotService, times(1)).retrieveResults(BALLOT_ID);
+		verify(ballotService, times(1)).retrieveSingleChoiceResults(testBallot);
 	}
 	
 	@Test

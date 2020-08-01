@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
-import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 import org.psu.edu.sweng.capstone.backend.model.User;
 
 import java.util.Date;
@@ -17,7 +17,7 @@ public class BallotResultDTOTest {
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
     private Ballot ballot = new Ballot(null, null, new Date(1337L));
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
-    private BallotResult ballotResult = new BallotResult(ballot, ballotOption, USER);
+    private BallotVote ballotResult = new BallotVote(ballot, ballotOption, USER);
     private BallotResultDTO testDTO;
 
     @BeforeEach
@@ -62,7 +62,7 @@ public class BallotResultDTOTest {
     @Test
     void build_handlesNullsProperly() {
         // given
-        BallotResult testResult = new BallotResult(null, null, null);
+        BallotVote testResult = new BallotVote(null, null, null);
         testResult.setRank(null);
         testResult.setVoteDate(null);
         // when
