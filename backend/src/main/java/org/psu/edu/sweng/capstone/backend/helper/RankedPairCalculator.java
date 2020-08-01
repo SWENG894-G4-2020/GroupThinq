@@ -1,33 +1,42 @@
 package org.psu.edu.sweng.capstone.backend.helper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedPairWinnerDAO;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.BallotOption;
+import org.psu.edu.sweng.capstone.backend.model.RankedPairWinner;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RankedPairCalculator {
 	
+	@Autowired
+	private BallotOptionDAO ballotOptionDao;
+	
+	@Autowired
+	private RankedPairWinnerDAO rankedPairWinnerDao;
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RankedPairCalculator.class);
 	
-	public Long runAlgorithm(List<Long> options, List<ArrayList<Long>> votes) {
-		ArrayList<UniquePair> uniquePairs = createUniquePairs(options);
-		ArrayList<RankedPairWinner> winners = determinePairWinners(uniquePairs, votes);
-		ArrayList<UniquePair> lockedWinners = sortAndLockWinners(winners);
-		
-		return calculateWinner(lockedWinners, options.size());
+	public Long runAlgorithm(final Ballot ballot, final List<Long> options, final List<ArrayList<Long>> votes) {	
+		determinePairWinners(ballot, createUniquePairs(options), votes);
+		return calculateWinner(sortAndLockWinners(ballot), options.size());
 	}
 
 	/** Creates unique pairs based upon the a list of Ballot Options.
 	 * @param options The list of Ballot options (sorted alphabetically).
 	 */
-	private static ArrayList<UniquePair> createUniquePairs(List<Long> options) {
+	private ArrayList<UniquePair> createUniquePairs(final List<Long> options) {
 		ArrayList<UniquePair> uniquePairs = new ArrayList<>();
 		
 		for (int x = 0; x < options.size(); x++) {
@@ -57,15 +66,16 @@ public class RankedPairCalculator {
 	 * @param votes A list of all the votes casted.
 	 * @return A HashMap containing the winning difference between one unique pair.
 	 */
-	private static ArrayList<RankedPairWinner> determinePairWinners(ArrayList<UniquePair> uniquePairs, List<ArrayList<Long>> votes) {
+	private void determinePairWinners(final Ballot ballot, final ArrayList<UniquePair> uniquePairs, final List<ArrayList<Long>> votes) {
+		
 		ArrayList<RankedPairWinner> winners = new ArrayList<>();
 		
 		uniquePairs.forEach(pair -> {			
 			int firstOptionTallies = 0;
 			int secondOptionTallies = 0;
 			
-			Long firstOption = pair.getOptionOne();
-			Long secondOption = pair.getOptionTwo();
+			final Long firstOption = pair.getOptionOne();
+			final Long secondOption = pair.getOptionTwo();
 			
 			for (ArrayList<Long> vote : votes) {
 				int firstOptionIndex = 0;
@@ -89,18 +99,26 @@ public class RankedPairCalculator {
 				}
 			}
 			
-			Long winningOption = (firstOptionTallies > secondOptionTallies) ? firstOption : secondOption;
+			boolean firstOptionWins = false;
+			if (firstOptionTallies > secondOptionTallies) { firstOptionWins = true; }
 			
-			int difference = (winningOption.equals(firstOption) ? 
-					(firstOptionTallies - secondOptionTallies) : (secondOptionTallies - firstOptionTallies));
+			final Long winningOption = (firstOptionWins) ? firstOption : secondOption;
+			final Long losingOption = (firstOptionWins) ? secondOption : firstOption;
+			final int margin = (firstOptionWins) ? (firstOptionTallies - secondOptionTallies) : (secondOptionTallies - firstOptionTallies);
 			
-			winners.add(new RankedPairWinner(pair, winningOption, difference));
+			Optional<BallotOption> winningBallotOption = ballotOptionDao.findById(winningOption);
+			Optional<BallotOption> losingBallotOption = ballotOptionDao.findById(losingOption);
+			
+			if (winningBallotOption.isPresent() && losingBallotOption.isPresent()) {
+				RankedPairWinner rpw = new RankedPairWinner(ballot, winningBallotOption.get(), losingBallotOption.get(), Long.valueOf(margin));
+				winners.add(rpw);
+			}
 		});
 		
-		winners.forEach(winner -> LOGGER.info("Winner between {} is {} by a margin of {} votes.", 
-				winner.getUniquePair(), winner.getWinningOption(), winner.getVoteDifference()));
+		winners.forEach(winner -> LOGGER.info("Winner is {} over {} by a margin of {} votes.", 
+				winner.getWinner(), winner.getLoser(), winner.getMargin()));
 		
-		return winners;
+		rankedPairWinnerDao.saveAll(winners);
 	}
 	
 	/** Sorts and locks the winners of the one on one matchups for each unique pair. 
@@ -109,28 +127,22 @@ public class RankedPairCalculator {
 	 * @return A list of the locked winners, sorted in order.
 	 */
 	@SuppressWarnings("unchecked")
-	private static ArrayList<UniquePair> sortAndLockWinners(ArrayList<RankedPairWinner> winners) {	
-		Collections.sort(winners, (RankedPairWinner r1, RankedPairWinner r2) -> r2.getVoteDifference() - r1.getVoteDifference());
+	private ArrayList<UniquePair> sortAndLockWinners(final Ballot ballot) {
+		ArrayList<RankedPairWinner> winners = rankedPairWinnerDao.findAllByBallotOrderByMarginDesc(ballot);
 		
 		ArrayList<UniquePair> lockedGraph = new ArrayList<>();
 		
 		winners.forEach(winner -> {
-			Long winningOption;
-			Long losingOption;
-			
 			ArrayList<UniquePair> potentialGraph = (ArrayList<UniquePair>) lockedGraph.clone();
 			
-			if (winner.getWinningOption().equals(winner.getUniquePair().getOptionTwo())) {
-				winningOption = winner.getWinningOption();
-				losingOption = winner.getUniquePair().getOptionOne();
-			} else {
-				winningOption = winner.getUniquePair().getOptionOne();
-				losingOption = winner.getUniquePair().getOptionTwo();
-			}
-
-			potentialGraph.add(new UniquePair(winningOption, losingOption));
-			if (isAcyclic(potentialGraph)) { lockedGraph.add(new UniquePair(winningOption, losingOption)); }
-
+			final Long winningOption = winner.getWinner().getId();
+			final Long losingOption = winner.getLoser().getId();
+			
+			UniquePair up = new UniquePair(winningOption, losingOption);
+			
+			potentialGraph.add(up);
+			
+			if (isAcyclic(potentialGraph)) { lockedGraph.add(up); }
 		});
 		
 		LOGGER.info("Locked in:");
@@ -145,7 +157,7 @@ public class RankedPairCalculator {
 	 * @param optionListSize An integer containing the list size of all ballot options.
 	 * @return The winning Ballot Option
 	 */
-	private static Long calculateWinner(ArrayList<UniquePair> lockedWinners, int optionListSize) {
+	private Long calculateWinner(final ArrayList<UniquePair> lockedWinners, int optionListSize) {
 		List<Long> sourceList = new ArrayList<>();
 		List<Long> uniqueDestinations = new ArrayList<>();
 		
@@ -173,7 +185,7 @@ public class RankedPairCalculator {
 	 * @return If graph is acyclic (does not contain any cycles)
 	 */
 	@SuppressWarnings("unchecked")
-	private static boolean isAcyclic(ArrayList<UniquePair> graph) {
+	private boolean isAcyclic(final ArrayList<UniquePair> graph) {
 		// A Graph containing 0 or 1 edges is by nature acyclic
 		if (graph.isEmpty() || graph.size() == 1) { return true; }
 
@@ -195,7 +207,7 @@ public class RankedPairCalculator {
 	 * @param graph The graph for which a leaf node should be found from.
 	 * @return An Optional containing a String of a leaf node, if it exists.
 	 */
-	private static Optional<Long> findLeaf(ArrayList<UniquePair> graph) {
+	private Optional<Long> findLeaf(final ArrayList<UniquePair> graph) {
 		// A leaf is a node which has incoming edges but no outgoing edges (ie. only a sink)
 		// First, collect all sources and sinks
 		Set<Long> sources = new HashSet<>();

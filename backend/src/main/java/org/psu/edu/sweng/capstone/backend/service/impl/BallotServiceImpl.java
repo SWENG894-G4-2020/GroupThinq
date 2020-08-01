@@ -243,12 +243,12 @@ public class BallotServiceImpl implements BallotService {
 				votes.add(vote);
 			});
 			
-			final Long winningBallotOptionId = rankedPairCalculator.runAlgorithm(ballotOptionIds, votes);
+			final Long winningBallotOptionId = rankedPairCalculator.runAlgorithm(ballot, ballotOptionIds, votes);
 			
 			final BallotOption ballotOptionWinner = ballotOptionDao.findById(winningBallotOptionId).orElseThrow(
 					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + winningBallotOptionId));
 			
-			RankedWinner winner = new RankedWinner(ballot, ballotOptionWinner);
+			final RankedWinner winner = new RankedWinner(ballot, ballotOptionWinner);
 			rankedWinnerDao.save(winner);
 			
 			response.getData().add(winner.getWinner().getTitle());
