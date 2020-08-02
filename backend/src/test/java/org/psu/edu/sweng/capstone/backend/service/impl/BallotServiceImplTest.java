@@ -21,16 +21,21 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
+import org.psu.edu.sweng.capstone.backend.helper.RankedPairCalculator;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
+import org.psu.edu.sweng.capstone.backend.model.RankedWinner;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.springframework.security.access.AccessDeniedException;
@@ -51,13 +56,22 @@ class BallotServiceImplTest extends ServiceImplTest {
 	private BallotTypeDAO ballotTypeDao;
 	
 	@Mock
-	private BallotOptionDAO ballotOptionDao;
-	
-	@Mock
 	private BallotVoteDAO ballotVoteDao;
 	
 	@Mock
+	private RankedWinnerDAO rankedWinnerDao;
+	
+	@Mock
+	private BallotOptionDAO ballotOptionDao;
+	
+	@Mock
+	private DecisionUserDAO decisionUserDao;
+	
+	@Mock
 	private BallotOptionService ballotOptionService;
+	
+	@Mock
+	private RankedPairCalculator rankedPairCalculator;
 	
 	@InjectMocks
 	private BallotServiceImpl ballotServiceImpl;
@@ -268,8 +282,7 @@ class BallotServiceImplTest extends ServiceImplTest {
 	@Test
 	void retrieveSingleChoiceResults_happyPath() throws EntityNotFoundException {
 		// given
-		ArrayList<BallotVote> ballotResults = new ArrayList<>();
-		ballotResults.add(new BallotVote(testBallot, testBallotOption, testUser));
+		testBallot.getVotes().add(new BallotVote(testBallot, testBallotOption, testUser));
 		
 		// when
 		ResponseEntity<?> response = ballotServiceImpl.retrieveSingleChoiceResults(testBallot);
@@ -285,6 +298,46 @@ class BallotServiceImplTest extends ServiceImplTest {
 		
 		// then
 		assertGenericSuccess(response);
+	}
+	
+	@Test
+	void retrieveRankedChoiceResults_happyPath() throws EntityNotFoundException {
+		// given
+		DecisionUser du = new DecisionUser(testDecision, testUser);
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		duList.add(du);
+		testBallotOption.setId(0L);
+		
+		ArrayList<BallotVote> votes = new ArrayList<>();
+		votes.add(new BallotVote(testBallot, testBallotOption, testUser));
+		
+		// when
+		when(rankedWinnerDao.findByBallot(testBallot)).thenReturn(Optional.empty());
+		when(decisionUserDao.findAllByDecision(testBallot.getDecision())).thenReturn(duList);
+		when(ballotVoteDao.findAllByUserAndBallotOrderByRankAsc(du.getUser(), testBallot)).thenReturn(votes);
+		when(ballotOptionDao.findById(testBallotOption.getId())).thenReturn(Optional.of(testBallotOption));
+		ballotServiceImpl.retrieveRankedChoiceResults(testBallot);
+		
+		verify(rankedWinnerDao, times(1)).save(Mockito.any(RankedWinner.class));
+	}
+	
+	@Test
+	void retrieveRankedChoiceResults_rankedWinnerAlreadyExists() throws EntityNotFoundException {
+		// when
+		when(rankedWinnerDao.findByBallot(testBallot)).thenReturn(Optional.of(new RankedWinner(testBallot, testBallotOption)));
+		ballotServiceImpl.retrieveRankedChoiceResults(testBallot);
+		
+		verify(rankedPairCalculator, times(0)).runAlgorithm(testBallot, new ArrayList<Long>(), new ArrayList<ArrayList<Long>>());
+	}
+	
+	@Test
+	void retrieveRankedChoiceResults_ballotOptionDoesNotExist() throws EntityNotFoundException {
+		// when
+		when(rankedWinnerDao.findByBallot(testBallot)).thenReturn(Optional.empty());
+		when(ballotOptionDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+		
+		// then
+		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.retrieveRankedChoiceResults(testBallot); });
 	}
 	
 	@Test

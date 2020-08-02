@@ -217,15 +217,10 @@ public class BallotServiceImpl implements BallotService {
 	}
 
 	@Override
-	public ResponseEntity<String> retrieveRankedChoiceResults(final Ballot ballot) {
-		ResponseEntity<String> response = new ResponseEntity<>();
-		
+	public void retrieveRankedChoiceResults(final Ballot ballot) throws EntityNotFoundException {
 		Optional<RankedWinner> rankedWinner = rankedWinnerDao.findByBallot(ballot);
 		
-		if (rankedWinner.isPresent()) {
-			response.getData().add(rankedWinner.get().getWinner().getTitle());
-		}
-		else {
+		if (!rankedWinner.isPresent()) {
 			List<Long> ballotOptionIds = new ArrayList<>();
 			List<ArrayList<Long>> votes = new ArrayList<>();
 
@@ -243,11 +238,13 @@ public class BallotServiceImpl implements BallotService {
 				votes.add(vote);
 			});
 			
-			response.getData().add(rankedPairCalculator.runAlgorithm(ballotOptionIds, votes).toString());
+			final Long winningBallotOptionId = rankedPairCalculator.runAlgorithm(ballot, ballotOptionIds, votes);
+			
+			final BallotOption ballotOptionWinner = ballotOptionDao.findById(winningBallotOptionId).orElseThrow(
+					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + winningBallotOptionId));
+			
+			final RankedWinner winner = new RankedWinner(ballot, ballotOptionWinner);
+			rankedWinnerDao.save(winner);
 		}
-		
-		response.attachGenericSuccess();
-		
-		return response;
 	}
 }

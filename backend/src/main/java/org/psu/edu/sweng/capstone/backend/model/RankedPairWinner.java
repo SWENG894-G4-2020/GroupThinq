@@ -33,6 +33,8 @@ public class RankedPairWinner {
 	@Column(name = "MARGIN")
 	private Long margin;
 	
+	protected RankedPairWinner() {}
+	
 	public RankedPairWinner(Ballot ballot, BallotOption winner, BallotOption loser, Long margin) {
 		this.ballot = ballot;
 		this.winner = winner;

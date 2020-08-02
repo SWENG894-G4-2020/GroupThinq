@@ -59,7 +59,7 @@ public class BallotOptionTest {
     }
 
     @Test
-    void defaultConstructor_worksProperly(){
+    void defaultConstructor_worksProperly() {
         BallotOption ballotOption = new BallotOption();
 
         assertNull(ballotOption.getId());
@@ -67,5 +67,10 @@ public class BallotOptionTest {
         assertNull(ballotOption.getTitle());
         assertNull(ballotOption.getUpdatedDate());
         assertNull(ballotOption.getUser());
+    }
+    
+    @Test
+    void toString_returnsTitle() {
+    	assertEquals(ballotOption.getTitle(), ballotOption.toString());
     }
 }

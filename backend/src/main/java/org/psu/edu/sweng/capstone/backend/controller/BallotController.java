@@ -3,13 +3,16 @@ package org.psu.edu.sweng.capstone.backend.controller;
 import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.enumeration.BallotTypeEnum;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.dto.RankedWinnerDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.RankedWinner;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +34,12 @@ public class BallotController {
 
 	@Autowired
 	private BallotDAO ballotDao;
-	
+		
 	@Autowired
 	private BallotService ballotService;
+	
+	@Autowired
+	private RankedWinnerDAO rankedWinnerDao;
 	
 	@Autowired
 	private BallotOptionService ballotOptionService;
@@ -85,7 +91,17 @@ public class BallotController {
 			return ballotService.retrieveSingleChoiceResults(ballot);
 		}
 		else {
-			return ballotService.retrieveRankedChoiceResults(ballot);
+			ResponseEntity<RankedWinnerDTO> response = new ResponseEntity<>();
+			
+			ballotService.retrieveRankedChoiceResults(ballot);
+			
+			final RankedWinner rankedWinner = rankedWinnerDao.findByBallot(ballot).orElseThrow(
+					() -> new EntityNotFoundException("Ranked Winner from Ballot " + ballot.getId()));
+			
+			response.attachGenericSuccess();
+			response.getData().add(RankedWinnerDTO.build(rankedWinner.getBallot(), rankedWinner.getWinner()));
+			
+			return response;
 		}
 	}
 	

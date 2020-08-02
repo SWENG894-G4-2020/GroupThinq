@@ -36,14 +36,13 @@ public class RankedWinnerId implements Serializable {
         	return true;
         }
         
-        if (!(o instanceof UserRoleId)) {
+        if (!(o instanceof RankedWinnerId)) {
         	return false;
         }
         
-        UserRoleId userRoleId = (UserRoleId) o;
+        RankedWinnerId rankedWinnerId = (RankedWinnerId) o;
         
-        return (Objects.equals(this.getWinner(), userRoleId.getRole()) &&
-        		Objects.equals(this.getBallot(), userRoleId.getUser()));
+        return (Objects.equals(this.getWinner(), rankedWinnerId.getWinner()) &&
+        		Objects.equals(this.getBallot(), rankedWinnerId.getBallot()));
 	}
-
 }
