@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { date } from 'quasar'
 
 export default {
   name: 'ExpirationField',
@@ -68,9 +69,15 @@ export default {
 
   mounted () {
     if (this.initialDate) {
-      this.initalizeDate()
+      this.datetime = date.formatDate(new Date(this.initialDate), 'YYYY/MM/DD HH:mm')
     }
     this.calculateRemainingTime()
+  },
+
+  watch: {
+    initialDate: function (newDate, oldDate) {
+      this.datetime = date.formatDate(new Date(this.initialDate), 'YYYY/MM/DD HH:mm')
+    }
   },
 
   computed: {
@@ -86,23 +93,6 @@ export default {
   },
 
   methods: {
-    initalizeDate () {
-      const date = new Date(this.initalizeDate)
-      let month = date.getMonth + 1
-      if (month < 10) { month = '0' + month }
-
-      let day = date.getDate
-      if (day < 10) { day = '0' + day }
-
-      let hours = date.getHours
-      if (hours < 10) { hours = '0' + hours }
-
-      let minutes = date.getMinutes
-      if (minutes < 10) { minutes = '0' + minutes }
-
-      this.datetime = `${date.getFullYear}/${month}/${day} ${hours}:${minutes}`
-    },
-
     isExpired () {
       return this.expired
     },

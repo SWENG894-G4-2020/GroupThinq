@@ -2,7 +2,7 @@
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pb-sm">
       <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
-      <ExpirationField v-bind:mode="mode" ref="datetime" @expired="setExpired"/>
+      <ExpirationField v-bind:mode="mode" v-bind:showTimer="showTimer" v-bind:initialDate="initialDate" ref="datetime" @expired="setExpired"/>
       <div class="q-mt-sm">
         <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
         <q-btn-toggle
@@ -69,7 +69,8 @@ export default {
       ],
       newOption: { title: '', userName: this.currentUserName },
       options: [],
-      expired: false
+      expired: false,
+      initialDate: ''
     }
   },
 
@@ -88,15 +89,41 @@ export default {
   mounted () {
     this.currentUserName = auth.getTokenData().sub
     this.newOption.userName = this.currentUserName
+
+    this.resetForm()
+
+    if (this.decision) {
+      this.populateWithDecision()
+    }
   },
 
   computed: {
     sortedOptions: function () {
       return this.options
+    },
+
+    showTimer: function () {
+      if (this.mode === 'view') {
+        return true
+      }
+      return false
     }
   },
 
   methods: {
+    resetForm () {
+      this.initialDate = ''
+      this.ballotTypeId = 1
+      this.options = []
+      this.newOption = { title: '', userName: this.currentUserName }
+    },
+
+    populateWithDecision () {
+      this.initialDate = this.decision.ballots[0].expirationDate
+      this.ballotTypeId = this.decision.ballots[0].ballotTypeId
+      this.decision.ballots[0].ballotOptions.forEach(option => this.options.push(option))
+    },
+
     addDecisionOption () {
       if (this.newOption.title !== '') {
         this.options.push({ title: this.newOption.title, userName: this.currentUserName })
@@ -126,9 +153,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.q-field--readonly .q-field__control:before {
-    border-bottom-style: none !important;
-}
-</style>

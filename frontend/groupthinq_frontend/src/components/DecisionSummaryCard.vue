@@ -26,7 +26,7 @@
     </q-card-section>
     <q-card-section class="q-py-xs col-grow">
       <div v-if="!expired"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
-      <div v-else><q-icon name="alarm_off" class="text-negative" /> {{ prettyDate }}</div>
+      <div><q-icon v-if="expired" name="alarm_off" class="text-negative" /> {{ prettyDate }}</div>
     </q-card-section>
     <q-card-actions vertical >
       <q-btn
@@ -52,6 +52,7 @@
 
 <script>
 import auth from 'src/store/auth'
+import { date } from 'quasar'
 
 export default {
   name: 'DecisionSummaryCard',
@@ -65,6 +66,18 @@ export default {
       minutesRemaining: '',
       secondsRemaining: ''
     }
+  },
+
+  props: {
+    decision: {
+      type: Object,
+      required: true
+    }
+  },
+
+  mounted () {
+    this.currentUserName = auth.getTokenData().sub
+    this.calculateRemainingTime()
   },
 
   computed: {
@@ -83,7 +96,7 @@ export default {
     },
 
     prettyDate: function () {
-      return new Date(this.decision.ballots[0].expirationDate).toLocaleString()
+      return date.formatDate(new Date(this.decision.ballots[0].expirationDate), 'YYYY/MM/DD HH:mm')
     },
 
     overUsers: function () {
@@ -101,18 +114,6 @@ export default {
         return this.decision.includedUsers
       }
     }
-  },
-
-  props: {
-    decision: {
-      type: Object,
-      required: true
-    }
-  },
-
-  mounted () {
-    this.currentUserName = auth.getTokenData().sub
-    this.calculateRemainingTime()
   },
 
   methods: {

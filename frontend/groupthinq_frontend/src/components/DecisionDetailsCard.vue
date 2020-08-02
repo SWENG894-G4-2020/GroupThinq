@@ -79,7 +79,7 @@ export default {
     this.resetForm()
 
     if (this.decision) {
-      this.populateWithDecision(this.decision)
+      this.populateWithDecision()
     }
   },
 
@@ -100,9 +100,11 @@ export default {
       this.selectedUsers = []
     },
 
-    populateWithDecision (decision) {
+    populateWithDecision () {
       this.name = this.decision.name
-      this.description = this.decision.description
+      if (this.decision.description) {
+        this.description = this.decision.description
+      }
       this.decision.includedUsers.forEach(user => this.selectedUsers.push(user.userName))
     },
 
@@ -126,9 +128,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.q-field--readonly .q-field__control:before {
-    border-bottom-style: none !important;
-}
-</style>

@@ -43,6 +43,7 @@
           v-for="navLink in navLinks"
           :key="navLink.title"
           v-bind="navLink"
+          :name="navLink.name"
         />
       </q-list>
     </q-drawer>
@@ -73,31 +74,36 @@ export default {
           title: 'Decisions',
           caption: 'See your decisions',
           icon: 'poll',
-          link: '/main'
+          link: '/main',
+          name: 'nav-decisions'
         },
         {
           title: 'New Decision',
           caption: 'Create a New Decision',
           icon: 'add_chart',
-          link: '/decisions/new'
+          link: '/decisions/new',
+          name: 'nav-new'
         },
         {
           title: 'Users',
           caption: 'View all users',
           icon: 'face',
-          link: '/main/users'
+          link: '/main/users',
+          name: 'nav-users'
         },
         {
           title: 'My Account',
           caption: 'View and edit your account information',
           icon: 'assignment_ind',
-          link: '/main/account'
+          link: '/main/account',
+          name: 'nav-account'
         },
         {
           title: 'Help',
           caption: 'Find help on using Groupthinq',
           icon: 'help_outline',
-          link: '/main/help'
+          link: '/main/help',
+          name: 'nav-help'
         }
       ]
     }

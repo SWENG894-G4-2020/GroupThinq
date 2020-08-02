@@ -54,8 +54,7 @@ export default {
       mode: 'create',
       submitting: false,
       submissionValid: true,
-      isError: false,
-      decision: {}
+      isError: false
     }
   },
 
@@ -102,6 +101,5 @@ export default {
       }
     }
   }
-
 }
 </script>
