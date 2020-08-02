@@ -6,35 +6,36 @@
       <div class="q-mt-sm">
         <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
         <q-btn-toggle
+          name="ballot-type"
           v-if="mode === 'create'"
           spread
           v-model="ballotTypeId"
           toggle-color="primary"
           :options="ballotTypeOptions"
         />
-        <div v-else class="q-py-sm">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).label }}</div>
-        <div class="q-py-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).description }}</div>
+        <div v-else class="q-pt-sm">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).label }}</div>
+        <div class="q-pb-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).description }}</div>
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
       <div class="text-grey-8" style="font-size: 16px"> Ballot choices</div>
-      <q-input class="q-mb-md" v-model="newOption.title" label="Add Choice" >
+      <q-input class="q-mb-md" v-model="newOption.title" label="Add Choice" name="ballot-option-name">
         <template v-slot:append>
-          <q-btn dense color="positive" icon="add" @click="addDecisionOption()" />
+          <q-btn dense color="positive" icon="add" @click="addDecisionOption()" name="ballot-option-add"/>
         </template>
       </q-input>
       <div class="column">
         <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm" style="width: 100%">
-          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.rank" />
+          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.rank" name="ballot-option-votecheck"/>
           <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
           <span class="text-body1 col-grow">{{option.title}}</span>
-          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="removeDecisionOption(option)" />
-          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="removeDecisionOption(option)" />
-          <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" />
+          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="removeDecisionOption(option)" name="ballot-option-rankup"/>
+          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="removeDecisionOption(option)" name="ballot-option-rankdown"/>
+          <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" name="ballot-option-delete"/>
         </div>
       </div>
       <div class="row reverse q-gutter-sm">
-        <q-btn v-if="!expired && mode === 'view'" icon="check" color="primary" label="Vote" />
+        <q-btn v-if="!expired && mode === 'view'" icon="check" color="primary" label="Vote" name="ballot-vote"/>
       </div>
     </q-card-section>
   </q-card>

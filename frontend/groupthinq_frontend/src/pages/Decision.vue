@@ -17,8 +17,8 @@
           A new decision requires a title, valid expiration date, and at least one option.
         </q-banner>
         <div class="row q-gutter-sm">
-          <q-btn icon="arrow_back" color="primary" label="Back" to="/main" />
-          <q-btn icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" />
+          <q-btn icon="arrow_back" color="primary" label="Back" to="/main" name="decision-back"/>
+          <q-btn icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
         </div>
       </div>
       <q-dialog v-model="deleteDecisionDialog" persistent>
@@ -28,8 +28,8 @@
             <div class="text-red-6"> This action cannot be undone!</div>
           </q-card-section>
           <q-card-actions align="right">
-            <q-btn label="cancel" @click="deleteDecisionDialog = false" />
-            <q-btn color="negative" @click="onConfirmDelete()" label="Confirm Deletion" />
+            <q-btn label="cancel" @click="deleteDecisionDialog = false" name="decision-delete-cancel"/>
+            <q-btn color="negative" @click="onConfirmDelete()" label="Confirm Deletion" name="decision-delete-confirm"/>
           </q-card-actions>
         </q-card>
       </q-dialog>

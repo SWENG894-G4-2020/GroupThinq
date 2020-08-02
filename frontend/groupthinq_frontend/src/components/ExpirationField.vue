@@ -14,12 +14,12 @@
               <q-card class="date-picker">
                 <q-card-section>
                   <div class="q-gutter-sm row justify-center">
-                    <q-date today-btn v-model="datetime" mask="YYYY/MM/DD HH:mm" default-year-month="2020/08" />
-                    <q-time now-btn v-model="datetime" mask="YYYY/MM/DD HH:mm" />
+                    <q-date today-btn v-model="datetime" mask="YYYY/MM/DD HH:mm" default-year-month="2020/08" name="expiration-date" />
+                    <q-time now-btn v-model="datetime" mask="YYYY/MM/DD HH:mm" name="expiration-time" />
                   </div>
                 </q-card-section>
                 <q-card-actions align="right">
-                  <q-btn color="positive" @click="closeDatetimeDialog()" label="Confirm" />
+                  <q-btn color="positive" @click="closeDatetimeDialog()" label="Confirm" name="expiration-confirm"/>
                 </q-card-actions>
               </q-card>
           </q-dialog>
