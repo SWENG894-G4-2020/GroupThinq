@@ -57,14 +57,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     	
         String secret = System.getenv().get("JWT_SECRET");
         Long exp = Long.parseLong(System.getenv().get("JWT_EXP"));
-        String role = "user";
+        String role = "User";
         if(((User) auth.getPrincipal()).getAuthorities().size() > 0){
             role = ((User) auth.getPrincipal()).getAuthorities().iterator().next().getAuthority();
         }
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + exp))
-                .withClaim("JWT_ROLE", role)
+                .withClaim("role", role)
                 .sign(HMAC512(secret.getBytes()));
         
         res.addHeader("Authorization", "Bearer " + token);
