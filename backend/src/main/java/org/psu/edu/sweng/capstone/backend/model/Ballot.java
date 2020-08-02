@@ -120,16 +120,8 @@ public class Ballot {
 	public Set<BallotVote> getVotes() {
 		return votes;
 	}
-
-	public void setVotes(Set<BallotVote> results) {
-		this.votes = results;
-	}
-
+	
 	public Set<RankedPairWinner> getRankedPairWinners() {
 		return rankedPairWinners;
-	}
-
-	public void setRankedPairWinners(Set<RankedPairWinner> rankedPairWinners) {
-		this.rankedPairWinners = rankedPairWinners;
 	}
 }

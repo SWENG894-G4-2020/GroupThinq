@@ -1,5 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.controller;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,12 +24,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.BallotOption;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.RankedWinner;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
@@ -51,6 +56,9 @@ class BallotControllerTest {
 	private BallotService ballotService;
 	
 	@Mock
+	private RankedWinnerDAO rankedWinnerDao;
+	
+	@Mock
 	private BallotOptionService ballotOptionService;
 	
 	private MockMvc mockMvc;
@@ -59,11 +67,19 @@ class BallotControllerTest {
 	private static final BallotDTO BALLOT_DTO = new BallotDTO();
 	private static final BallotOptionDTO BALLOT_OPTION_DTO = new BallotOptionDTO();
 	private static final ArrayList<BallotResultDTO> BALLOT_RESULT_DTO = new ArrayList<>();
+	
+	private static final User TEST_USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+	private static final Decision TEST_DECISION = new Decision("Test Decision", TEST_USER);
+	private static final BallotType TEST_BALLOT_TYPE = new BallotType(2L, "Ranked-Pair");
+	private static Ballot testBallot = new Ballot(TEST_DECISION, TEST_BALLOT_TYPE, new Date(1337));
+	private static final BallotOption TEST_BALLOT_OPTION = new BallotOption("Title", testBallot, TEST_USER);
 
 	@BeforeEach
 	void setUp() {
 		FormattingConversionService bean = new FormattingConversionService();
 		mockMvc = standaloneSetup(ballotController).setConversionService(bean).build();
+		
+		testBallot.setId(1L);
 	}
 	
 	@Test
@@ -111,7 +127,7 @@ class BallotControllerTest {
 	}
 	
 	@Test
-	void retrieveResults_callsRightServiceFunction() throws Exception {
+	void retrieveResults_singleChoice_happyPath() throws Exception {
 		// given
 		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 		Decision testDecision = new Decision("Test Decision", testUser);
@@ -125,6 +141,37 @@ class BallotControllerTest {
 		
 		// then
 		verify(ballotService, times(1)).retrieveSingleChoiceResults(testBallot);
+	}
+	
+	@Test
+	void retrieveResults_singleChoice_ballotNotFound() throws Exception {
+		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.empty());
+		
+		// then
+		verify(ballotService, times(0)).retrieveSingleChoiceResults(testBallot);
+	    assertThrows(EntityNotFoundException.class, () -> { ballotController.retrieveResults(BALLOT_ID); });
+	}
+	
+	@Test
+	void retrieveResults_rankedChoice() throws Exception {
+		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
+		when(rankedWinnerDao.findByBallot(testBallot)).thenReturn(Optional.of(new RankedWinner(testBallot, TEST_BALLOT_OPTION)));
+		mockMvc.perform(get("/ballot/{id}/results", BALLOT_ID)).andExpect(status().isOk());
+		
+		// then
+		verify(ballotService, times(1)).retrieveRankedChoiceResults(testBallot);
+	}
+	
+	@Test
+	void retrieveResults_rankedChoice_notFound() throws Exception {
+		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
+		when(rankedWinnerDao.findByBallot(testBallot)).thenReturn(Optional.empty());
+		
+		// then
+	    assertThrows(EntityNotFoundException.class, () -> { ballotController.retrieveResults(BALLOT_ID); });
 	}
 	
 	@Test

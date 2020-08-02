@@ -25,6 +25,8 @@ class BallotTest {
 		testBallot.setExpirationDate(new Date(1337L));
 		testBallot.setCreatedDate(new Date(1111L));
 		testBallot.setUpdatedDate(new Date(2222L));
+		testBallot.setType(new BallotType(2L, "Ranked-Choice"));
+		
 		ballotOptions.add(ballotOption);
 		testBallot.setOptions(ballotOptions);
 	}
@@ -41,10 +43,13 @@ class BallotTest {
 	@Test
 	void getters_workProperly() {
 		assertEquals(1L, testBallot.getId());
+		assertEquals(0, testBallot.getRankedPairWinners().size());
+		assertEquals(0, testBallot.getVotes().size());
 		assertEquals("mboyer87", testBallot.getDecision().getOwnerId().getUserName());
 		assertEquals(new Date(1337L), testBallot.getExpirationDate());
 		assertEquals(new Date(1111L), testBallot.getCreatedDate());
 		assertEquals(new Date(2222L), testBallot.getUpdatedDate());
+		assertEquals("Ranked-Choice", testBallot.getType().getName());
 		assertEquals(ballotOption, testBallot.getOptions().toArray()[0]);
 	}
 	
@@ -55,9 +60,11 @@ class BallotTest {
 		testBallot.setCreatedDate(new Date(3333L));
 		testBallot.setUpdatedDate(new Date(4444L));
 		testBallot.setExpirationDate(new Date(5555L));
+		testBallot.setType(new BallotType(1L, "Single-Choice"));
 		
 		assertNull(testBallot.getDecision().getOwnerId());
 		assertEquals(2L, testBallot.getId());
+		assertEquals(1L, testBallot.getType().getId());
 		assertEquals(new Date(3333L), testBallot.getCreatedDate());
 		assertEquals(new Date(4444L), testBallot.getUpdatedDate());
 		assertEquals(new Date(5555L), testBallot.getExpirationDate());
