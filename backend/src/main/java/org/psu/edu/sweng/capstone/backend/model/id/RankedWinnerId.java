@@ -45,5 +45,4 @@ public class RankedWinnerId implements Serializable {
         return (Objects.equals(this.getWinner(), rankedWinnerId.getWinner()) &&
         		Objects.equals(this.getBallot(), rankedWinnerId.getBallot()));
 	}
-
 }
