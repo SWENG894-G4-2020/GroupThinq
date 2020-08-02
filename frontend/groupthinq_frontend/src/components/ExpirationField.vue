@@ -107,10 +107,14 @@ export default {
       return this.expired
     },
 
-    isValid () {
-      const check = Date.parse(this.datetime)
+    checkValidDate (d) {
+      const check = Date.parse(d)
       if (check) { return true }
       return false
+    },
+
+    isValid () {
+      return this.checkValidDate(this.datetime)
     },
 
     closeDatetimeDialog () {
@@ -145,8 +149,18 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .q-field--readonly .q-field__control:before {
     border-bottom-style: none !important;
+}
+
+.date-picker {
+  min-width: 620px;
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .date-picker {
+    min-width: 375px;
+  }
 }
 </style>

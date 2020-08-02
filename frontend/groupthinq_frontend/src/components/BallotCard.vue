@@ -2,7 +2,7 @@
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pb-sm">
       <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
-      <ExpirationField v-bind:mode="mode" ref="datetime"/>
+      <ExpirationField v-bind:mode="mode" ref="datetime" @expired="setExpired"/>
       <div class="q-mt-sm">
         <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
         <q-btn-toggle
@@ -68,7 +68,8 @@ export default {
         }
       ],
       newOption: { title: '', userName: this.currentUserName },
-      options: []
+      options: [],
+      expired: false
     }
   },
 
@@ -106,6 +107,21 @@ export default {
     removeDecisionOption (option) {
       const pos = this.options.indexOf(option)
       this.options.splice(pos, 1)
+    },
+
+    getExpiration () {
+      return this.$refs.datetime.datetime
+    },
+
+    setExpired () {
+      this.expired = true
+    },
+
+    isValid () {
+      if (!this.$refs.datetime.isValid()) { return false }
+      if (!this.ballotTypeId || this.ballotTypeId === '' || this.ballotTypeId < 1 || this.ballotTypeId > 2) { return false }
+      if (this.options < 1) { return false }
+      return true
     }
   }
 }

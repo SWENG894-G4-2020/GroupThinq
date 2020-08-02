@@ -120,7 +120,7 @@ export default {
     },
 
     isValid () {
-      if (this.decision.name === '' || this.decision.length > 160) { return false }
+      if (this.name === '' || this.name.length > 160) { return false }
       return true
     }
   }
