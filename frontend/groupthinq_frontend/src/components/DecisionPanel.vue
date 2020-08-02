@@ -2,7 +2,7 @@
   <div class="q-pa-md full-width">
     <div v-if="isLoaded" class="row">
       <div class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered>
+        <q-card bordered style="height: 100%">
           <q-card-section>
             <div class="text-h5"><q-icon name="how_to_vote" /> Decision Details</div>
             <q-input
@@ -30,37 +30,7 @@
               v-model="decision.description"
               />
             </q-expansion-item>
-            <q-input
-            v-model="decision.ballots[0].expirationDate"
-            name="datetime-input"
-            label="When should voting close?"
-            :rules="[val => checkValidDate(val) || '*Valid Date Required']"
-            :readonly="(mode === 'create' || mode === 'edit') ? false : true"
-            mask="datetime"
-            hint="YYYY/MM/DD HH:mm">
-              <template v-if="(mode === 'create' || mode === 'edit')" v-slot:append>
-                <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
-                  <q-dialog v-model="pickDatetimeDialog">
-                      <q-card class="date-picker">
-                        <q-card-section>
-                          <div class="q-gutter-sm row justify-center">
-                            <q-date today-btn v-model="decision.ballots[0].expirationDate" mask="YYYY/MM/DD HH:mm" default-year-month="2020/08" />
-                            <q-time now-btn v-model="decision.ballots[0].expirationDate" mask="YYYY/MM/DD HH:mm" />
-                          </div>
-                        </q-card-section>
-                        <q-card-actions align="right">
-                          <q-btn color="positive" @click="closeDatetimeDialog()" label="Confirm" />
-                        </q-card-actions>
-                      </q-card>
-                  </q-dialog>
-                </q-icon>
-              </template>
-            </q-input>
           </q-card-section>
-        </q-card>
-      </div>
-      <div class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered style="height: 100%">
           <q-card-section>
             <div class="text-h5"><q-icon name="person" /> Participants</div>
             <q-select
@@ -79,12 +49,38 @@
           </q-card-section>
         </q-card>
       </div>
-      <div v-if="!expired" class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered>
-          <q-card-section>
+      <div v-if="!expired || mode === 'create'" class="q-pa-sm col-xs-12 col-md-6">
+        <q-card bordered style="height: 100%">
+          <q-card-section class="q-pb-sm">
             <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
+            <q-input
+            v-model="datetime"
+            name="datetime-input"
+            label="Voting end date"
+            :rules="[val => checkValidDate(val) || '*Valid Date Required']"
+            :readonly="(mode === 'create' || mode === 'edit') ? false : true"
+            mask="datetime"
+            hint="YYYY/MM/DD HH:mm">
+              <template v-if="(mode === 'create' || mode === 'edit')" v-slot:append>
+                <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
+                  <q-dialog v-model="pickDatetimeDialog">
+                      <q-card class="date-picker">
+                        <q-card-section>
+                          <div class="q-gutter-sm row justify-center">
+                            <q-date today-btn v-model="datetime" mask="YYYY/MM/DD HH:mm" default-year-month="2020/08" />
+                            <q-time now-btn v-model="datetime" mask="YYYY/MM/DD HH:mm" />
+                          </div>
+                        </q-card-section>
+                        <q-card-actions align="right">
+                          <q-btn color="positive" @click="closeDatetimeDialog()" label="Confirm" />
+                        </q-card-actions>
+                      </q-card>
+                  </q-dialog>
+                </q-icon>
+              </template>
+            </q-input>
             <div v-if="mode === 'view'"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s remaining</div>
-            <div>
+            <div class="q-mt-sm">
               <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
               <q-btn-toggle
                 v-if="mode === 'create'"
@@ -97,16 +93,31 @@
               <div class="q-py-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === decision.ballots[0].ballotTypeId ).description }}</div>
             </div>
           </q-card-section>
-          <q-card-section v-if="mode === 'create'">
-
-          </q-card-section>
-          <q-card-section v-else>
-
+          <q-card-section class="q-pt-none">
+            <div class="text-grey-8" style="font-size: 16px"> Ballot choices</div>
+            <q-input class="q-mb-md" v-model="newOption.title" label="Add Choice" >
+              <template v-slot:append>
+                <q-btn dense color="positive" icon="add" @click="addDecisionOption()" />
+              </template>
+            </q-input>
+            <div class="column">
+              <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm" style="width: 100%">
+                <q-checkbox v-if="decision.ballots[0].ballotTypeId === 1 && mode !== 'create'" v-model="option.rank" />
+                <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
+                <span class="text-body1 col-grow">{{option.title}}</span>
+                <q-btn v-if="decision.ballots[0].ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="removeDecisionOption(option)" />
+                <q-btn v-if="decision.ballots[0].ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="removeDecisionOption(option)" />
+                <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" />
+              </div>
+            </div>
+            <div class="row reverse q-gutter-sm">
+              <q-btn v-if="!expired && mode === 'view'" icon="check" color="primary" label="Vote" />
+            </div>
           </q-card-section>
         </q-card>
       </div>
       <div v-else class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered>
+        <q-card bordered style="height: 100%">
           <q-card-section>
             <div class="text-h5"><q-icon name="poll" /> Results</div>
             <div><q-icon name="alarm_off" class="text-negative" /> Decided on {{ prettyDate }}</div>
@@ -114,27 +125,32 @@
         </q-card>
       </div>
       <div v-if="!expired && mode === 'view'" class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered>
+        <q-card bordered style="height: 100%">
           <q-card-section>
             <div class="text-h5"><q-icon name="psychology" /> Groupthinq Brain&trade;</div>
             <div>Perdiction: Option 1</div>
           </q-card-section>
         </q-card>
       </div>
-      <div class="q-pa-sm col-xs-12 col-md-6">
-        <q-card bordered>
-          <q-card-section>
-            <div class="text-h5"><q-icon name="edit" /> Actions</div>
-            <div class="row reverse q-gutter-sm">
-              <q-btn v-if="!expired && mode === 'create'" icon="add" color="positive" label="Create" />
-              <q-btn v-if="!expired && mode === 'edit'" icon="check" color="positive" label="Confirm" />
-              <q-btn v-if="!expired && mode === 'view'" icon="edit" label="Edit" />
-              <q-btn v-if="!expired && (mode === 'view' || mode === 'edit')" icon="delete" color="negative" label="Delete" />
-              <q-btn v-if="!expired && mode === 'edit'" icon="clear" color="primary" label="Cancel" />
-              <q-btn v-if="!expired && mode === 'create'" icon="clear" label="Cancel" to="/main" />
-            </div>
-          </q-card-section>
-        </q-card>
+      <div class="q-pa-sm col-xs-12">
+        <q-banner v-if="!submissionValid" class="bg-red-1 q-my-sm">
+          <template v-slot:avatar>
+            <q-icon name="warning" color="negative" />
+          </template>
+          A new decision requires a title, valid expiration date, and at least one option.
+        </q-banner>
+        <div class="row reverse q-gutter-sm">
+          <q-btn v-if="mode === 'create'" icon="add" color="positive" label="Create" @click="onCreate()" :loading="submitting">
+            <template v-slot:loading>
+              <q-spinner />
+            </template>
+          </q-btn>
+          <q-btn v-if="!expired && mode === 'edit'" icon="check" color="positive" label="Confirm" />
+          <q-btn v-if="!expired && mode === 'view'" icon="edit" label="Edit" />
+          <q-btn v-if="!expired && (mode === 'view' || mode === 'edit')" icon="delete" color="negative" label="Delete" />
+          <q-btn v-if="!expired && mode === 'edit'" icon="clear" label="Cancel" />
+          <q-btn v-if="mode === 'create'" icon="clear" label="Cancel" to="/main" />
+        </div>
       </div>
     </div>
     <div v-else-if="!isError">
@@ -162,10 +178,11 @@ export default {
       errorMsg: '',
       currentUserName: '',
       mode: 'view',
-      voteMode: false,
-      decision: { ballots: [{ ballotTypeId: 1, ballotOptions: [] }], includedUsers: [] },
-      savedDecision: { ballots: [{ ballotTypeId: 1, ballotOptions: [] }], includedUsers: [] },
+      submissionValid: true,
+      decision: { ballots: [{ ballotTypeId: 1, ballotOptions: [] }], includedUsers: [{ userName: this.currentUserName }] },
+      savedDecision: { ballots: [{ ballotTypeId: 1, ballotOptions: [] }], includedUsers: [{ userName: this.currentUserName }] },
       newOption: { title: '', userName: this.currentUserName },
+      datetime: '',
       resultsList: [],
       allUsersList: [],
       filteredUsersList: [],
@@ -175,6 +192,7 @@ export default {
       hoursRemaining: '',
       minutesRemaining: '',
       secondsRemaining: '',
+      submitting: false,
       ballotTypeOptions: [
         {
           label: 'First Past the Post',
@@ -206,13 +224,13 @@ export default {
 
   computed: {
     expired: function () {
-      const diff = (new Date(this.decision.ballots[0].expirationDate) - Date.now()) / 1000
+      const diff = (new Date(this.datetime) - Date.now()) / 1000
       if (diff < 0) { return true }
       return false
     },
 
     prettyDate: function () {
-      return new Date(this.decision.ballots[0].expirationDate).toLocaleString()
+      return new Date(this.datetime).toLocaleString()
     },
 
     resultTotals: function () {
@@ -266,6 +284,10 @@ export default {
       })
       data.sort((a, b) => b.percentage - a.percentage)
       return data
+    },
+
+    sortedOptions: function () {
+      return this.decision.ballots[0].ballotOptions
     }
   },
 
@@ -297,6 +319,7 @@ export default {
 
         this.decision = response.data.data[0]
         this.decision.includedUsers.forEach((user) => this.selectedUsers.push(user.userName))
+        this.datetime = this.decision.ballots[0].expirationDate
 
         if (this.expired) {
           this.getResultsData()
@@ -318,7 +341,7 @@ export default {
 
     checkValidSubmit () {
       if (this.decision.name === '') { return false }
-      if (!this.checkValidDate(this.decision.ballots[0].expirationDate)) { return false }
+      if (!this.checkValidDate(this.datetime)) { return false }
       if (!this.decision.ballots[0].ballotTypeId || this.decision.ballots[0].ballotTypeId === '') { return false }
       if (this.decision.ballots[0].length < 1) { return false }
       return true
@@ -345,7 +368,7 @@ export default {
 
     addDecisionOption () {
       if (this.newOption.title !== '') {
-        this.decision.ballots[0].ballotOptions.push(this.newOption)
+        this.decision.ballots[0].ballotOptions.push({ title: this.newOption.title, userName: this.currentUserName })
         this.newOption = { title: '', userName: this.currentUserName }
       }
     },
@@ -402,17 +425,21 @@ export default {
         this.submissionValid = false
         return
       }
-
-      this.decision.ballots[0].expirationDate = new Date(this.newExpirationDate)
+      this.submitting = true
+      this.decision.ballots[0].expirationDate = new Date(this.datetime)
       this.selectedUsers.forEach((user) => this.decision.includedUsers.push({ userName: user }))
-      this.decision.ballots[0].ballotTypeId = this.ballotType
-      this.decision.ballots[0].ballotOptions = this.optionsList
+      this.decision.includedUsers.push({ userName: this.currentUserName })
+      this.decision.ownerUsername = this.currentUserName
 
-      console.log(this.newDecision)
+      console.log(this.decision)
 
       try {
-        await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
-        this.$emit('createClose')
+        const response = await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.decision)
+        this.decision = response.data.data[0]
+        this.selectedUsers = []
+        this.includedUsers.forEach((user) => this.selectedUsers.push(user.userName))
+        this.submitting = false
+        this.submissionValid = true
       } catch (error) {
         console.log(error)
         this.$emit('error')
