@@ -55,8 +55,8 @@ public class RankedPairCalculator {
 			}
 		}
 		
-		LOGGER.info("Unique Pairs:");
-		uniquePairs.forEach(pair -> LOGGER.info(pair.toString()));
+		LOGGER.debug("Unique Pairs:");
+		uniquePairs.forEach(pair -> LOGGER.debug(pair.toString()));
 		
 		return uniquePairs;
 	}
@@ -115,7 +115,7 @@ public class RankedPairCalculator {
 			}
 		});
 		
-		winners.forEach(winner -> LOGGER.info("Winner is {} over {} by a margin of {} votes.", 
+		winners.forEach(winner -> LOGGER.debug("Winner is {} over {} by a margin of {} votes.", 
 				winner.getWinner(), winner.getLoser(), winner.getMargin()));
 		
 		rankedPairWinnerDao.saveAll(winners);
@@ -145,8 +145,8 @@ public class RankedPairCalculator {
 			if (isAcyclic(potentialGraph)) { lockedGraph.add(up); }
 		});
 		
-		LOGGER.info("Locked in:");
-		lockedGraph.forEach(pair -> LOGGER.info("{} over {}", pair.getOptionOne(), pair.getOptionTwo()));
+		LOGGER.debug("Locked in:");
+		lockedGraph.forEach(pair -> LOGGER.debug("{} over {}", pair.getOptionOne(), pair.getOptionTwo()));
 		
 		return lockedGraph;
 	}
