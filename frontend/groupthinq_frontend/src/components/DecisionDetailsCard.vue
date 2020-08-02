@@ -13,11 +13,6 @@
       <q-input
       :readonly="(mode === 'create' || mode === 'edit') ? false : true"
       name="details-description"
-      autogrow
-      dense
-      clearable
-      class="text-body2 text-grey-5"
-      placeholder="No Details"
       v-model="description"
       label='Additional Details'
       hint='(Optional)'
@@ -124,6 +119,18 @@ export default {
     isValid () {
       if (this.name === '' || this.name.length > 160) { return false }
       return true
+    },
+
+    getRequestObject () {
+      const decision = {
+        ballots: [],
+        includedUsers: [{ userName: this.currentUserName }],
+        name: this.name,
+        description: this.description,
+        ownerUsername: this.currentUserName
+      }
+      this.selectedUsers.forEach(user => decision.includedUsers.push({ userName: user }))
+      return decision
     }
   }
 }

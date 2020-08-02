@@ -64,25 +64,13 @@ export default {
 
   methods: {
     buildDecision () {
-      const decision = {
-        ballots: [{
-          ballotTypeId: 1,
-          ballotOptions: [],
-          expirationDate: new Date(this.$refs.ballot.getExpiration())
-        }],
-        includedUsers: [{ userName: this.currentUserName }],
-        name: this.$refs.details.name,
-        description: this.$refs.details.description,
-        ownerUsername: this.currentUserName
-      }
-      this.$refs.details.selectedUsers.forEach(user => decision.includedUsers.push({ userName: user }))
-      this.$refs.ballot.options.forEach(option => decision.ballots[0].ballotOptions.push(option))
+      const decision = this.$refs.details.getRequestObject()
+      decision.ballots.push(this.$refs.ballot.getRequestObject())
       return decision
     },
 
     async onCreate () {
       if (!this.$refs.details.isValid() || !this.$refs.ballot.isValid()) {
-        console.log(this.buildDecision())
         this.submissionValid = false
         return
       }

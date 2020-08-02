@@ -25,7 +25,7 @@
         </template>
       </q-input>
       <div class="column">
-        <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm" style="width: 100%">
+        <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
           <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.rank" name="ballot-option-votecheck"/>
           <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
           <span class="text-body1 col-grow">{{option.title}}</span>
@@ -68,7 +68,7 @@ export default {
           description: 'Selects a single winner using votes that express preferences. Voters rank the choices.'
         }
       ],
-      newOption: { title: '', userName: this.currentUserName },
+      newOption: { title: '', userName: this.currentUserName, vote: false, rank: 999 },
       options: [],
       expired: false,
       initialDate: ''
@@ -116,7 +116,7 @@ export default {
       this.initialDate = ''
       this.ballotTypeId = 1
       this.options = []
-      this.newOption = { title: '', userName: this.currentUserName }
+      this.newOption = { title: '', userName: this.currentUserName, vote: false, rank: 999 }
     },
 
     populateWithDecision () {
@@ -127,14 +127,9 @@ export default {
 
     addDecisionOption () {
       if (this.newOption.title !== '') {
-        this.options.push({ title: this.newOption.title, userName: this.currentUserName })
-        this.newOption = { title: '', userName: this.currentUserName }
+        this.options.push({ title: this.newOption.title, userName: this.currentUserName, vote: false, rank: 999 })
+        this.newOption = { title: '', userName: this.currentUserName, vote: false, rank: 999 }
       }
-    },
-
-    removeDecisionOption (option) {
-      const pos = this.options.indexOf(option)
-      this.options.splice(pos, 1)
     },
 
     getExpiration () {
@@ -150,6 +145,16 @@ export default {
       if (!this.ballotTypeId || this.ballotTypeId === '' || this.ballotTypeId < 1 || this.ballotTypeId > 2) { return false }
       if (this.options < 1) { return false }
       return true
+    },
+
+    getRequestObject () {
+      const ballot = {
+        ballotTypeId: this.ballotTypeId,
+        ballotOptions: [],
+        expirationDate: new Date(this.getExpiration())
+      }
+      this.options.forEach(option => ballot.ballotOptions.push({ title: option.title, userName: this.currentUserName }))
+      return ballot
     }
   }
 }
