@@ -17,14 +17,22 @@
           A new decision requires a title, valid expiration date, and at least one option.
         </q-banner>
         <div class="row q-gutter-sm">
-          <q-btn icon="add" color="positive" label="Create" @click="onCreate()" :loading="submitting" :disabled="submitting">
-            <template v-slot:loading>
-              <q-spinner />
-            </template>
-          </q-btn>
-          <q-btn icon="clear" label="Cancel" to="/main" />
+          <q-btn icon="arrow_back" color="primary" label="Back" to="/main" />
+          <q-btn icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" />
         </div>
       </div>
+      <q-dialog v-model="deleteDecisionDialog" persistent>
+        <q-card>
+          <q-card-section class='column items-center'>
+            <div class="text-grey-8"> Are you sure you want to delete this decision?</div>
+            <div class="text-red-6"> This action cannot be undone!</div>
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn label="cancel" @click="deleteDecisionDialog = false" />
+            <q-btn color="negative" @click="onConfirmDelete()" label="Confirm Deletion" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
     <div v-else-if="!isError">
       <div class="text-h5 text-primary">Loading...
@@ -62,6 +70,7 @@ export default {
       isError: false,
       errorMsg: '',
       isLoaded: false,
+      deleteDecisionDialog: false,
       decision: {}
     }
   },
@@ -121,6 +130,17 @@ export default {
 
         this.submitting = false
         this.submissionValid = true
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
+    },
+
+    async onConfirmDelete () {
+      try {
+        await this.$axios.delete(`${process.env.BACKEND_URL}/decision/${this.decision.id}`)
+        this.deleteDecisionDialog = false
+        this.$router.push({ path: '/main' })
       } catch (error) {
         console.log(error)
         this.isError = true
