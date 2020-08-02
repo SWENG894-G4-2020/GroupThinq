@@ -1,26 +1,33 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
-import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
+import org.psu.edu.sweng.capstone.backend.helper.RankedPairCalculator;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
-import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
+import org.psu.edu.sweng.capstone.backend.model.RankedWinner;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
@@ -45,10 +52,19 @@ public class BallotServiceImpl implements BallotService {
 	private BallotTypeDAO ballotTypeDao;
 	
 	@Autowired
-	private BallotResultDAO ballotResultDao;
+	private BallotVoteDAO ballotVoteDao;
 	
 	@Autowired
 	private BallotOptionDAO ballotOptionDao;
+	
+	@Autowired
+	private RankedWinnerDAO rankedWinnerDao;
+	
+	@Autowired
+	private DecisionUserDAO decisionUserDao;
+	
+	@Autowired
+	private RankedPairCalculator rankedPairCalculator;
 	
 	@Autowired
 	private BallotOptionService ballotOptionService;
@@ -140,11 +156,11 @@ public class BallotServiceImpl implements BallotService {
 			final BallotOption ballotOption = ballotOptionDao.findById(vote.getBallotOptionId()).orElseThrow(
 					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + vote.getBallotOptionId()));
 			
-			BallotResult result = new BallotResult(ballot, ballotOption, user);
+			BallotVote result = new BallotVote(ballot, ballotOption, user);
 
 			if (vote.getRank() != null) { result.setRank(vote.getRank()); }
 			
-			ballotResultDao.save(result);
+			ballotVoteDao.save(result);
 		}
 				
 		response.attachCreatedSuccess();
@@ -163,7 +179,7 @@ public class BallotServiceImpl implements BallotService {
 			final User user = userDao.findByUserName(vote.getUserName()).orElseThrow(
 					() -> new EntityNotFoundException("User " + vote.getUserName()));		
 	
-			BallotResult result = ballotResultDao.findByUserAndBallot(user, ballot)
+			BallotVote result = ballotVoteDao.findByUserAndBallot(user, ballot)
 					.orElseThrow( () -> new EntityNotFoundException("Ballot Result with Ballot " + vote.getBallotId() +
 							", and User " + vote.getUserName()));
 			
@@ -176,7 +192,7 @@ public class BallotServiceImpl implements BallotService {
 				
 				if (vote.getRank() != null) { result.setRank(vote.getRank()); }
 				
-				ballotResultDao.save(result);
+				ballotVoteDao.save(result);
 			}
 			else {
 				throw new AccessDeniedException(BALLOT_OPTION_HEADER + vote.getBallotOptionId() + 
@@ -190,16 +206,45 @@ public class BallotServiceImpl implements BallotService {
 	}
 	
 	@Override
-	public ResponseEntity<BallotResultDTO> retrieveResults(final Long ballotId) throws EntityNotFoundException {
+	public ResponseEntity<BallotResultDTO> retrieveSingleChoiceResults(final Ballot ballot) throws EntityNotFoundException {
 		ResponseEntity<BallotResultDTO> response = new ResponseEntity<>();
 		
-		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
-				() -> new EntityNotFoundException(BALLOT_HEADER + ballotId));
-		
-		ballotResultDao.findAllByBallot(ballot).stream().forEach(br -> response.getData().add(BallotResultDTO.build(br)));
+		ballot.getVotes().forEach(br -> response.getData().add(BallotResultDTO.build(br)));
 		
 		response.attachGenericSuccess();
 		
 		return response;
+	}
+
+	@Override
+	public void retrieveRankedChoiceResults(final Ballot ballot) throws EntityNotFoundException {
+		Optional<RankedWinner> rankedWinner = rankedWinnerDao.findByBallot(ballot);
+		
+		if (!rankedWinner.isPresent()) {
+			List<Long> ballotOptionIds = new ArrayList<>();
+			List<ArrayList<Long>> votes = new ArrayList<>();
+
+			ballot.getOptions().forEach(option -> ballotOptionIds.add(option.getId()));
+			
+			ArrayList<DecisionUser> decisionUsers = decisionUserDao.findAllByDecision(ballot.getDecision());
+			
+			decisionUsers.forEach(du -> {
+				ArrayList<BallotVote> userVotes = ballotVoteDao.findAllByUserAndBallotOrderByRankAsc(du.getUser(), ballot);
+				
+				ArrayList<Long> vote = new ArrayList<>();
+				
+				userVotes.forEach(v -> vote.add(v.getBallotOption().getId()));
+				
+				votes.add(vote);
+			});
+			
+			final Long winningBallotOptionId = rankedPairCalculator.runAlgorithm(ballot, ballotOptionIds, votes);
+			
+			final BallotOption ballotOptionWinner = ballotOptionDao.findById(winningBallotOptionId).orElseThrow(
+					() -> new EntityNotFoundException(BALLOT_OPTION_HEADER + winningBallotOptionId));
+			
+			final RankedWinner winner = new RankedWinner(ballot, ballotOptionWinner);
+			rankedWinnerDao.save(winner);
+		}
 	}
 }

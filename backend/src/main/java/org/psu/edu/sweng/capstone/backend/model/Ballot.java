@@ -45,6 +45,12 @@ public class Ballot {
 	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
 	private Set<BallotOption> options = new HashSet<>();
 	
+	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotVote.class)
+	private Set<BallotVote> votes = new HashSet<>();
+	
+	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = RankedPairWinner.class)
+	private Set<RankedPairWinner> rankedPairWinners = new HashSet<>();
+	
 	protected Ballot() {}
 	
 	public Ballot(Decision decision, BallotType type, Date expirationDate) {
@@ -109,5 +115,13 @@ public class Ballot {
 
 	public void setOptions(Set<BallotOption> ballotOptions) {
 		this.options = ballotOptions;
+	}
+
+	public Set<BallotVote> getVotes() {
+		return votes;
+	}
+	
+	public Set<RankedPairWinner> getRankedPairWinners() {
+		return rankedPairWinners;
 	}
 }

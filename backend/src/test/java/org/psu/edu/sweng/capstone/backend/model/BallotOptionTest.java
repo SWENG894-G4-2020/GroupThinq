@@ -16,12 +16,10 @@ public class BallotOptionTest {
     private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
     private Ballot ballot = new Ballot();
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
-    private BallotResult result = new BallotResult(ballot, ballotOption, USER);
 
     @BeforeEach
     void setUp() {
         ballotOption.setUpdatedDate(new Date(2222L));
-        ballotOption.getResults().add(result);
     }
 
     @Test
@@ -38,10 +36,10 @@ public class BallotOptionTest {
         User USER = new User("zzzzzach", "dorwssap", "Beimford", "Zach", "email@fake.com", new Date());
         Ballot ballot = new Ballot();
         BallotOption otherBallotOption = new BallotOption("Mickey D's", ballot, USER);
-        BallotResult extraResultOne = new BallotResult(ballot, otherBallotOption, USER);
-        BallotResult extraResultTwo = new BallotResult(ballot, otherBallotOption, USER);
+        BallotVote extraResultOne = new BallotVote(ballot, otherBallotOption, USER);
+        BallotVote extraResultTwo = new BallotVote(ballot, otherBallotOption, USER);
         
-        Set<BallotResult> results = new HashSet<>();
+        Set<BallotVote> results = new HashSet<>();
         results.add(extraResultOne);
         results.add(extraResultTwo);
 
@@ -51,7 +49,6 @@ public class BallotOptionTest {
         ballotOption.setUpdatedDate(new Date(4444L));
         ballotOption.setUser(USER);
         ballotOption.setBallot(ballot);
-        ballotOption.setResults(results);
 
         assertEquals(2L, ballotOption.getId());
         assertEquals("subway", ballotOption.getTitle());
@@ -59,11 +56,10 @@ public class BallotOptionTest {
         assertEquals(new Date(4444L), ballotOption.getUpdatedDate());
         assertEquals(ballot, ballotOption.getBallot());
         assertEquals(USER, ballotOption.getUser());
-        assertEquals(2, ballotOption.getResults().size());
     }
 
     @Test
-    void defaultConstructor_worksProperly(){
+    void defaultConstructor_worksProperly() {
         BallotOption ballotOption = new BallotOption();
 
         assertNull(ballotOption.getId());
@@ -71,5 +67,10 @@ public class BallotOptionTest {
         assertNull(ballotOption.getTitle());
         assertNull(ballotOption.getUpdatedDate());
         assertNull(ballotOption.getUser());
+    }
+    
+    @Test
+    void toString_returnsTitle() {
+    	assertEquals(ballotOption.getTitle(), ballotOption.toString());
     }
 }

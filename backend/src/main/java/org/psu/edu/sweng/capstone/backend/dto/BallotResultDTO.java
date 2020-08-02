@@ -2,7 +2,7 @@ package org.psu.edu.sweng.capstone.backend.dto;
 
 import java.util.Date;
 
-import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -64,7 +64,7 @@ public class BallotResultDTO {
 		this.voteUpdatedDate = voteUpdatedDate;
 	}
 	
-	public static BallotResultDTO build(BallotResult br) {
+	public static BallotResultDTO build(BallotVote br) {
 		BallotResultDTO dto = new BallotResultDTO();
 		
 		if (br.getBallot() != null) { dto.setBallotId(br.getBallot().getId()); }
