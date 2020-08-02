@@ -27,6 +27,7 @@ services:
       - DB_CONN=${DB_CONN}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXP=${JWT_EXP}
+      - JWT_ROLE=${JWT_ROLE}
     ports:
       - 8080:8080
     working_dir: /backend
