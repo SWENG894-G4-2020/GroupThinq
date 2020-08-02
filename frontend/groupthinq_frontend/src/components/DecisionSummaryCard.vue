@@ -117,11 +117,12 @@ export default {
 
   methods: {
     calculateRemainingTime () {
-      const secondsTiemr = setInterval(() => {
+      const secondsTimer = setInterval(() => {
         const diff = (new Date(this.decision.ballots[0].expirationDate) - Date.now()) / 1000
 
         if (diff < 0) {
-          clearInterval(secondsTiemr)
+          this.$forceUpdate()
+          clearInterval(secondsTimer)
           return
         }
 

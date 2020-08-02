@@ -130,6 +130,7 @@ export default {
         const diff = (new Date(this.datetime) - Date.now()) / 1000
 
         if (diff < 0) {
+          this.$forceUpdate()
           this.$emit('expired')
           clearInterval(secondsTimer)
           return
