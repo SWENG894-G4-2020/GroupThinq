@@ -37,7 +37,7 @@
           class="text-grey-8"
           style="font-size: 1.25em"
         >
-          Navigation
+          Menu
         </q-item-label>
         <NavItem
           v-for="navLink in navLinks"
@@ -70,40 +70,34 @@ export default {
       leftDrawerOpen: false,
       navLinks: [
         {
-          title: 'Home',
-          caption: 'Return to the Homescreen',
-          icon: 'home',
+          title: 'Decisions',
+          caption: 'See your decisions',
+          icon: 'poll',
           link: '/main'
         },
         {
-          title: 'Account Info',
-          caption: 'View and Edit Your Account Information',
+          title: 'New Decision',
+          caption: 'Create a New Decision',
+          icon: 'add_chart',
+          link: '/decisions/new'
+        },
+        {
+          title: 'Users',
+          caption: 'View all users',
+          icon: 'face',
+          link: '/main/users'
+        },
+        {
+          title: 'My Account',
+          caption: 'View and edit your account information',
           icon: 'assignment_ind',
           link: '/main/account'
         },
         {
-          title: 'Decisions',
-          caption: 'View All Decisions',
-          icon: 'speaker_notes',
-          link: '/main/decisions'
-        },
-        {
-          title: 'Results',
-          caption: 'View All Results',
-          icon: 'assignment_turned_in',
-          link: '/main/results'
-        },
-        {
           title: 'Help',
-          caption: 'GroupThinq Documentation',
+          caption: 'Find help on using Groupthinq',
           icon: 'help_outline',
           link: '/main/help'
-        },
-        {
-          title: 'Users',
-          caption: 'View All Users',
-          icon: 'face',
-          link: '/main/users'
         }
       ]
     }

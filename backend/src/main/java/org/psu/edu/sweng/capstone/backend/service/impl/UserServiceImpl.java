@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 	private DecisionUserDAO decisionUserDao;
 	
 	@Autowired
-	private BallotResultDAO ballotResultDao;
+	private BallotVoteDAO ballotVoteDao;
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
 		final User user = userDao.findByUserName(username).orElseThrow(
 				() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		ballotResultDao.deleteByUser(user);
+		ballotVoteDao.deleteByUser(user);
 		decisionUserDao.deleteByUser(user);		
 		decisionDao.deleteByOwnerId(user);
 		

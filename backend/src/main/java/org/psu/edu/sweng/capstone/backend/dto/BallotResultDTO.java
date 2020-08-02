@@ -2,7 +2,7 @@ package org.psu.edu.sweng.capstone.backend.dto;
 
 import java.util.Date;
 
-import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -12,6 +12,7 @@ public class BallotResultDTO {
 	private Long ballotId;
 	private Long ballotOptionId;
 	private String userName;
+	private Long rank;
 	private Date voteDate;
 	private Date voteUpdatedDate;
 	
@@ -39,6 +40,14 @@ public class BallotResultDTO {
 		this.userName = userName;
 	}
 	
+	public Long getRank() {
+		return rank;
+	}
+
+	public void setRank(Long rank) {
+		this.rank = rank;
+	}
+
 	public Date getVoteDate() {
 		return voteDate;
 	}
@@ -55,12 +64,13 @@ public class BallotResultDTO {
 		this.voteUpdatedDate = voteUpdatedDate;
 	}
 	
-	public static BallotResultDTO build(BallotResult br) {
+	public static BallotResultDTO build(BallotVote br) {
 		BallotResultDTO dto = new BallotResultDTO();
 		
 		if (br.getBallot() != null) { dto.setBallotId(br.getBallot().getId()); }
 		if (br.getBallotOption() != null) { dto.setBallotOptionId(br.getBallotOption().getId()); }
 		if (br.getUser() != null) { dto.setUserName(br.getUser().getUserName()); }
+		if (br.getRank() != null) { dto.setRank(br.getRank()); }
 		if (br.getVoteDate() != null) { dto.setVoteDate(br.getVoteDate()); }
 		if (br.getVoteUpdatedDate() != null) { dto.setVoteUpdatedDate(br.getVoteUpdatedDate()); }
 		

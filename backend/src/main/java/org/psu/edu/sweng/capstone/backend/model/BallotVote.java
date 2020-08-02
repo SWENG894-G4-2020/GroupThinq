@@ -13,8 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "BALLOT_RESULT")
-public class BallotResult {
+@Table(name = "BALLOT_VOTES")
+public class BallotVote {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,19 +32,23 @@ public class BallotResult {
 	@JoinColumn(name = "USER_ID")
 	private User user;
 	
+	@Column(name = "RANK")
+	private Long rank;
+	
 	@Column(name = "VOTE_DATE")
 	private Date voteDate;
 	
 	@Column(name = "VOTE_UPDATED_DATE")
 	private Date voteUpdatedDate;
 	
-	protected BallotResult() {}
+	protected BallotVote() {}
 	
-	public BallotResult(Ballot ballot, BallotOption ballotOption, User user) {
+	public BallotVote(Ballot ballot, BallotOption ballotOption, User user) {
 		this.ballot = ballot;
 		this.ballotOption = ballotOption;
 		this.user = user;
 		
+		this.rank = 1L; // default value
 		this.voteDate = new Date();
 	}
 
@@ -78,6 +82,14 @@ public class BallotResult {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public Long getRank() {
+		return rank;
+	}
+
+	public void setRank(Long rank) {
+		this.rank = rank;
 	}
 
 	public Date getVoteDate() {

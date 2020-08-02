@@ -3,6 +3,8 @@
       <div v-if="isLoaded">
         <div class="full-width row justify-between">
           <q-btn color="green-8" label="New Decision" icon-right="add" @click="createDecision()"/>
+          {{ $route.params.id }}
+          <DecisionPanel v-bind:id="$route.params.id" />
           <q-select
             outlined
             dense
@@ -41,13 +43,15 @@
 import auth from 'src/store/auth'
 import DecisionCard from 'src/components/DecisionCard'
 import CreateDecisionCard from 'src/components/CreateDecisionCard'
+import DecisionPanel from 'src/components/DecisionPanel'
 
 export default {
   name: 'PageDecisions',
 
   components: {
     DecisionCard,
-    CreateDecisionCard
+    CreateDecisionCard,
+    DecisionPanel
   },
 
   data () {

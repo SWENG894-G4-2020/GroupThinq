@@ -2,12 +2,18 @@ package org.psu.edu.sweng.capstone.backend.controller;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +22,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.model.Ballot;
+import org.psu.edu.sweng.capstone.backend.model.BallotType;
+import org.psu.edu.sweng.capstone.backend.model.Decision;
+import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.service.BallotOptionService;
 import org.psu.edu.sweng.capstone.backend.service.BallotService;
 import org.springframework.format.support.FormattingConversionService;
@@ -34,6 +45,9 @@ class BallotControllerTest {
 	private BallotController ballotController;
 	
 	@Mock
+	private BallotDAO ballotDao;
+	
+	@Mock
 	private BallotService ballotService;
 	
 	@Mock
@@ -44,7 +58,7 @@ class BallotControllerTest {
 	private static final Long BALLOT_ID = 1L;
 	private static final BallotDTO BALLOT_DTO = new BallotDTO();
 	private static final BallotOptionDTO BALLOT_OPTION_DTO = new BallotOptionDTO();
-	private static final BallotResultDTO BALLOT_RESULT_DTO = new BallotResultDTO();
+	private static final ArrayList<BallotResultDTO> BALLOT_RESULT_DTO = new ArrayList<>();
 
 	@BeforeEach
 	void setUp() {
@@ -98,11 +112,19 @@ class BallotControllerTest {
 	
 	@Test
 	void retrieveResults_callsRightServiceFunction() throws Exception {
+		// given
+		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+		Decision testDecision = new Decision("Test Decision", testUser);
+		BallotType testBallotType = new BallotType(1L, "Single-Choice");
+		Ballot testBallot = new Ballot(testDecision, testBallotType, new Date(1337));
+		testBallot.setId(1L);
+
 		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
 		mockMvc.perform(get("/ballot/{id}/results", BALLOT_ID)).andExpect(status().isOk());
 		
 		// then
-		verify(ballotService, times(1)).retrieveResults(BALLOT_ID);
+		verify(ballotService, times(1)).retrieveSingleChoiceResults(testBallot);
 	}
 	
 	@Test
@@ -115,7 +137,7 @@ class BallotControllerTest {
 				.andExpect(status().isCreated());
 
 		// then
-		verify(ballotService, times(1)).castVote(Mockito.any(BallotResultDTO.class));
+		verify(ballotService, times(1)).castVote(Mockito.<BallotResultDTO>anyList());
 	}
 	
 	@Test
@@ -141,6 +163,6 @@ class BallotControllerTest {
 				.andExpect(status().isOk());
 
 		// then
-		verify(ballotService, times(1)).updateVote(Mockito.any(BallotResultDTO.class));
+		verify(ballotService, times(1)).updateVote(Mockito.<BallotResultDTO>anyList());
 	}
 }

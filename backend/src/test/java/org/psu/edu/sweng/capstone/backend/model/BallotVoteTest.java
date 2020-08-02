@@ -9,25 +9,25 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BallotResultTest {
+public class BallotVoteTest {
 
     private static final User USER = new User("mboyer87", "password", "Boyer", "Matt", "mboyer87@gmail.com", new Date());
     private Ballot ballot = new Ballot();
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
 
-    private BallotResult testResult = new BallotResult(ballot, ballotOption, USER);
+    private BallotVote testResult = new BallotVote(ballot, ballotOption, USER);
 
     @BeforeEach
     void setUp() {
     	testResult.setId(1L);
-        testResult.setVoteUpdatedDate(new Date(321L));
+    	testResult.setVoteUpdatedDate(new Date(321L));
     }
 
     @Test
     void constructor_worksProperly() {
-
         assertNotNull(testResult.getVoteDate());
         assertEquals(ballot, testResult.getBallot());
+    	assertEquals(1L, testResult.getRank());
         assertEquals(USER, testResult.getUser());
         assertEquals(new Date(321L), testResult.getVoteUpdatedDate());
         assertEquals(ballotOption, testResult.getBallotOption());
@@ -46,6 +46,7 @@ public class BallotResultTest {
         testResult.setUser(USER);
         testResult.setBallot(ballot);
         testResult.setId(2L);
+        testResult.setRank(3L);
 
         assertEquals(ballotOption, testResult.getBallotOption());
         assertEquals(new Date(3333L), testResult.getVoteDate());
@@ -53,12 +54,14 @@ public class BallotResultTest {
         assertEquals(ballot, testResult.getBallot());
         assertEquals(USER, testResult.getUser());
         assertEquals(2L, testResult.getId());
+        assertEquals(3L, testResult.getRank());
     }
 
     @Test
     void defaultConstructor_worksProperly(){
-        BallotResult ballotResult = new BallotResult();
+        BallotVote ballotResult = new BallotVote();
 
+        assertNull(ballotResult.getRank());
         assertNull(ballotResult.getBallot());
         assertNull(ballotResult.getBallotOption());
         assertNull(ballotResult.getVoteUpdatedDate());

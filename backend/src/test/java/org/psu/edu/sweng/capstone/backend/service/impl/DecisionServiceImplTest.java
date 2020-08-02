@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
-import org.psu.edu.sweng.capstone.backend.dao.BallotResultDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
@@ -27,7 +27,7 @@ import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
-import org.psu.edu.sweng.capstone.backend.model.BallotResult;
+import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 import org.psu.edu.sweng.capstone.backend.model.BallotType;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
@@ -59,7 +59,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	private DecisionUserDAO decisionUserDao;
 	
 	@Mock
-	private BallotResultDAO ballotResultDao;
+	private BallotVoteDAO ballotResultDao;
 		
 	@InjectMocks
 	private DecisionServiceImpl decisionServiceImpl;
@@ -358,9 +358,9 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		testBallot.getOptions().add(testBallotOption);
 		dec.getBallots().add(testBallot);
 		
-		BallotResult br = new BallotResult(testBallot, testBallotOption, testUser);
+		BallotVote br = new BallotVote(testBallot, testBallotOption, testUser);
 
-		ArrayList<BallotResult> results = new ArrayList<>();
+		ArrayList<BallotVote> results = new ArrayList<>();
 		results.add(br);
 		
 		// when
