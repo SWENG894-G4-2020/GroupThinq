@@ -4,6 +4,9 @@
       <div class="q-pa-sm col-xs-12 col-md-6">
         <DecisionDetailsCard ref="details" v-bind:mode="mode" />
       </div>
+      <div class="q-pa-sm col-xs-12 col-md-6">
+        <BallotCard ref="ballot" v-bind:mode="mode" />
+      </div>
     </div>
     <div class="q-pa-sm col-xs-12">
       <q-banner v-if="!submissionValid" class="bg-red-1 q-my-sm">
@@ -26,17 +29,20 @@
 
 <script>
 import DecisionDetailsCard from 'src/components/DecisionDetailsCard'
+import BallotCard from 'src/components/BallotCard'
 
 export default {
   name: 'PageDecisions',
 
   components: {
-    DecisionDetailsCard
+    DecisionDetailsCard,
+    BallotCard
   },
 
   data () {
     return {
       mode: 'create',
+      submitting: false,
       submissionValid: true
     }
   },
@@ -67,8 +73,6 @@ export default {
       try {
         const response = await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.decision)
         this.decision = response.data.data[0]
-        this.selectedUsers = []
-        this.includedUsers.forEach((user) => this.selectedUsers.push(user.userName))
         this.submitting = false
         this.submissionValid = true
       } catch (error) {

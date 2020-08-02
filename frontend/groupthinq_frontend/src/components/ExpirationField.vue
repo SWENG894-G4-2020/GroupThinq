@@ -145,7 +145,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .q-field--readonly .q-field__control:before {
     border-bottom-style: none !important;
 }
