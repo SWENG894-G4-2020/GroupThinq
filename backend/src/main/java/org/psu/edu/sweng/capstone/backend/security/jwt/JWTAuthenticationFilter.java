@@ -2,9 +2,14 @@ package org.psu.edu.sweng.capstone.backend.security.jwt;
 
 import com.auth0.jwt.JWT;
 
+import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
+import org.psu.edu.sweng.capstone.backend.model.Role;
+import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,8 +57,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     	
         String secret = System.getenv().get("JWT_SECRET");
         Long exp = Long.parseLong(System.getenv().get("JWT_EXP"));
-        String role = System.getenv().get("JWT_ROLE") == null ? "user" : System.getenv().get("JWT_ROLE");
-
+        String role = "user";
+        if(((User) auth.getPrincipal()).getAuthorities().size() > 0){
+            role = ((User) auth.getPrincipal()).getAuthorities().iterator().next().getAuthority();
+        }
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + exp))
