@@ -19,6 +19,6 @@ public interface BallotService {
 	ResponseEntity<String> castVote(final List<BallotResultDTO> vote) throws EntityNotFoundException;
 	ResponseEntity<String> updateVote(final List<BallotResultDTO> vote) throws EntityNotFoundException;
 
-	ResponseEntity<BallotResultDTO> retrieveSingleChoiceResults(final Ballot ballot) throws EntityNotFoundException;
+	ResponseEntity<BallotResultDTO> retrieveAllVotes(final Ballot ballot) throws EntityNotFoundException;
 	void retrieveRankedChoiceResults(final Ballot ballotId) throws EntityNotFoundException;
 }

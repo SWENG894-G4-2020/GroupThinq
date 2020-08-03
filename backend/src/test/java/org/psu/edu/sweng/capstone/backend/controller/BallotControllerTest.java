@@ -140,7 +140,7 @@ class BallotControllerTest {
 		mockMvc.perform(get("/ballot/{id}/votes", BALLOT_ID)).andExpect(status().isOk());
 
 		// then
-		verify(ballotService, times(1)).retrieveSingleChoiceResults(testBallot);
+		verify(ballotService, times(1)).retrieveAllVotes(testBallot);
 	}
 
 	@Test
@@ -149,7 +149,7 @@ class BallotControllerTest {
 		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.empty());
 
 		// then
-		verify(ballotService, times(0)).retrieveSingleChoiceResults(testBallot);
+		verify(ballotService, times(0)).retrieveAllVotes(testBallot);
 		assertThrows(EntityNotFoundException.class, () -> { ballotController.retrieveVotes(BALLOT_ID); });
 	}
 	
@@ -167,7 +167,7 @@ class BallotControllerTest {
 		mockMvc.perform(get("/ballot/{id}/results", BALLOT_ID)).andExpect(status().isOk());
 		
 		// then
-		verify(ballotService, times(1)).retrieveSingleChoiceResults(testBallot);
+		verify(ballotService, times(1)).retrieveAllVotes(testBallot);
 	}
 	
 	@Test
@@ -176,7 +176,7 @@ class BallotControllerTest {
 		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.empty());
 		
 		// then
-		verify(ballotService, times(0)).retrieveSingleChoiceResults(testBallot);
+		verify(ballotService, times(0)).retrieveAllVotes(testBallot);
 	    assertThrows(EntityNotFoundException.class, () -> { ballotController.retrieveResults(BALLOT_ID); });
 	}
 	
