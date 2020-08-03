@@ -29,13 +29,17 @@
           <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.vote" @input="validateCheckboxVote(option)" name="ballot-option-votecheck"/>
           <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
           <span class="text-body1 col-grow">{{option.title}}</span>
-          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="removeDecisionOption(option)" name="ballot-option-rankup"/>
-          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="removeDecisionOption(option)" name="ballot-option-rankdown"/>
+          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="validateRankVote(option, 'up')" name="ballot-option-rankup"/>
+          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="validateRankVote(option, 'down')" name="ballot-option-rankdown"/>
           <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" name="ballot-option-delete"/>
         </div>
       </div>
       <div class="row reverse q-gutter-sm">
-        <q-btn v-if="!expired && mode === 'view' && voteChanged" icon="check" color="primary" label="Vote" name="ballot-vote"/>
+        <q-btn v-if="!expired && mode === 'view' && voteChanged" icon="check" color="primary" label="Vote" name="ballot-vote" @click="onVote()" :loading="voting" :disabled="voting">
+            <template v-slot:loading>
+              <q-spinner />
+            </template>
+        </q-btn>
       </div>
     </q-card-section>
   </q-card>
@@ -72,7 +76,8 @@ export default {
       options: [],
       expired: false,
       initialDate: '',
-      voteChanged: false
+      voteChanged: false,
+      voting: false
     }
   },
 
@@ -96,6 +101,10 @@ export default {
 
     if (this.decision) {
       this.populateWithDecision()
+    }
+
+    if (this.decision && this.mode !== 'create') {
+
     }
   },
 
@@ -130,7 +139,12 @@ export default {
     populateWithDecision () {
       this.initialDate = this.decision.ballots[0].expirationDate
       this.ballotTypeId = this.decision.ballots[0].ballotTypeId
-      this.decision.ballots[0].ballotOptions.forEach(option => this.options.push({ title: option.title, userName: option.userName, vote: false, rank: 999 }))
+      this.decision.ballots[0].ballotOptions.forEach(option => {
+        const newOpt = option
+        newOpt.vote = false
+        newOpt.rank = 999
+        this.options.push(newOpt)
+      })
     },
 
     addDecisionOption () {
@@ -171,6 +185,7 @@ export default {
     },
 
     validateCheckboxVote (option) {
+      console.log(this.options)
       this.voteChanged = true
       this.options.forEach(opt => {
         if (opt !== option) {
@@ -179,6 +194,32 @@ export default {
           opt.vote = true
         }
       })
+    },
+
+    validateRankVote (option, dir) {
+      console.log('Not implemented yet!')
+    },
+
+    async onVote () {
+      try {
+        this.voting = true
+        if (this.ballotTypeId === 1) {
+          const vote = this.options.find(opt => opt.vote === true)
+          const votePayload = [{
+            ballotId: this.decision.ballots[0].id,
+            ballotOptionId: vote.id,
+            userName: this.currentUserName
+          }]
+          await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
+        } else {
+          console.log('Not implemented yet!')
+        }
+        this.voteChanged = false
+        this.voting = false
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
     }
   }
 }
