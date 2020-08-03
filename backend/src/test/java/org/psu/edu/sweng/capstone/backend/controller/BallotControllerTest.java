@@ -125,6 +125,33 @@ class BallotControllerTest {
 		// then
 		verify(ballotService, times(1)).updateBallot(Mockito.anyLong(), Mockito.any(BallotDTO.class));
 	}
+
+	@Test
+	void retrieveVotes_happyPath() throws Exception {
+		// given
+		User testUser = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
+		Decision testDecision = new Decision("Test Decision", testUser);
+		BallotType testBallotType = new BallotType(1L, "Single-Choice");
+		Ballot testBallot = new Ballot(testDecision, testBallotType, new Date(1337));
+		testBallot.setId(1L);
+
+		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.of(testBallot));
+		mockMvc.perform(get("/ballot/{id}/votes", BALLOT_ID)).andExpect(status().isOk());
+
+		// then
+		verify(ballotService, times(1)).retrieveAllVotes(testBallot);
+	}
+
+	@Test
+	void retrieveVotes_ballotNotFound() throws Exception {
+		// when
+		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.empty());
+
+		// then
+		verify(ballotService, times(0)).retrieveAllVotes(testBallot);
+		assertThrows(EntityNotFoundException.class, () -> { ballotController.retrieveVotes(BALLOT_ID); });
+	}
 	
 	@Test
 	void retrieveResults_singleChoice_happyPath() throws Exception {
@@ -140,7 +167,7 @@ class BallotControllerTest {
 		mockMvc.perform(get("/ballot/{id}/results", BALLOT_ID)).andExpect(status().isOk());
 		
 		// then
-		verify(ballotService, times(1)).retrieveSingleChoiceResults(testBallot);
+		verify(ballotService, times(1)).retrieveAllVotes(testBallot);
 	}
 	
 	@Test
@@ -149,7 +176,7 @@ class BallotControllerTest {
 		when(ballotDao.findById(testBallot.getId())).thenReturn(Optional.empty());
 		
 		// then
-		verify(ballotService, times(0)).retrieveSingleChoiceResults(testBallot);
+		verify(ballotService, times(0)).retrieveAllVotes(testBallot);
 	    assertThrows(EntityNotFoundException.class, () -> { ballotController.retrieveResults(BALLOT_ID); });
 	}
 	
