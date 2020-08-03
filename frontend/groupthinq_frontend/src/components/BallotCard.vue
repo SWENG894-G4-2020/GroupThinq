@@ -20,13 +20,13 @@
     <q-card-section class="q-pt-none">
       <div class="text-grey-8" style="font-size: 16px"> Ballot choices</div>
       <q-input class="q-mb-md" v-model="newOption.title" label="Add Choice" name="ballot-option-name">
-        <template v-slot:append>
+        <template v-if="mode === 'create' || userIncluded" v-slot:append>
           <q-btn dense color="positive" icon="add" @click="addDecisionOption()" name="ballot-option-add"/>
         </template>
       </q-input>
       <div class="column">
         <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
-          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.vote" name="ballot-option-votecheck"/>
+          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.vote" @input="validateCheckboxVote(option)" name="ballot-option-votecheck"/>
           <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
           <span class="text-body1 col-grow">{{option.title}}</span>
           <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="removeDecisionOption(option)" name="ballot-option-rankup"/>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="row reverse q-gutter-sm">
-        <q-btn v-if="!expired && mode === 'view'" icon="check" color="primary" label="Vote" name="ballot-vote"/>
+        <q-btn v-if="!expired && mode === 'view' && voteChanged" icon="check" color="primary" label="Vote" name="ballot-vote"/>
       </div>
     </q-card-section>
   </q-card>
@@ -71,7 +71,8 @@ export default {
       newOption: { title: '', userName: this.currentUserName, vote: false, rank: 999 },
       options: [],
       expired: false,
-      initialDate: ''
+      initialDate: '',
+      voteChanged: false
     }
   },
 
@@ -108,6 +109,13 @@ export default {
         return true
       }
       return false
+    },
+
+    userIncluded: function () {
+      if (this.decision && this.decision.includedUsers.find(user => user.userName === this.currentUserName)) {
+        return true
+      }
+      return false
     }
   },
 
@@ -122,7 +130,7 @@ export default {
     populateWithDecision () {
       this.initialDate = this.decision.ballots[0].expirationDate
       this.ballotTypeId = this.decision.ballots[0].ballotTypeId
-      this.decision.ballots[0].ballotOptions.forEach(option => this.options.push(option))
+      this.decision.ballots[0].ballotOptions.forEach(option => this.options.push({ title: option.title, userName: option.userName, vote: false, rank: 999 }))
     },
 
     addDecisionOption () {
@@ -160,6 +168,17 @@ export default {
       }
       this.options.forEach(option => ballot.ballotOptions.push({ title: option.title, userName: this.currentUserName }))
       return ballot
+    },
+
+    validateCheckboxVote (option) {
+      this.voteChanged = true
+      this.options.forEach(opt => {
+        if (opt !== option) {
+          opt.vote = false
+        } else {
+          opt.vote = true
+        }
+      })
     }
   }
 }

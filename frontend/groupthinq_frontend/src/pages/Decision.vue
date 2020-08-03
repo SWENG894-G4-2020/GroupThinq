@@ -18,6 +18,7 @@
         </q-banner>
         <div class="row q-gutter-sm">
           <q-btn icon="arrow_back" color="primary" label="Back" to="/main" name="decision-back"/>
+          <q-btn v-if="currentUserName === decision.ownerUsername || currentUserRole === 'Admin'" icon="edit" label="Edit" name="decision-edit"/>
           <q-btn v-if="currentUserName === decision.ownerUsername || currentUserRole === 'Admin'" icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
         </div>
       </div>
