@@ -81,6 +81,13 @@ public class BallotController {
 	public ResponseEntity<String> updateVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
 		return ballotService.updateVote(vote);
 	}
+
+	@GetMapping("/ballot/{id}/votes")
+	public ResponseEntity<BallotResultDTO> retrieveVotes(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException("Ballot " + ballotId));
+		return ballotService.retrieveSingleChoiceResults(ballot);
+	}
 	
 	@GetMapping("/ballot/{id}/results")
 	public ResponseEntity<?> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
