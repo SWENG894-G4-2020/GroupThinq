@@ -2,6 +2,10 @@
   <q-card bordered style="height: 100%">
     <q-card-section>
       <div class="text-h5"><q-icon name="how_to_vote" /> Decision Details</div>
+      <q-chip v-if="mode === 'view'" dense>
+            <q-avatar icon="campaign" color="primary" text-color="white" />
+            {{ decision.ownerUsername }}
+      </q-chip>
       <q-input
       :readonly="(mode === 'create' || mode === 'edit') ? false : true"
       name="details-name"

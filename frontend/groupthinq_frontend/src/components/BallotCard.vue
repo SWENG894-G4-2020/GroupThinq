@@ -26,7 +26,7 @@
       </q-input>
       <div class="column">
         <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
-          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.rank" name="ballot-option-votecheck"/>
+          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.vote" name="ballot-option-votecheck"/>
           <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
           <span class="text-body1 col-grow">{{option.title}}</span>
           <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="removeDecisionOption(option)" name="ballot-option-rankup"/>
@@ -130,6 +130,11 @@ export default {
         this.options.push({ title: this.newOption.title, userName: this.currentUserName, vote: false, rank: 999 })
         this.newOption = { title: '', userName: this.currentUserName, vote: false, rank: 999 }
       }
+    },
+
+    removeDecisionOption (option) {
+      const pos = this.options.indexOf(option)
+      this.options.splice(pos, 1)
     },
 
     getExpiration () {

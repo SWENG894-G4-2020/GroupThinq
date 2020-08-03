@@ -18,7 +18,7 @@
         </q-banner>
         <div class="row q-gutter-sm">
           <q-btn icon="arrow_back" color="primary" label="Back" to="/main" name="decision-back"/>
-          <q-btn icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
+          <q-btn v-if="currentUserName === decision.ownerUsername || currentUserRole === 'Admin'" icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
         </div>
       </div>
       <q-dialog v-model="deleteDecisionDialog" persistent>
@@ -64,6 +64,7 @@ export default {
   data () {
     return {
       currentUserName: '',
+      currentUserRole: 'User',
       mode: 'view',
       submitting: false,
       submissionValid: true,
@@ -77,6 +78,7 @@ export default {
 
   mounted () {
     this.currentUserName = auth.getTokenData().sub
+    this.currentUserRole = auth.getTokenData().role
     this.getDecision()
   },
 
