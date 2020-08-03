@@ -280,21 +280,21 @@ class BallotServiceImplTest extends ServiceImplTest {
 	}
 	
 	@Test
-	void retrieveSingleChoiceResults_happyPath() throws EntityNotFoundException {
+	void retrieveAllVotes_happyPath() throws EntityNotFoundException {
 		// given
 		testBallot.getVotes().add(new BallotVote(testBallot, testBallotOption, testUser));
 		
 		// when
-		ResponseEntity<?> response = ballotServiceImpl.retrieveSingleChoiceResults(testBallot);
+		ResponseEntity<?> response = ballotServiceImpl.retrieveAllVotes(testBallot);
 		
 		// then
 		assertGenericSuccess(response);
 	}
 	
 	@Test
-	void retrieveSingleChoiceResults_noResults() throws EntityNotFoundException {
+	void retrieveAllVotes_noResults() throws EntityNotFoundException {
 		// when
-		ResponseEntity<BallotResultDTO> response = ballotServiceImpl.retrieveSingleChoiceResults(testBallot);
+		ResponseEntity<BallotResultDTO> response = ballotServiceImpl.retrieveAllVotes(testBallot);
 		
 		// then
 		assertGenericSuccess(response);
