@@ -2,14 +2,9 @@ package org.psu.edu.sweng.capstone.backend.security.jwt;
 
 import com.auth0.jwt.JWT;
 
-import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
-import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
-import org.psu.edu.sweng.capstone.backend.model.Role;
-import org.psu.edu.sweng.capstone.backend.model.UserRole;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

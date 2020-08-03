@@ -311,6 +311,7 @@ class DecisionServiceImplTest extends ServiceImplTest {
 		testBallot.setType(type);
 		
 		dec.getBallots().add(testBallot);
+		dec.setDescription("Description");
 		
 		DecisionDTO dto = DecisionDTO.build(dec);
 		

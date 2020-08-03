@@ -105,7 +105,10 @@ public class DecisionServiceImpl implements DecisionService {
 				() -> new EntityNotFoundException(USER_HEADER + decisionDto.getOwnerUsername()));
 		
 		// Create new Decision
-		Decision newDecision = new Decision(decisionDto.getName(), user);		
+		Decision newDecision = new Decision(decisionDto.getName(), user);
+		
+		if (decisionDto.getDescription() != null) { newDecision.setDescription(decisionDto.getDescription()); }
+		
 		decisionDao.save(newDecision);
 
 		// Add Users
