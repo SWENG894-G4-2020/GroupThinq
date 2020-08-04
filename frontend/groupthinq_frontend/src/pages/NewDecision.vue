@@ -16,13 +16,13 @@
           </template>
           A new decision requires a title, valid expiration date, and at least one option.
         </q-banner>
-        <div class="row q-gutter-sm">
-          <q-btn icon="add" color="positive" label="Create" @click="onCreate()" :loading="submitting" :disabled="submitting">
+        <div class="row reverse q-gutter-md">
+          <q-btn icon="add" class="col-xs-12 col-sm-auto" size="lg" color="positive" label="Create" @click="onCreate()" :loading="submitting" :disabled="submitting">
             <template v-slot:loading>
               <q-spinner />
             </template>
           </q-btn>
-          <q-btn icon="clear" label="Cancel" to="/main" />
+          <q-btn icon="clear" class="col-xs-12 col-sm-auto" size="lg" label="Cancel" to="/main" />
         </div>
       </div>
     </div>

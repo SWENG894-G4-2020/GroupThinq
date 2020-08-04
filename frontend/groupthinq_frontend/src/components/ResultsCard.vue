@@ -20,9 +20,6 @@
     <q-card-section v-else>
       No results to show.
     </q-card-section>
-    <q-card-actions align="right" v-if="decisionInfo.showClose">
-      <q-btn label="Close" @click="$emit('resultsClose')" />
-    </q-card-actions>
   </q-card>
 </template>
 
@@ -34,26 +31,7 @@ export default {
   data () {
     return {
       isLoaded: false,
-      resultsList: [],
-      initialPagination: {
-        sortBy: 'desc',
-        descending: false,
-        page: 1,
-        rowsPerPage: 10
-      },
-      columns: [
-        {
-          name: 'name',
-          required: true,
-          label: 'Option',
-          align: 'left',
-          field: row => row.name,
-          format: val => `${val}`,
-          sortable: true
-        },
-        { name: 'winner', align: 'center', label: 'Winner', field: 'winner', sortable: true },
-        { name: 'votes', align: 'center', label: '# of Votes', field: 'votes', sortable: true }
-      ]
+      resultsList: []
     }
   },
 

@@ -11,7 +11,7 @@
         <div class="q-pa-sm col-xs-12 col-md-6">
           <ResultsCard
             v-bind:ballot="this.decision.ballots[0]"
-            v-bind:decisionInfo="{ name: this.decision.name, description: this.decision.description, showClose: true }"
+            v-bind:decisionInfo="{ name: this.decision.name, description: this.decision.description }"
            />
         </div>
       </div>
@@ -22,12 +22,11 @@
           </template>
           A new decision requires a title, valid expiration date, and at least one option.
         </q-banner>
-        <div class="row q-gutter-sm">
-          <q-btn v-if="mode !== 'edit'" icon="arrow_back" color="primary" label="Back" to="/main" name="decision-back"/>
-          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'edit'" icon="check" color="positive" label="Confirm" name="decision-confirm" @click="onEditConfirm()"/>
-          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'view'" icon="edit" label="Edit" name="decision-edit" @click="onEdit()"/>
-          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'edit'" icon="close" label="Cancel" name="decision-edit-cancel" @click="onEditCancel()"/>
-          <q-btn v-if="currentUserName === decision.ownerUsername || currentUserRole === 'Admin'" icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
+        <div class="row reverse q-gutter-sm">
+          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'edit'" class="col-xs-12 col-sm-auto" size="lg" icon="check" color="positive" label="Confirm" name="decision-confirm" @click="onEditConfirm()"/>
+          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'view'" class="col-xs-12 col-sm-auto" size="lg" icon="edit" label="Edit" name="decision-edit" @click="onEdit()"/>
+          <q-btn v-if="currentUserName === decision.ownerUsername || currentUserRole === 'Admin'" class="col-xs-12 col-sm-auto" icon="delete" size="lg" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
+          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'edit'" class="col-xs-12 col-sm-auto" icon="close" size="lg" label="Cancel" name="decision-edit-cancel" @click="onEditCancel()"/>
         </div>
       </div>
       <q-dialog v-model="deleteDecisionDialog" persistent>

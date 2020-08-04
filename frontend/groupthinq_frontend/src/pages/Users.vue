@@ -72,7 +72,6 @@ export default {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/users`)
         this.users = response.data.data
-        console.log(this.users)
         this.isLoaded = true
       } catch (error) {
         console.log(error)
