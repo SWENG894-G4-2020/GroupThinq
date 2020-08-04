@@ -1,7 +1,7 @@
 <template>
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pb-sm">
-      <div class="text-h5"><q-icon name="ballot" /> Ballot</div>
+      <div class="text-h5 q-py-md"><q-icon name="ballot" color="grey-7"/> Ballot</div>
       <ExpirationField v-bind:mode="mode" v-bind:showTimer="showTimer" v-bind:initialDate="initialDate" ref="datetime" @expired="setExpired"/>
       <div class="q-mt-sm">
         <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>

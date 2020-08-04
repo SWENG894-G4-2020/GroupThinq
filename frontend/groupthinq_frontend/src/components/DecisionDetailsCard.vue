@@ -1,19 +1,25 @@
 <template>
   <q-card bordered style="height: 100%">
     <q-card-section>
-      <div class="text-h5"><q-icon name="how_to_vote" /> Decision Details</div>
-      <q-chip v-if="mode === 'view'" dense>
+      <div class="text-h5">
+        <q-input
+        :readonly="(mode === 'create' || mode === 'edit') ? false : true"
+        name="details-name"
+        v-model="name"
+        label="Decision"
+        class="text-h5"
+        :rules="[val => !!val || '*Required', val => val.length < 161 || 'Decision name must be less than 160 characters']"
+        >
+          <template v-slot:prepend>
+            <q-icon name="how_to_vote" />
+          </template>
+        </q-input>
+      </div>
+      <span class="text-grey-7">Started by</span>
+      <q-chip dense>
             <q-avatar icon="campaign" color="primary" text-color="white" />
             {{ decision.ownerUsername }}
       </q-chip>
-      <q-input
-      :readonly="(mode === 'create' || mode === 'edit') ? false : true"
-      name="details-name"
-      v-model="name"
-      label="Name"
-      hint="Short description of what must be decided."
-      :rules="[val => !!val || '*Required', val => val.length < 161 || 'Decision name must be less than 160 characters']"
-      />
       <q-input
       :readonly="(mode === 'create' || mode === 'edit') ? false : true"
       name="details-description"
