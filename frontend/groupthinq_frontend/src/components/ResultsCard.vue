@@ -2,13 +2,16 @@
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pa-md">
       <div class="text-h5 q-py-md"><q-icon name="poll" color="grey-7"/> {{decision.name}}</div>
-      <span class="text-caption">Decided on: {{this.prettyDate}}</span>
+      <span v-if="expired" class="text-caption">Decided on: {{this.prettyDate}}</span>
     </q-card-section>
-    <q-card-section class="q-pa-md column items-center" v-if="resultsList">
+    <q-card-section v-if="!expired" class="q-pa-md">
+      <span class="text-caption">No results yet.</span>
+    </q-card-section>
+    <q-card-section class="q-pa-md column items-center" v-else-if="resultsList">
       <div class="text-h5" style="text-align: left; width: 100%">Results</div>
       <q-separator class="q-mb-md"/>
       <div v-if="ballot.ballotTypeId === 1" class="bg-grey-2 q-pa-sm" style="width: 100%">
-        <div v-for="result in tabulatedResults" :key="result.rank" class="q-pa-sm">
+        <div v-for="(result, idx) in tabulatedResults" :key="idx" class="q-pa-sm">
           <div class="row">
             <div class="q-pa-xs"><q-icon name="done" class="text-green q-pa-xs" v-if="result.winner"/>{{ result.name }}</div>
             <div class="col-grow q-pa-xs" style="text-align: right">{{ Math.round(result.percentage * 100)}}% ({{ result.votes }})</div>
@@ -105,6 +108,18 @@ export default {
       return data
     },
 
+    rankedPairResults: function () {
+      const data = []
+
+      return data
+    },
+
+    expired: function () {
+      const diff = (new Date(this.ballot.expirationDate) - Date.now()) / 1000
+      if (diff < 0) { return true }
+      return false
+    },
+
     prettyDate: function () {
       return new Date(this.ballot.expirationDate).toGMTString()
     }
@@ -113,9 +128,11 @@ export default {
   methods: {
     async getResultsData () {
       try {
-        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballot.id}/results`)
-        this.resultsList = response.data.data
-        this.isLoaded = true
+        if (this.expired) {
+          const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.ballot.id}/results`)
+          this.resultsList = response.data.data
+          this.isLoaded = true
+        }
       } catch (error) {
         console.log(error)
       }

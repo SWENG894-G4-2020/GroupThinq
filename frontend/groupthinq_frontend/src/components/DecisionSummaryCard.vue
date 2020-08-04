@@ -122,7 +122,7 @@ export default {
         const diff = (new Date(this.decision.ballots[0].expirationDate) - Date.now()) / 1000
 
         if (diff < 0) {
-          this.$forceUpdate()
+          this.$emit('reload')
           clearInterval(secondsTimer)
           return
         }

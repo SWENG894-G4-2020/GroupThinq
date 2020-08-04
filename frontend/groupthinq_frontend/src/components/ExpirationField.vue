@@ -4,7 +4,7 @@
     v-model="datetime"
     name="expiration-datetime"
     label="Voting end date"
-    :rules="[val => checkValidDate(val) || '*Valid Date Required']"
+    :rules="[val => checkValidDate(val) || '*Valid Date in the Future Required']"
     :readonly="(mode === 'create' || mode === 'edit') ? false : true"
     mask="datetime"
     hint="YYYY/MM/DD HH:mm">
@@ -99,8 +99,10 @@ export default {
 
     checkValidDate (d) {
       const check = Date.parse(d)
-      if (check) { return true }
-      return false
+      if (!check) { return false }
+      const diff = (new Date(d) - Date.now()) / 1000
+      if (diff < 0) { return false }
+      return true
     },
 
     isValid () {

@@ -31,7 +31,7 @@
             :key="idx"
             v-bind:decision="decision"
             class="col-xs-12 col-sm-6 col-lg-3"
-            @needReload="getData()"
+            @reload="getData()"
           />
         </div>
       </div>

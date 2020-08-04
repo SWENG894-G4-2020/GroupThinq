@@ -4,11 +4,20 @@ import auth from 'src/store/auth'
 
 Vue.prototype.$axios = axios
 
-axios.interceptors.request.use((config) => {
+axios.interceptors.request.use(req => {
   if (auth.isLoggedIn()) {
-    config.headers.authorization = 'Bearer ' + auth.getEncodedToken()
+    req.headers.authorization = 'Bearer ' + auth.getEncodedToken()
   }
-  return config
+  return req
+}, (error) => {
+  return Promise.reject(error)
+})
+
+axios.interceptors.response.use(res => {
+  if (!res.data.success) {
+    throw new Error(res.data.errors[0].message)
+  }
+  return res
 }, (error) => {
   return Promise.reject(error)
 })

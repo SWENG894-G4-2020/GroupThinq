@@ -24,6 +24,7 @@
       <q-input
       :readonly="(mode === 'create' || mode === 'edit') ? false : true"
       name="details-description"
+      v-if="(mode === 'create' || mode === 'edit') || description"
       v-model="description"
       label='Additional Details'
       hint='(Optional)'

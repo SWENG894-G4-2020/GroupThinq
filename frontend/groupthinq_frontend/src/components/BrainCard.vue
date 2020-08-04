@@ -1,17 +1,17 @@
 <template>
   <q-card bordered style="height: 100%">
     <q-card-section>
-      <div class="text-h5"><q-icon name="psychology" /> Groupthinq Brain&trade;</div>
+      <div class="text-h5"><q-icon color="accent" name="psychology" /> Groupthinq Brain&trade;</div>
     </q-card-section>
     <q-card-section v-if="isLoaded">
-      <div class="text-grey-7">Our machine learning analysis perdicts the following results:</div>
+      <div class="text-grey-7 q-pa-sm">Our machine learning model perdicts the following results for <span class="text-bold">"{{decision.name}}"</span></div>
       <div class="bg-grey-2 q-pa-sm" style="width: 100%">
-        <div v-for="result in tabulatedResults" :key="result.percentage" class="q-pa-sm">
+        <div v-for="(result, idx) in tabulatedResults" :key="idx" class="q-pa-sm">
           <div class="row">
             <div class="q-pa-xs"><q-icon name="done" class="text-green q-pa-xs" v-if="result.winner"/>{{ result.title }}</div>
             <div class="col-grow q-pa-xs" style="text-align: right">{{ Math.round(result.percentage * 100)}}% </div>
           </div>
-          <div class="q-pa-xs"><q-linear-progress rounded size="14px" :value="result.percentage" /></div>
+          <div class="q-pa-xs"><q-linear-progress rounded color="accent" size="14px" :value="result.percentage" /></div>
         </div>
       </div>
     </q-card-section>
