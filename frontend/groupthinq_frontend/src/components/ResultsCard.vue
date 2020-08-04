@@ -1,15 +1,14 @@
 <template>
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pa-md">
-      <div class="text-h5 q-py-md"><q-icon name="poll" color="grey-7"/> {{decision.name}}</div>
-      <span v-if="expired" class="text-caption">Decided on: {{this.prettyDate}}</span>
+      <div class="text-h5 q-py-md"><q-icon name="poll" color="grey-7"/> Results</div>
+      <div class="text-grey-7">Decision: {{decision.name}}</div>
+      <div v-if="expired" class="text-caption">Decided on: {{this.prettyDate}}</div>
     </q-card-section>
     <q-card-section v-if="!expired" class="q-pa-md">
       <span class="text-caption">No results yet.</span>
     </q-card-section>
     <q-card-section class="q-pa-md column items-center" v-else-if="resultsList">
-      <div class="text-h5" style="text-align: left; width: 100%">Results</div>
-      <q-separator class="q-mb-md"/>
       <div v-if="ballot.ballotTypeId === 1" class="bg-grey-2 q-pa-sm" style="width: 100%">
         <div v-for="(result, idx) in tabulatedResults" :key="idx" class="q-pa-sm">
           <div class="row">
@@ -19,8 +18,18 @@
           <div class="q-pa-xs"><q-linear-progress rounded size="14px" :value="result.percentage" /></div>
         </div>
       </div>
-      <div v-else>
-      {{resultsList}}
+      <div v-else class="bg-grey-2 q-pa-sm" style="width: 100%">
+        <div class=" text-h6 q-pa-xs">Winning Choice: <q-icon name="emoji_events" size="lg" class="text-green q-pa-xs"/>{{ resultsList[0].winner.title }}</div>
+        <q-expansion-item
+          icon="read_more"
+          label="Details"
+          caption="See each 1v1 result"
+        >
+          <div v-for="(result, idx) in rankedPairResults" :key="idx" class="q-pa-sm">
+            <div class="q-pa-xs"> <span :class="(result.winner.id === resultsList[0].winner.id) ? 'text-positive text-bold': ''">{{ result.winner.title }}</span> beat <span :class="(result.loser.id === resultsList[0].winner.id) ? 'text-negative text-bold': ''">{{result.loser.title}}</span> by ({{result.margin}})</div>
+            <q-separator />
+          </div>
+        </q-expansion-item>
       </div>
     </q-card-section>
     <q-card-section v-else>
@@ -110,7 +119,8 @@ export default {
 
     rankedPairResults: function () {
       const data = []
-
+      this.resultsList[0].rankedPairWinners.forEach(res => data.push(res))
+      data.sort((a, b) => b.margin - a.margin)
       return data
     },
 

@@ -13,13 +13,4 @@ axios.interceptors.request.use(req => {
   return Promise.reject(error)
 })
 
-axios.interceptors.response.use(res => {
-  if (!res.data.success) {
-    throw new Error(res.data.errors[0].message)
-  }
-  return res
-}, (error) => {
-  return Promise.reject(error)
-})
-
 export default { axios }

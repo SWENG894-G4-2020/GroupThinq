@@ -98,6 +98,7 @@ export default {
     },
 
     checkValidDate (d) {
+      if (this.mode === 'view') { return true }
       const check = Date.parse(d)
       if (!check) { return false }
       const diff = (new Date(d) - Date.now()) / 1000
