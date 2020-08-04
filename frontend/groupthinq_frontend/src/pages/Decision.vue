@@ -8,6 +8,12 @@
         <div class="q-pa-sm col-xs-12 col-md-6">
           <BallotCard ref="ballot" v-bind:mode="mode" v-bind:decision="decision"/>
         </div>
+        <div class="q-pa-sm col-xs-12 col-md-6">
+          <ResultsCard
+            v-bind:ballot="this.decision.ballots[0]"
+            v-bind:decisionInfo="{ name: this.decision.name, description: this.decision.description, showClose: true }"
+           />
+        </div>
       </div>
       <div class="q-pa-sm col-xs-12">
         <q-banner v-if="!submissionValid" class="bg-red-1 q-my-sm">
@@ -17,7 +23,8 @@
           A new decision requires a title, valid expiration date, and at least one option.
         </q-banner>
         <div class="row q-gutter-sm">
-          <q-btn icon="arrow_back" color="primary" label="Back" to="/main" name="decision-back"/>
+          <q-btn v-if="mode !== 'edit'" icon="arrow_back" color="primary" label="Back" to="/main" name="decision-back"/>
+          <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'edit'" icon="check" color="positive" label="Confirm" name="decision-confirm" @click="onEditConfirm()"/>
           <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'view'" icon="edit" label="Edit" name="decision-edit" @click="onEdit()"/>
           <q-btn v-if="(currentUserName === decision.ownerUsername || currentUserRole === 'Admin') && mode === 'edit'" icon="close" label="Cancel" name="decision-edit-cancel" @click="onEditCancel()"/>
           <q-btn v-if="currentUserName === decision.ownerUsername || currentUserRole === 'Admin'" icon="delete" color="negative" label="Delete" @click="deleteDecisionDialog = true" name="decision-delete"/>
@@ -54,13 +61,15 @@
 import auth from 'src/store/auth'
 import DecisionDetailsCard from 'src/components/DecisionDetailsCard'
 import BallotCard from 'src/components/BallotCard'
+import ResultsCard from 'src/components/ResultsCard'
 
 export default {
   name: 'PageDecisions',
 
   components: {
     DecisionDetailsCard,
-    BallotCard
+    BallotCard,
+    ResultsCard
   },
 
   data () {
@@ -118,19 +127,17 @@ export default {
       return decision
     },
 
-    async onCreate () {
+    async onEditCOnfirm () {
       if (!this.$refs.details.isValid() || !this.$refs.ballot.isValid()) {
         this.submissionValid = false
         return
       }
-      this.submitting = true
       const decision = this.buildDecision()
 
       try {
         await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, decision)
-        this.$router.push({ path: '/main' })
+        this.getDecision()
 
-        this.submitting = false
         this.submissionValid = true
       } catch (error) {
         console.log(error)
