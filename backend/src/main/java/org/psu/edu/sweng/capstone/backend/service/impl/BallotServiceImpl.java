@@ -206,7 +206,7 @@ public class BallotServiceImpl implements BallotService {
 	}
 	
 	@Override
-	public ResponseEntity<BallotResultDTO> retrieveSingleChoiceResults(final Ballot ballot) throws EntityNotFoundException {
+	public ResponseEntity<BallotResultDTO> retrieveAllVotes(final Ballot ballot) throws EntityNotFoundException {
 		ResponseEntity<BallotResultDTO> response = new ResponseEntity<>();
 		
 		ballot.getVotes().forEach(br -> response.getData().add(BallotResultDTO.build(br)));
