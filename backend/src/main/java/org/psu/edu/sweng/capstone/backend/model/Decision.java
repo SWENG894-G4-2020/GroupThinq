@@ -76,7 +76,7 @@ public class Decision {
 		this.description = description;
 	}
 	
-	public User getOwnerId() {
+	public User getOwner() {
 		return ownerId;
 	}
 
