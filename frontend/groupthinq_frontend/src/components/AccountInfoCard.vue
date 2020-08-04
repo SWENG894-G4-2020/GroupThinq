@@ -25,15 +25,15 @@
         </q-btn>
       </q-card-actions>
       <q-card-section>
-        <q-input filled dense class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.firstName" :rules="[val => !!val || '*Required']" label="First Name" />
-        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.lastName" :rules="[val => !!val || '*Required']" label="Last Name" />
-        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.emailAddress" :rules="[val => !!val || '*Required']" label="Email Address" />
-        <q-input filled dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.birthDate" label="Birthdate" />
-        <q-input filled dense class="q-my-md" readonly v-model="userInfo.userName" label="Username" />
-        <q-input filled dense class="q-mt-md" readonly v-model="userInfo.password" type="password" label="Password" />
-        <q-input filled dense class="q-mt-md" readonly v-model="userInfo.createdDate" label="Created On" />
-        <q-input filled dense class="q-mt-md" readonly v-model="userInfo.updatedDate" label="Last Updated" />
-        <q-input filled dense class="q-mt-md" readonly v-model="userInfo.lastLoggedIn" label="Last Logged In" />
+        <q-input dense class="q-mb-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.firstName" :rules="[val => !!val || '*Required']" label="First Name" />
+        <q-input dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.lastName" :rules="[val => !!val || '*Required']" label="Last Name" />
+        <q-input dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.emailAddress" :rules="[val => !!val || '*Required']" label="Email Address" />
+        <q-input dense class="q-my-md" :readonly="!editEnabled" :bg-color="fieldColor" v-model="userInfo.birthDate" label="Birthdate" />
+        <q-input dense class="q-my-md" readonly v-model="userInfo.userName" label="Username" />
+        <q-input dense class="q-mt-md" readonly v-model="userInfo.password" type="password" label="Password" />
+        <q-input dense class="q-mt-md" readonly v-model="userInfo.createdDate" label="Created On" />
+        <q-input dense class="q-mt-md" readonly v-model="userInfo.updatedDate" label="Last Updated" />
+        <q-input dense class="q-mt-md" readonly v-model="userInfo.lastLoggedIn" label="Last Logged In" />
       </q-card-section>
       <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
         <q-card-actions key="buttons" v-if="editEnabled" align="right">
@@ -130,3 +130,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.q-field--readonly .q-field__control:before {
+    border-bottom-style: none !important;
+}
+</style>
