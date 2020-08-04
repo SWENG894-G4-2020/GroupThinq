@@ -8,8 +8,11 @@ import java.util.Optional;
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedPairWinnerDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
@@ -43,7 +46,13 @@ public class DecisionServiceImpl implements DecisionService {
 	private DecisionDAO decisionDao;
 	
 	@Autowired
+	private BallotTypeDAO ballotTypeDao;
+	
+	@Autowired
 	private BallotService ballotService;
+	
+	@Autowired
+	private BallotVoteDAO ballotVoteDao;
 	
 	@Autowired
 	private DecisionUserDAO decisionUserDao;
@@ -52,7 +61,10 @@ public class DecisionServiceImpl implements DecisionService {
 	private BallotOptionDAO ballotOptionDao;
 	
 	@Autowired
-	private BallotTypeDAO ballotTypeDao;
+	private RankedWinnerDAO rankedWinnerDao;
+	
+	@Autowired
+	private RankedPairWinnerDAO rankedPairWinnerDao;
 		
 	private static final String USER_HEADER = "User ";
 	private static final String DECISION_HEADER = "Decision ";
@@ -148,6 +160,12 @@ public class DecisionServiceImpl implements DecisionService {
 		
 		final Decision decision = decisionDao.findById(id).orElseThrow(
 				() -> new EntityNotFoundException(DECISION_HEADER + id.toString()));
+		
+		decision.getBallots().forEach(ballot -> {
+			rankedWinnerDao.deleteByBallot(ballot);
+			rankedPairWinnerDao.deleteByBallot(ballot);
+			ballotVoteDao.deleteByBallot(ballot);
+		});
 		
 		decision.getBallots().clear();
 		
