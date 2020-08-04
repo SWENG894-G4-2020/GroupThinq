@@ -2,7 +2,7 @@
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pb-sm">
       <div class="text-h5 q-py-md"><q-icon name="ballot" color="grey-7"/> Ballot</div>
-      <ExpirationField v-bind:mode="mode" v-bind:showTimer="showTimer" v-bind:initialDate="initialDate" ref="datetime" @expired="setExpired"/>
+      <ExpirationField v-bind:mode="mode" v-bind:showTimer="showTimer" v-bind:initialDate="initialDate" ref="datetime" @expired="setExpired()"/>
       <div class="q-mt-sm">
         <div class="text-grey-8" style="font-size: 16px"> Voting Method</div>
         <q-btn-toggle
@@ -32,16 +32,17 @@
         />
       </div>
       <div v-else-if="voting && ballotTypeId === 2" class="column">
-        <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
-          <span class="text-body1">{{option.rank}}</span>
+        <div v-for="(option,idx) in newVote" :key="idx" class="row items-center q-mb-sm">
+          <q-avatar color="primary" size="sm" class="q-mr-md text-white text-bold">{{option.rank}}</q-avatar>
           <span class="text-body1 col-grow">{{option.title}}</span>
-          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="validateRankVote(option, 'up')" name="ballot-option-rankup"/>
-          <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="validateRankVote(option, 'down')" name="ballot-option-rankdown"/>
+          <q-btn flat color="positive" icon="expand_less" @click="moveRankUp(option)" name="ballot-option-rankup"/>
+          <q-btn flat color="negative" icon="expand_more" @click="moveRankDown(option)" name="ballot-option-rankdown"/>
         </div>
       </div>
       <div v-else class="column">
-        <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
-          <q-icon v-if="isMyVote(option)" name="check" color="positive" class="q-pr-sm"/>
+        <div v-for="(option,idx) in options" :key="idx" class="row items-center q-mb-sm">
+          <q-icon v-if="isMyVote(option) && ballotTypeId === 1" name="check" color="positive" class="q-pr-sm"/>
+          <q-avatar v-else-if="isMyVote(option) && ballotTypeId === 2" color="primary" size="sm" class="q-mr-md text-white text-bold">{{option.rank}}</q-avatar>
           <q-icon v-else name="close" color="white" class="q-pr-sm"/>
           <span class="text-body1 col-grow">{{option.title}}</span>
           <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" name="ballot-option-delete"/>
@@ -115,20 +116,10 @@ export default {
 
     if (this.decision) {
       this.populateWithBallot(this.decision.ballots[0])
-      this.getVotes()
     }
   },
 
   computed: {
-    sortedOptions: function () {
-      if (this.ballotTypeId === 1) {
-        return this.options
-      } else {
-        const clone = this.options.slice()
-        return clone.sort((a, b) => a - b)
-      }
-    },
-
     myVotes: function () {
       return this.votes.filter(vote => vote.userName === this.currentUserName)
     },
@@ -160,6 +151,7 @@ export default {
       this.votes = []
       this.newOption = { title: '', userName: this.currentUserName }
       this.newVoteSelection = ''
+      this.newVote = []
     },
 
     createNewVote () {
@@ -180,16 +172,21 @@ export default {
         vote.push(opt)
         iter++
       })
-      vote.sort((a, b) => a - b)
+      vote.sort((a, b) => a.rank - b.rank)
       return vote
     },
 
-    populateWithBallot (ballot) {
+    async populateWithBallot (ballot) {
       this.initialDate = ballot.expirationDate
       this.ballotTypeId = ballot.ballotTypeId
       this.options = []
-      ballot.ballotOptions.forEach(option => this.options.push(option)
-      )
+      ballot.ballotOptions.forEach(option => this.options.push(option))
+      await this.getVotes()
+      this.myVotes.forEach(vote => {
+        const opt = this.options.find(opt => vote.ballotOptionId === opt.id)
+        opt.rank = vote.rank
+      })
+      this.options.sort((a, b) => a.rank - b.rank)
     },
 
     addDecisionOption () {
@@ -211,6 +208,7 @@ export default {
     },
 
     setExpired () {
+      this.$emit('expired')
       this.expired = true
     },
 
@@ -247,8 +245,28 @@ export default {
       return ballot
     },
 
-    validateRankVote (option, dir) {
-      console.log('Not implemented yet!')
+    moveRankUp (option) {
+      if (option.rank > 1) {
+        const swap = this.newVote.find(opt => opt.rank === (option.rank - 1))
+        swap.rank = option.rank
+        option.rank = option.rank - 1
+      } else {
+        this.newVote.forEach(opt => opt.rank--)
+        option.rank = this.newVote.length
+      }
+      this.newVote.sort((a, b) => a.rank - b.rank)
+    },
+
+    moveRankDown (option) {
+      if (option.rank < this.newVote.length) {
+        const swap = this.newVote.find(opt => opt.rank === (option.rank + 1))
+        swap.rank = option.rank
+        option.rank = option.rank + 1
+      } else {
+        this.newVote.forEach(opt => opt.rank++)
+        option.rank = 1
+      }
+      this.newVote.sort((a, b) => a.rank - b.rank)
     },
 
     async addBallotOption (option) {
@@ -264,8 +282,8 @@ export default {
     async getBallot () {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/decision/${this.decision.id}`)
-        this.populateWithBallot(response.data.data[0].ballots[0])
         this.getVotes()
+        this.populateWithBallot(response.data.data[0].ballots[0])
       } catch (error) {
         console.log(error)
         this.isError = true
@@ -291,28 +309,37 @@ export default {
     },
 
     async onVoteConfirm () {
-      try {
-        if (this.ballotTypeId === 1) {
-          if (!this.newVoteSelection) {
-            this.onVoteCancel()
-            return
-          }
-          const votePayload = [{
-            ballotId: this.decision.ballots[0].id,
-            ballotOptionId: this.newVoteSelection,
-            userName: this.currentUserName
-          }]
-
-          if (this.haveVoted) {
-            await this.$axios.put(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
-          } else {
-            await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
-          }
-          this.getVotes()
+      const votePayload = []
+      if (this.ballotTypeId === 1) {
+        if (!this.newVoteSelection) {
           this.onVoteCancel()
-        } else {
-          console.log('Not implemented yet!')
+          return
         }
+        votePayload.push({
+          ballotId: this.decision.ballots[0].id,
+          ballotOptionId: this.newVoteSelection,
+          userName: this.currentUserName
+        })
+      } else {
+        this.newVote.forEach(vote => {
+          votePayload.push({
+            ballotId: this.decision.ballots[0].id,
+            ballotOptionId: vote.id,
+            userName: this.currentUserName,
+            rank: vote.rank
+          })
+        })
+      }
+
+      try {
+        if (this.haveVoted) {
+          await this.$axios.put(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
+        } else {
+          await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
+        }
+        this.getVotes()
+        this.populateWithBallot(this.decision.ballots[0])
+        this.onVoteCancel()
       } catch (error) {
         console.log(error)
         this.isError = true

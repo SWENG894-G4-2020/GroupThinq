@@ -6,13 +6,10 @@
           <DecisionDetailsCard ref="details" v-bind:mode="mode" v-bind:decision="decision" />
         </div>
         <div class="q-pa-sm col-xs-12 col-md-6">
-          <BallotCard ref="ballot" v-bind:mode="mode" v-bind:decision="decision"/>
+          <BallotCard ref="ballot" v-bind:mode="mode" v-bind:decision="decision" @expired="setExpired()" />
         </div>
-        <div class="q-pa-sm col-xs-12 col-md-6">
-          <ResultsCard
-            v-bind:ballot="this.decision.ballots[0]"
-            v-bind:decisionInfo="{ name: this.decision.name, description: this.decision.description }"
-           />
+        <div v-if="expired" class="q-pa-sm col-xs-12 col-md-6">
+          <ResultsCard v-bind:decision="this.decision" />
         </div>
       </div>
       <div class="q-pa-sm col-xs-12">
@@ -82,7 +79,8 @@ export default {
       errorMsg: '',
       isLoaded: false,
       deleteDecisionDialog: false,
-      decision: {}
+      decision: {},
+      expired: false
     }
   },
 
@@ -108,6 +106,10 @@ export default {
         this.isError = true
         this.errorMsg = error.message
       }
+    },
+
+    setExpired () {
+      this.expired = true
     },
 
     onEdit () {

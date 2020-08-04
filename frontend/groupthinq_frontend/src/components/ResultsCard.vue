@@ -1,13 +1,13 @@
 <template>
   <q-card bordered style="height: 100%">
     <q-card-section class="q-pa-md">
-      <div class="text-h5 q-py-md"><q-icon name="poll" color="grey-7"/> {{decisionInfo.name}}</div>
+      <div class="text-h5 q-py-md"><q-icon name="poll" color="grey-7"/> {{decision.name}}</div>
       <span class="text-caption">Decided on: {{this.prettyDate}}</span>
     </q-card-section>
     <q-card-section class="q-pa-md column items-center" v-if="resultsList">
       <div class="text-h5" style="text-align: left; width: 100%">Results</div>
       <q-separator class="q-mb-md"/>
-      <div class="bg-grey-2 q-pa-sm" style="width: 100%">
+      <div v-if="ballot.ballotTypeId === 1" class="bg-grey-2 q-pa-sm" style="width: 100%">
         <div v-for="result in tabulatedResults" :key="result.rank" class="q-pa-sm">
           <div class="row">
             <div class="q-pa-xs"><q-icon name="done" class="text-green q-pa-xs" v-if="result.winner"/>{{ result.name }}</div>
@@ -15,6 +15,9 @@
           </div>
           <div class="q-pa-xs"><q-linear-progress rounded size="14px" :value="result.percentage" /></div>
         </div>
+      </div>
+      <div v-else>
+      {{resultsList}}
       </div>
     </q-card-section>
     <q-card-section v-else>
@@ -31,12 +34,21 @@ export default {
   data () {
     return {
       isLoaded: false,
-      resultsList: []
+      resultsList: [],
+      ballot: {}
     }
   },
 
   mounted () {
+    this.ballot = this.decision.ballots[0]
     this.getResultsData()
+  },
+
+  props: {
+    decision: {
+      type: Object,
+      required: true
+    }
   },
 
   computed: {
@@ -107,17 +119,6 @@ export default {
       } catch (error) {
         console.log(error)
       }
-    }
-  },
-
-  props: {
-    decisionInfo: {
-      type: Object,
-      required: true
-    },
-    ballot: {
-      type: Object,
-      required: true
     }
   }
 }
