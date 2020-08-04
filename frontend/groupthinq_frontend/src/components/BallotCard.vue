@@ -194,6 +194,7 @@ export default {
         this.options.push({ title: this.newOption.title, userName: this.currentUserName })
       } else if (this.newOption.title !== '') {
         this.addBallotOption({ title: this.newOption.title, userName: this.currentUserName, ballotId: this.decision.ballots[0].id })
+        this.$emit('reload')
       }
       this.newOption = { title: '', userName: this.currentUserName }
     },

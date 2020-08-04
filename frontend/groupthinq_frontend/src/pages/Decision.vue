@@ -6,10 +6,13 @@
           <DecisionDetailsCard ref="details" v-bind:mode="mode" v-bind:decision="decision" />
         </div>
         <div class="q-pa-sm col-xs-12 col-md-6">
-          <BallotCard ref="ballot" v-bind:mode="mode" v-bind:decision="decision" @expired="setExpired()" />
+          <BallotCard ref="ballot" v-bind:mode="mode" v-bind:decision="decision" @expired="setExpired()" @reload="getDecision()" />
         </div>
         <div v-if="expired" class="q-pa-sm col-xs-12 col-md-6">
           <ResultsCard v-bind:decision="this.decision" />
+        </div>
+        <div class="q-pa-sm col-xs-12 col-md-6">
+          <BrainCard v-bind:decision="this.decision" />
         </div>
       </div>
       <div class="q-pa-sm col-xs-12">
@@ -58,6 +61,7 @@ import auth from 'src/store/auth'
 import DecisionDetailsCard from 'src/components/DecisionDetailsCard'
 import BallotCard from 'src/components/BallotCard'
 import ResultsCard from 'src/components/ResultsCard'
+import BrainCard from 'src/components/BrainCard'
 
 export default {
   name: 'PageDecisions',
@@ -65,7 +69,8 @@ export default {
   components: {
     DecisionDetailsCard,
     BallotCard,
-    ResultsCard
+    ResultsCard,
+    BrainCard
   },
 
   data () {

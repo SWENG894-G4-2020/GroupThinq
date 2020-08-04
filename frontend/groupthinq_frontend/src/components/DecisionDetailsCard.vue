@@ -4,6 +4,7 @@
       <q-input
       :readonly="(mode === 'create' || mode === 'edit') ? false : true"
       name="details-name"
+      autogrow
       v-model="name"
       label="Decision"
       class="text-h5"
@@ -14,7 +15,7 @@
         </template>
       </q-input>
       <div v-if="mode !== 'create' ">
-        <span class="text-grey-7">Started by</span>
+        <span class="text-grey-7">A decision by</span>
         <q-chip v-if="mode !== 'create' " dense>
               <q-avatar icon="campaign" color="primary" text-color="white" />
               {{ decision ? decision.ownerUsername : '' }}
