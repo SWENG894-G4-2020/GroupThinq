@@ -24,22 +24,33 @@
           <q-btn dense color="positive" icon="add" @click="addDecisionOption()" name="ballot-option-add"/>
         </template>
       </q-input>
-      <div class="column">
+      <div v-if="voting && ballotTypeId === 1" class="column">
+        <q-option-group
+          v-model="newVoteSelection"
+          :options="newVote"
+          color="primary"
+        />
+      </div>
+      <div v-else-if="voting && ballotTypeId === 2" class="column">
         <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
-          <q-checkbox v-if="ballotTypeId === 1 && mode !== 'create'" v-model="option.vote" @input="validateCheckboxVote(option)" name="ballot-option-votecheck"/>
-          <q-avatar v-else-if="mode !== 'create'" size="md">{{ option.rank ? option.rank : idx + 1 }}</q-avatar>
+          <span class="text-body1">{{option.rank}}</span>
           <span class="text-body1 col-grow">{{option.title}}</span>
           <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="positive" icon="expand_less" @click="validateRankVote(option, 'up')" name="ballot-option-rankup"/>
           <q-btn v-if="ballotTypeId === 2 && mode !== 'create'" flat color="negative" icon="expand_more" @click="validateRankVote(option, 'down')" name="ballot-option-rankdown"/>
+        </div>
+      </div>
+      <div v-else class="column">
+        <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
+          <span>{{idx}}</span>
+          <span class="text-body1 col-grow">{{option.title}}</span>
           <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" name="ballot-option-delete"/>
         </div>
       </div>
       <div class="row reverse q-gutter-sm">
-        <q-btn v-if="!expired && mode === 'view' && voteChanged" icon="check" color="primary" label="Vote" name="ballot-vote" @click="onVote()" :loading="voting" :disabled="voting">
-            <template v-slot:loading>
-              <q-spinner />
-            </template>
-        </q-btn>
+        <q-btn v-if="!expired && mode === 'view' && !voting" icon="ballot" color="primary" label="Vote" name="ballot-vote-start" @click="onVoteStart()"/>
+        <q-btn v-if="!expired && mode === 'view' && voting" icon="check" color="positive" label="Confirm" name="ballot-vote-confirm" @click="onVoteConfirm()"/>
+        <q-btn v-if="!expired && mode === 'view' && voting" icon="close" label="Cancel" name="ballot-vote-cancel" @click="onVoteCancel()"/>
+
       </div>
     </q-card-section>
   </q-card>
@@ -72,11 +83,14 @@ export default {
           description: 'Selects a single winner using votes that express preferences. Voters rank the choices.'
         }
       ],
-      newOption: { title: '', userName: this.currentUserName, vote: false, rank: 999 },
+      newOption: { title: '', userName: this.currentUserName },
       options: [],
+      newVote: [],
+      newVoteSelection: '',
       expired: false,
       initialDate: '',
-      voteChanged: false,
+      votes: [],
+      voteMode: 'view',
       voting: false
     }
   },
@@ -100,17 +114,18 @@ export default {
     this.resetForm()
 
     if (this.decision) {
-      this.populateWithDecision()
-    }
-
-    if (this.decision && this.mode !== 'create') {
-
+      this.populateWithDecision(this.decision.ballots[0])
+      this.getVotes()
     }
   },
 
   computed: {
     sortedOptions: function () {
       return this.options
+    },
+
+    myVotes: function () {
+      return this.votes.filter(vote => vote.userName === this.currentUserName)
     },
 
     showTimer: function () {
@@ -133,25 +148,47 @@ export default {
       this.initialDate = ''
       this.ballotTypeId = 1
       this.options = []
-      this.newOption = { title: '', userName: this.currentUserName, vote: false, rank: 999 }
+      this.votes = []
+      this.newOption = { title: '', userName: this.currentUserName }
+      this.newVoteSelection = ''
     },
 
-    populateWithDecision () {
-      this.initialDate = this.decision.ballots[0].expirationDate
-      this.ballotTypeId = this.decision.ballots[0].ballotTypeId
-      this.decision.ballots[0].ballotOptions.forEach(option => {
-        const newOpt = option
-        newOpt.vote = false
-        newOpt.rank = 999
-        this.options.push(newOpt)
+    createNewVote () {
+      const vote = []
+      let iter = 1
+      this.options.forEach(option => {
+        const opt = option
+        const myVote = this.myVotes.find(v => v.ballotOptionId === option.id)
+        if (myVote) {
+          opt.vote = true
+          opt.rank = myVote.rank
+        } else {
+          opt.vote = false
+          opt.rank = iter
+        }
+        opt.label = option.title
+        opt.value = option.id
+        vote.push(opt)
+        iter++
       })
+      vote.sort((a, b) => a - b)
+      return vote
+    },
+
+    populateWithBallot (ballot) {
+      this.initialDate = ballot.expirationDate
+      this.ballotTypeId = ballot.ballotTypeId
+      ballot.ballotOptions.forEach(option => this.options.push(option)
+      )
     },
 
     addDecisionOption () {
-      if (this.newOption.title !== '') {
-        this.options.push({ title: this.newOption.title, userName: this.currentUserName, vote: false, rank: 999 })
-        this.newOption = { title: '', userName: this.currentUserName, vote: false, rank: 999 }
+      if (this.mode === 'create' && this.newOption.title !== '') {
+        this.options.push({ title: this.newOption.title, userName: this.currentUserName })
+      } else if (this.newOption.title !== '') {
+        this.addBallotOption({ title: this.newOption.title, userName: this.currentUserName })
       }
+      this.newOption = { title: '', userName: this.currentUserName }
     },
 
     removeDecisionOption (option) {
@@ -184,42 +221,73 @@ export default {
       return ballot
     },
 
-    validateCheckboxVote (option) {
-      console.log(this.options)
-      this.voteChanged = true
-      this.options.forEach(opt => {
-        if (opt !== option) {
-          opt.vote = false
-        } else {
-          opt.vote = true
-        }
-      })
-    },
-
     validateRankVote (option, dir) {
       console.log('Not implemented yet!')
     },
 
-    async onVote () {
+    onVoteStart () {
+      this.voting = true
+      this.newVote = this.createNewVote()
+    },
+
+    async addBallotOption (option) {
       try {
-        this.voting = true
-        if (this.ballotTypeId === 1) {
-          const vote = this.options.find(opt => opt.vote === true)
-          const votePayload = [{
-            ballotId: this.decision.ballots[0].id,
-            ballotOptionId: vote.id,
-            userName: this.currentUserName
-          }]
-          await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
-        } else {
-          console.log('Not implemented yet!')
-        }
-        this.voteChanged = false
-        this.voting = false
+        await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/option`, option)
+        this.getBallot()
       } catch (error) {
         console.log(error)
         this.isError = true
       }
+    },
+
+    async getBallot () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}`)
+        this.populateWithBallot(response.data.data[0])
+        this.getVotes()
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
+    },
+
+    async getVotes () {
+      try {
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/votes`)
+        this.votes = response.data.data
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
+    },
+
+    async onVoteConfirm () {
+      try {
+        if (this.ballotTypeId === 1) {
+          const votePayload = [{
+            ballotId: this.decision.ballots[0].id,
+            ballotOptionId: this.newVoteSelection,
+            userName: this.currentUserName
+          }]
+
+          if (this.myVotes.length > 0) {
+            await this.$axios.put(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
+          } else {
+            await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
+          }
+          this.onVoteCancel()
+        } else {
+          console.log('Not implemented yet!')
+        }
+      } catch (error) {
+        console.log(error)
+        this.isError = true
+      }
+    },
+
+    onVoteCancel () {
+      this.voting = false
+      this.newVote = []
     }
   }
 }
