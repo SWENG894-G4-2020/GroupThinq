@@ -231,7 +231,19 @@ export default {
         ballotOptions: [],
         expirationDate: new Date(this.getExpiration())
       }
-      this.options.forEach(option => ballot.ballotOptions.push({ title: option.title, userName: this.currentUserName }))
+
+      if (this.decision) {
+        ballot.id = this.decision.ballots[0].id
+        this.options.forEach(option => ballot.ballotOptions.push({
+          title: option.title,
+          userName: this.currentUserName,
+          ballotId: this.decision.ballots[0].id,
+          id: option.id
+        }))
+      } else {
+        this.options.forEach(option => ballot.ballotOptions.push({ title: option.title, userName: this.currentUserName }))
+      }
+
       return ballot
     },
 

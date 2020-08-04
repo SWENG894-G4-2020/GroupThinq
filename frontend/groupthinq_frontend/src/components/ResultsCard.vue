@@ -1,8 +1,7 @@
 <template>
-  <q-card style="min-width: 360px; max-width: 600px">
-    <q-card-section class="q-pa-md column">
-      <span class="text-h4">{{decisionInfo.name}}</span>
-      <span class="text-subtitle1 text-grey">{{decisionInfo.description}}</span>
+  <q-card bordered style="height: 100%">
+    <q-card-section class="q-pa-md">
+      <div class="text-h5 q-py-md"><q-icon name="poll" color="grey-7"/> {{decisionInfo.name}}</div>
       <span class="text-caption">Decided on: {{this.prettyDate}}</span>
     </q-card-section>
     <q-card-section class="q-pa-md column items-center" v-if="resultsList">

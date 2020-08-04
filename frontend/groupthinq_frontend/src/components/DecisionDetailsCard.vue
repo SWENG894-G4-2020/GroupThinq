@@ -88,6 +88,14 @@ export default {
     }
   },
 
+  watch: {
+    mode: function (newMode, oldMode) {
+      if (newMode === 'edit') {
+        this.selectedUsers = this.selectedUsers.filter(v => v !== this.currentUserName)
+      }
+    }
+  },
+
   methods: {
     async getAllUsers () {
       try {
@@ -140,6 +148,10 @@ export default {
         ownerUsername: this.currentUserName
       }
       this.selectedUsers.forEach(user => decision.includedUsers.push({ userName: user }))
+
+      if (this.decision) {
+        decision.id = this.decision.id
+      }
       return decision
     }
   }

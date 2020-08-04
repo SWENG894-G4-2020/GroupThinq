@@ -127,7 +127,7 @@ export default {
       return decision
     },
 
-    async onEditCOnfirm () {
+    async onEditConfirm () {
       if (!this.$refs.details.isValid() || !this.$refs.ballot.isValid()) {
         this.submissionValid = false
         return
@@ -135,8 +135,8 @@ export default {
       const decision = this.buildDecision()
 
       try {
-        await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, decision)
-        this.getDecision()
+        await this.$axios.put(`${process.env.BACKEND_URL}/decision/${this.decision.id}`, decision)
+        this.onEditCancel()
 
         this.submissionValid = true
       } catch (error) {
