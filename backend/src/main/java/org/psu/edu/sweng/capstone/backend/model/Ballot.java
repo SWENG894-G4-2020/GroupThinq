@@ -45,10 +45,10 @@ public class Ballot {
 	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotOption.class)
 	private Set<BallotOption> options = new HashSet<>();
 	
-	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BallotVote.class)
+	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = false, targetEntity = BallotVote.class)
 	private Set<BallotVote> votes = new HashSet<>();
 	
-	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = RankedPairWinner.class)
+	@OneToMany(mappedBy = "ballot", fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = false, targetEntity = RankedPairWinner.class)
 	private Set<RankedPairWinner> rankedPairWinners = new HashSet<>();
 	
 	protected Ballot() {}
