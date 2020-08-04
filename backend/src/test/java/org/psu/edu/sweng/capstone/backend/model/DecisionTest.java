@@ -56,7 +56,7 @@ class DecisionTest {
 		// then
 		assertEquals("Leetest Decision", newDecision.getName());
 		assertEquals("The description of this Decision", description);
-		assertEquals(testUser, newDecision.getOwnerId());
+		assertEquals(testUser, newDecision.getOwner());
 	}
 	
 	@Test
@@ -64,7 +64,7 @@ class DecisionTest {
 		assertEquals(1L, testDecision.getId());
 		assertEquals("Test Decision", testDecision.getName());
 		assertEquals("The Leetest Decision Description", testDecision.getDescription());
-		assertEquals(testUser, testDecision.getOwnerId());
+		assertEquals(testUser, testDecision.getOwner());
 		assertEquals(new Date(1111L), testDecision.getCreatedDate());
 		assertEquals(new Date(2222L), testDecision.getUpdatedDate());
 		assertEquals(1, testDecision.getBallots().size());
@@ -91,7 +91,7 @@ class DecisionTest {
 		// then
 		assertEquals("New Test Decision", testDecision.getName());
 		assertEquals("New Test Description", testDecision.getDescription());
-		assertEquals(testUser, testDecision.getOwnerId());
+		assertEquals(testUser, testDecision.getOwner());
 		assertEquals(new Date(4444L), testDecision.getCreatedDate());
 		assertEquals(new Date(5555L), testDecision.getUpdatedDate());
 		assertEquals(2, testDecision.getBallots().size());

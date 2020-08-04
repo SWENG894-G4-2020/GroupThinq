@@ -51,13 +51,13 @@ public class BallotController {
 		return ballotService.createBallot(ballot);
 	}
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#ballot.getDecisionId()) or @authCheck.isAdmin()")
+	@PreAuthorize("@authCheck.doesUserOwnDecisionUnderBallot(#ballotId) or @authCheck.isAdmin()")
 	@DeleteMapping("ballot/{id}")
 	public ResponseEntity<BallotDTO> deleteBallot(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.deleteBallot(ballotId);
 	}
 	
-	@PreAuthorize("@authCheck.isDecisionOwner(#ballot.getDecisionId()) or @authCheck.isAdmin()")
+	@PreAuthorize("@authCheck.doesUserOwnDecisionUnderBallot(#ballotId) or @authCheck.isAdmin()")
 	@GetMapping("/ballot/{id}")
 	public ResponseEntity<BallotDTO> retrieveBallot(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		return ballotService.retrieveBallot(ballotId);
