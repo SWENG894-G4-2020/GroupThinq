@@ -41,16 +41,16 @@
       </div>
       <div v-else class="column">
         <div v-for="(option,idx) in sortedOptions" :key="idx" class="row items-center q-mb-sm">
-          <span>{{idx}}</span>
+          <q-icon v-if="isMyVote(option)" name="check" color="positive" class="q-pr-sm"/>
+          <q-icon v-else name="close" color="white" class="q-pr-sm"/>
           <span class="text-body1 col-grow">{{option.title}}</span>
           <q-btn v-if="mode === 'create'" flat color="negative" icon="close" @click="removeDecisionOption(option)" name="ballot-option-delete"/>
         </div>
       </div>
       <div class="row reverse q-gutter-sm">
-        <q-btn v-if="!expired && mode === 'view' && !voting" icon="ballot" color="primary" label="Vote" name="ballot-vote-start" @click="onVoteStart()"/>
+        <q-btn v-if="!expired && mode === 'view' && !voting" icon="ballot" color="primary" :label="haveVoted ? 'Change Vote' : 'Vote'" name="ballot-vote-start" @click="onVoteStart()"/>
         <q-btn v-if="!expired && mode === 'view' && voting" icon="check" color="positive" label="Confirm" name="ballot-vote-confirm" @click="onVoteConfirm()"/>
         <q-btn v-if="!expired && mode === 'view' && voting" icon="close" label="Cancel" name="ballot-vote-cancel" @click="onVoteCancel()"/>
-
       </div>
     </q-card-section>
   </q-card>
@@ -114,18 +114,27 @@ export default {
     this.resetForm()
 
     if (this.decision) {
-      this.populateWithDecision(this.decision.ballots[0])
+      this.populateWithBallot(this.decision.ballots[0])
       this.getVotes()
     }
   },
 
   computed: {
     sortedOptions: function () {
-      return this.options
+      if (this.ballotTypeId === 1) {
+        return this.options
+      } else {
+        const clone = this.options.slice()
+        return clone.sort((a, b) => a - b)
+      }
     },
 
     myVotes: function () {
       return this.votes.filter(vote => vote.userName === this.currentUserName)
+    },
+
+    haveVoted: function () {
+      return this.myVotes.length > 0
     },
 
     showTimer: function () {
@@ -178,6 +187,7 @@ export default {
     populateWithBallot (ballot) {
       this.initialDate = ballot.expirationDate
       this.ballotTypeId = ballot.ballotTypeId
+      this.options = []
       ballot.ballotOptions.forEach(option => this.options.push(option)
       )
     },
@@ -186,7 +196,7 @@ export default {
       if (this.mode === 'create' && this.newOption.title !== '') {
         this.options.push({ title: this.newOption.title, userName: this.currentUserName })
       } else if (this.newOption.title !== '') {
-        this.addBallotOption({ title: this.newOption.title, userName: this.currentUserName })
+        this.addBallotOption({ title: this.newOption.title, userName: this.currentUserName, ballotId: this.decision.ballots[0].id })
       }
       this.newOption = { title: '', userName: this.currentUserName }
     },
@@ -202,6 +212,10 @@ export default {
 
     setExpired () {
       this.expired = true
+    },
+
+    isMyVote (option) {
+      return this.myVotes.find(v => v.ballotOptionId === option.id)
     },
 
     isValid () {
@@ -225,11 +239,6 @@ export default {
       console.log('Not implemented yet!')
     },
 
-    onVoteStart () {
-      this.voting = true
-      this.newVote = this.createNewVote()
-    },
-
     async addBallotOption (option) {
       try {
         await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/option`, option)
@@ -242,8 +251,8 @@ export default {
 
     async getBallot () {
       try {
-        const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}`)
-        this.populateWithBallot(response.data.data[0])
+        const response = await this.$axios.get(`${process.env.BACKEND_URL}/decision/${this.decision.id}`)
+        this.populateWithBallot(response.data.data[0].ballots[0])
         this.getVotes()
       } catch (error) {
         console.log(error)
@@ -255,26 +264,39 @@ export default {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/votes`)
         this.votes = response.data.data
+        if (this.haveVoted && this.ballotTypeId === 1) {
+          this.newVoteSelection = this.myVotes[0].ballotOptionId
+        }
       } catch (error) {
         console.log(error)
         this.isError = true
       }
     },
 
+    onVoteStart () {
+      this.voting = true
+      this.newVote = this.createNewVote()
+    },
+
     async onVoteConfirm () {
       try {
         if (this.ballotTypeId === 1) {
+          if (!this.newVoteSelection) {
+            this.onVoteCancel()
+            return
+          }
           const votePayload = [{
             ballotId: this.decision.ballots[0].id,
             ballotOptionId: this.newVoteSelection,
             userName: this.currentUserName
           }]
 
-          if (this.myVotes.length > 0) {
+          if (this.haveVoted) {
             await this.$axios.put(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
           } else {
             await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
           }
+          this.getVotes()
           this.onVoteCancel()
         } else {
           console.log('Not implemented yet!')
