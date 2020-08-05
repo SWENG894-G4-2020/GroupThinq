@@ -1,6 +1,6 @@
 <template>
 <div class="q-pa-sm">
-  <q-card flat bordered class="column" style="height: 100%">
+  <q-card bordered class="column" style="height: 100%">
     <q-card-section class="q-py-xs">
       <div class="text-h5">
         <q-icon v-if="!expired" name="event_available" class="text-positive"  />

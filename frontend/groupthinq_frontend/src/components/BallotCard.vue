@@ -14,12 +14,12 @@
           :options="ballotTypeOptions"
         />
         <div v-else class="q-pt-sm">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).label }}</div>
-        <div class="q-pb-sm text-grey-7" style="min-height: 62px">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).description }}</div>
+        <div class="text-grey-7">{{ ballotTypeOptions.find(bt => bt.value === ballotTypeId ).description }}</div>
       </div>
     </q-card-section>
     <q-card-section class="q-pt-none">
-      <div class="text-grey-8" style="font-size: 16px"> Ballot choices</div>
-      <q-input class="q-mb-md" v-model="newOption.title" label="Add Choice" name="ballot-option-name">
+      <div class="text-h5 q-pb-sm"><q-icon name="list" class="text-grey-7" /> Ballot choices</div>
+      <q-input v-if="!expired" class="q-mb-md" v-model="newOption.title" label="Add Choice" name="ballot-option-name">
         <template v-if="mode === 'create' || userIncluded" v-slot:append>
           <q-btn dense color="positive" icon="add" @click="addDecisionOption()" name="ballot-option-add"/>
         </template>

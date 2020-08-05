@@ -1,19 +1,19 @@
 <template>
   <q-page class="q-pa-md">
-    <div v-if='isLoaded' class="row q-gutter-md q-pr-md">
-      <div class="col-xs-12">
-          <q-input
-            v-model="search"
-            debounce="0"
-            filled
-            placeholder="Search"
-            >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-      </div>
+    <q-input
+      v-model="search"
+      debounce="0"
+      filled
+      placeholder="Search"
+      class="full-width q-pa-sm"
+      >
+      <template v-slot:append>
+        <q-icon name="search" />
+      </template>
+    </q-input>
+    <div v-if='isLoaded' class="row">
       <UserCard
+      class="col-xs-12 col-sm-6 col-md-4 col-lg-3"
       v-for="user in filteredUsers"
       :key="user.userName"
       v-bind="user"

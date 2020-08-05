@@ -32,7 +32,7 @@
       />
     </q-card-section>
     <q-card-section>
-      <div class="text-h5"><q-icon name="person" /> Participants</div>
+      <div class="text-h5"><q-icon name="person" class="text-grey-7" /> Participants</div>
       <q-select
         label="Select Participants"
         name="details-users"

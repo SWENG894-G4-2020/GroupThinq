@@ -8,7 +8,7 @@
     <q-card-section v-if="!expired" class="q-pa-md">
       <span class="text-caption">No results yet.</span>
     </q-card-section>
-    <q-card-section class="q-pa-md column items-center" v-else-if="resultsList">
+    <q-card-section class="q-pa-md column items-center" v-else-if="isLoaded">
       <div v-if="ballot.ballotTypeId === 1" class="bg-grey-2 q-pa-sm" style="width: 100%">
         <div v-for="(result, idx) in tabulatedResults" :key="idx" class="q-pa-sm">
           <div class="row">
@@ -33,7 +33,9 @@
       </div>
     </q-card-section>
     <q-card-section v-else>
-      No results to show.
+      <div class="text-h5 text-primary">Loading...
+        <q-spinner-hourglass color="primary" size="2em"/>
+      </div>
     </q-card-section>
   </q-card>
 </template>
