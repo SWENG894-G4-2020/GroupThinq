@@ -89,7 +89,8 @@ describe('Expiration field tests', () => {
       }, 
     localVue })
     const vm = wrapper.vm
-    expect(vm.isValid).toBeFalsy()
+    expect(vm.isValid.call()).toBeFalsy()
+    
   })
 
   it('will not validate malformed dates', async () => {
@@ -103,7 +104,16 @@ describe('Expiration field tests', () => {
       }, 
     localVue })
     const vm = wrapper.vm
-    expect(vm.isValid).toBeFalsy()
+    expect(vm.isValid.call({datetime: "la la la la"})).toBeFalsy()
+  })
+
+  it('recalculates on a decision change', () => {
+    date.formatDate = jest.fn(() => '2020/10/12 00:00')
+    const wrapper = shallowMount(ExpirationField, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    testProps.initialDate = "2020-10-12T04:00:00.000Z"
+    expect(date.formatDate).toHaveBeenCalled()
   })
 
 })

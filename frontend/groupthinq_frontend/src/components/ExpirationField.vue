@@ -93,10 +93,6 @@ export default {
   },
 
   methods: {
-    isExpired () {
-      return this.expired
-    },
-
     checkValidDate (d) {
       if (this.mode === 'view') { return true }
       const check = Date.parse(d)

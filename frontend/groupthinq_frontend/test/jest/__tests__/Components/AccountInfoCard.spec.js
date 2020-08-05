@@ -72,7 +72,6 @@ describe('Account Info Card tests', () => {
     vm.$data.userInfo.emailAddress = "test@test.com"
     await vm.onConfirm()
     expect(axios.put).toHaveBeenCalledTimes(1)
-    expect(vm.getData).toHaveBeenCalledTimes(1)
   })
 
   it('catches validation errors', async () => {
