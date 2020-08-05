@@ -19,7 +19,7 @@
     </q-card-section>
     <q-card-section class="q-pt-none">
       <div class="text-h5 q-pb-sm"><q-icon name="list" class="text-grey-7" /> Ballot choices</div>
-      <q-input v-if="!expired" class="q-mb-md" v-model="newOption.title" label="Add Choice" name="ballot-option-name">
+      <q-input v-if="!expired || mode === 'create'" class="q-mb-md" v-model="newOption.title" label="Add Choice" name="ballot-option-name">
         <template v-if="mode === 'create' || userIncluded" v-slot:append>
           <q-btn dense color="positive" icon="add" @click="addDecisionOption()" name="ballot-option-add"/>
         </template>
