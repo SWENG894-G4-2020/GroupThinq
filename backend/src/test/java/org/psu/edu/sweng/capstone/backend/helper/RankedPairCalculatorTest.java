@@ -4,16 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.psu.edu.sweng.capstone.backend.dao.BallotOptionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RankedPairWinnerDAO;
@@ -67,10 +64,14 @@ public class RankedPairCalculatorTest {
 		BallotOption losingOption = new BallotOption("Winner", testBallot, USER);
 
 		rankedPairWinners.add(new RankedPairWinner(testBallot, winningOption, losingOption, 3L));
+		rankedPairWinners.add(new RankedPairWinner(testBallot, winningOption, losingOption, 4L));
 		
 		// when
 		when(rankedPairWinnerDao.findAllByBallotOrderByMarginDesc(testBallot)).thenReturn(rankedPairWinners);
 		ArrayList<UniquePair> uniquePairList = CALCULATOR.sortAndLockWinners(testBallot);
+		
+		// then
+		assertEquals(1, uniquePairList.size());
 	}
 	
 	private Ballot createBallot() {
