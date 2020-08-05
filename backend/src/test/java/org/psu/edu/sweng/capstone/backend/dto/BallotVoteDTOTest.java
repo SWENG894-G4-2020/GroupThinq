@@ -12,13 +12,13 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class BallotResultDTOTest {
+public class BallotVoteDTOTest {
 
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
     private Ballot ballot = new Ballot(null, null, new Date(1337L));
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
     private BallotVote ballotResult = new BallotVote(ballot, ballotOption, USER);
-    private BallotResultDTO testDTO;
+    private BallotVoteDTO testDTO;
 
     @BeforeEach
     void setUp() {
@@ -27,7 +27,7 @@ public class BallotResultDTOTest {
         ballotResult.setRank(3L);
         ballotResult.setVoteDate(new Date(333L));
         ballotResult.setVoteUpdatedDate(new Date(444L));
-        testDTO = BallotResultDTO.build(ballotResult);
+        testDTO = BallotVoteDTO.build(ballotResult);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class BallotResultDTOTest {
         testResult.setRank(null);
         testResult.setVoteDate(null);
         // when
-        BallotResultDTO testDTO = BallotResultDTO.build(testResult);
+        BallotVoteDTO testDTO = BallotVoteDTO.build(testResult);
 
         // then
         assertNull(testDTO.getRank());
