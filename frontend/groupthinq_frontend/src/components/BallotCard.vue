@@ -163,6 +163,7 @@ export default {
         if (myVote) {
           opt.vote = true
           opt.rank = myVote.rank
+          opt.voteId = myVote.id
         } else {
           opt.vote = false
           opt.rank = iter
@@ -326,6 +327,7 @@ export default {
           votePayload.push({
             ballotId: this.decision.ballots[0].id,
             ballotOptionId: vote.id,
+            id: vote.voteId,
             userName: this.currentUserName,
             rank: vote.rank
           })
