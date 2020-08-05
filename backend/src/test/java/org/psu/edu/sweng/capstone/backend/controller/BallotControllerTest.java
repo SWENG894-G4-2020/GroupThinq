@@ -27,7 +27,7 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
-import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotVoteDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
 import org.psu.edu.sweng.capstone.backend.model.BallotOption;
@@ -66,7 +66,7 @@ class BallotControllerTest {
 	private static final Long BALLOT_ID = 1L;
 	private static final BallotDTO BALLOT_DTO = new BallotDTO();
 	private static final BallotOptionDTO BALLOT_OPTION_DTO = new BallotOptionDTO();
-	private static final ArrayList<BallotResultDTO> BALLOT_RESULT_DTO = new ArrayList<>();
+	private static final ArrayList<BallotVoteDTO> BALLOT_RESULT_DTO = new ArrayList<>();
 	
 	private static final User TEST_USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
 	private static final Decision TEST_DECISION = new Decision("Test Decision", TEST_USER);
@@ -211,7 +211,7 @@ class BallotControllerTest {
 				.andExpect(status().isCreated());
 
 		// then
-		verify(ballotService, times(1)).castVote(Mockito.<BallotResultDTO>anyList());
+		verify(ballotService, times(1)).castVote(Mockito.<BallotVoteDTO>anyList());
 	}
 	
 	@Test
@@ -237,6 +237,6 @@ class BallotControllerTest {
 				.andExpect(status().isOk());
 
 		// then
-		verify(ballotService, times(1)).updateVote(Mockito.<BallotResultDTO>anyList());
+		verify(ballotService, times(1)).updateVote(Mockito.<BallotVoteDTO>anyList());
 	}
 }

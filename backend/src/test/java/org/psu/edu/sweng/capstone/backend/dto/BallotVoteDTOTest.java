@@ -12,26 +12,28 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class BallotResultDTOTest {
+public class BallotVoteDTOTest {
 
     private static final User USER = new User("pop pop", "90210", "Wayne", "Clark", "123imfake@email.gov", new Date(911L));
     private Ballot ballot = new Ballot(null, null, new Date(1337L));
     private BallotOption ballotOption = new BallotOption("BK Lounge", ballot, USER);
-    private BallotVote ballotResult = new BallotVote(ballot, ballotOption, USER);
-    private BallotResultDTO testDTO;
+    private BallotVote ballotVote = new BallotVote(ballot, ballotOption, USER);
+    private BallotVoteDTO testDTO;
 
     @BeforeEach
     void setUp() {
         ballot.setId(1L);
         ballotOption.setId(2L);
-        ballotResult.setRank(3L);
-        ballotResult.setVoteDate(new Date(333L));
-        ballotResult.setVoteUpdatedDate(new Date(444L));
-        testDTO = BallotResultDTO.build(ballotResult);
+        ballotVote.setId(1L);
+        ballotVote.setRank(3L);
+        ballotVote.setVoteDate(new Date(333L));
+        ballotVote.setVoteUpdatedDate(new Date(444L));
+        testDTO = BallotVoteDTO.build(ballotVote);
     }
 
     @Test
     void getters_workProperly() {
+    	assertEquals(1L, testDTO.getId());
         assertEquals(1L, testDTO.getBallotId());
         assertEquals(2L, testDTO.getBallotOptionId());
         assertEquals(3L, testDTO.getRank());
@@ -43,6 +45,7 @@ public class BallotResultDTOTest {
     @Test
     void setters_workProperly() {
         // when
+    	testDTO.setId(2L);
         testDTO.setBallotOptionId(2L);
         testDTO.setBallotId(3L);
         testDTO.setRank(4L);
@@ -51,6 +54,7 @@ public class BallotResultDTOTest {
         testDTO.setUserName("username");
 
         // then
+        assertEquals(2L, testDTO.getId());
         assertEquals(2L, testDTO.getBallotOptionId());
         assertEquals(3L, testDTO.getBallotId());
         assertEquals(4L, testDTO.getRank());
@@ -66,9 +70,10 @@ public class BallotResultDTOTest {
         testResult.setRank(null);
         testResult.setVoteDate(null);
         // when
-        BallotResultDTO testDTO = BallotResultDTO.build(testResult);
+        BallotVoteDTO testDTO = BallotVoteDTO.build(testResult);
 
         // then
+        assertNull(testDTO.getId());
         assertNull(testDTO.getRank());
         assertNull(testDTO.getBallotOptionId());
         assertNull(testDTO.getVoteDate());
