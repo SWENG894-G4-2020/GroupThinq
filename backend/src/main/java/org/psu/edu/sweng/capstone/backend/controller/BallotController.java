@@ -8,7 +8,7 @@ import org.psu.edu.sweng.capstone.backend.dto.BallotDTO;
 import org.psu.edu.sweng.capstone.backend.dto.BallotOptionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.enumeration.BallotTypeEnum;
-import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotVoteDTO;
 import org.psu.edu.sweng.capstone.backend.dto.RankedWinnerDTO;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
@@ -69,26 +69,28 @@ public class BallotController {
 		return ballotService.updateBallot(ballotId, ballot);
 	}
 	
-	@PreAuthorize("@authCheck.votingActive(#vote.get(0).getBallotId())")
+	@PreAuthorize("@authCheck.votingActive(#vote)")
 	@PostMapping("/ballot/{id}/vote")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<String> castVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
+	public ResponseEntity<String> castVote(@RequestBody final List<BallotVoteDTO> vote) throws EntityNotFoundException {
 		return ballotService.castVote(vote);
 	}
 	
-	@PreAuthorize("@authCheck.votingActive(#vote.get(0).getBallotId())")
+	@PreAuthorize("@authCheck.votingActive(#vote)")
 	@PutMapping("/ballot/{id}/vote")
-	public ResponseEntity<String> updateVote(@RequestBody final List<BallotResultDTO> vote) throws EntityNotFoundException {
+	public ResponseEntity<String> updateVote(@RequestBody final List<BallotVoteDTO> vote) throws EntityNotFoundException {
 		return ballotService.updateVote(vote);
 	}
 
+	@PreAuthorize("@authCheck.votingHasExpired(#ballotId)")
 	@GetMapping("/ballot/{id}/votes")
-	public ResponseEntity<BallotResultDTO> retrieveVotes(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
+	public ResponseEntity<BallotVoteDTO> retrieveVotes(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
 				() -> new EntityNotFoundException("Ballot " + ballotId));
 		return ballotService.retrieveAllVotes(ballot);
 	}
 	
+	@PreAuthorize("@authCheck.votingHasExpired(#ballotId)")
 	@GetMapping("/ballot/{id}/results")
 	public ResponseEntity<?> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(

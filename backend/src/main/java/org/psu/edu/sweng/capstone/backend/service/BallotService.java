@@ -1,6 +1,6 @@
 package org.psu.edu.sweng.capstone.backend.service;
 
-import org.psu.edu.sweng.capstone.backend.dto.BallotResultDTO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotVoteDTO;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public interface BallotService {
 	ResponseEntity<BallotDTO> retrieveBallot(final Long ballotId) throws EntityNotFoundException;
 	ResponseEntity<BallotDTO> updateBallot(final Long ballotId, final BallotDTO ballot) throws EntityNotFoundException;
 
-	ResponseEntity<String> castVote(final List<BallotResultDTO> vote) throws EntityNotFoundException;
-	ResponseEntity<String> updateVote(final List<BallotResultDTO> vote) throws EntityNotFoundException;
+	ResponseEntity<String> castVote(final List<BallotVoteDTO> vote) throws EntityNotFoundException;
+	ResponseEntity<String> updateVote(final List<BallotVoteDTO> vote) throws EntityNotFoundException;
 
-	ResponseEntity<BallotResultDTO> retrieveAllVotes(final Ballot ballot) throws EntityNotFoundException;
+	ResponseEntity<BallotVoteDTO> retrieveAllVotes(final Ballot ballot) throws EntityNotFoundException;
 	void retrieveRankedChoiceResults(final Ballot ballotId) throws EntityNotFoundException;
 }
