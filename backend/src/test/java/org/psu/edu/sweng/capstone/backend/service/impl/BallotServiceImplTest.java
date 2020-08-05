@@ -378,7 +378,13 @@ class BallotServiceImplTest extends ServiceImplTest {
 	@Test
 	void updateVote_noBallotFound() throws EntityNotFoundException {
 		// given
+		BallotVote vote = new BallotVote(testBallot, testBallotOption, testUser);
 		ArrayList<BallotVoteDTO> resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotVoteDao.findById(Mockito.anyLong())).thenReturn(Optional.of(vote));
+		when(ballotOptionDao.findById(Mockito.anyLong())).thenReturn(Optional.of(testBallotOption));
+		when(ballotDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
 		// then
 		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });
@@ -405,7 +411,12 @@ class BallotServiceImplTest extends ServiceImplTest {
 	@Test
 	void updateVote_noBallotOptionFound() throws EntityNotFoundException {
 		// given
+		BallotVote vote = new BallotVote(testBallot, testBallotOption, testUser);
 		ArrayList<BallotVoteDTO> resultDTO = createBallotResultDTO();
+		
+		// when
+		when(ballotVoteDao.findById(Mockito.anyLong())).thenReturn(Optional.of(vote));
+		when(ballotOptionDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 		
 		// then
 		assertThrows(EntityNotFoundException.class, () -> { ballotServiceImpl.updateVote(resultDTO); });

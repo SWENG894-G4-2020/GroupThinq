@@ -131,4 +131,19 @@ public class AuthCheck {
 		
 		return currentDate.before(ballot.getExpirationDate());
 	}
+	
+	/** Determines if voting has expired on the Ballot.
+	 * 
+	 * @param ballotId - The unique identifier of the Ballot
+	 * @return True if the Ballot has expired, false if not
+	 * @throws EntityNotFoundException Will throw if the Ballot cannot be found based off ID
+	 */
+	public boolean votingHasExpired(final Long ballotId) throws EntityNotFoundException {
+		final Date currentDate = new Date();
+		
+		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
+				() -> new EntityNotFoundException("Ballot " + ballotId));
+		
+		return currentDate.after(ballot.getExpirationDate());
+	}
 }

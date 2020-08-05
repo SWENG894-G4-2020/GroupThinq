@@ -82,6 +82,7 @@ public class BallotController {
 		return ballotService.updateVote(vote);
 	}
 
+	@PreAuthorize("@authCheck.votingHasExpired(#ballotId)")
 	@GetMapping("/ballot/{id}/votes")
 	public ResponseEntity<BallotVoteDTO> retrieveVotes(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
@@ -89,6 +90,7 @@ public class BallotController {
 		return ballotService.retrieveAllVotes(ballot);
 	}
 	
+	@PreAuthorize("@authCheck.votingHasExpired(#ballotId)")
 	@GetMapping("/ballot/{id}/results")
 	public ResponseEntity<?> retrieveResults(@PathVariable(value = "id") final Long ballotId) throws EntityNotFoundException {
 		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
