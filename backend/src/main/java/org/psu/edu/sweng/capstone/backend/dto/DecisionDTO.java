@@ -95,7 +95,7 @@ public class DecisionDTO {
         if (d.getDescription() != null) { dto.setDescription(d.getDescription()); }
         if (d.getCreatedDate() != null) { dto.setCreatedDate(d.getCreatedDate()); }
         if (d.getUpdatedDate() != null) { dto.setUpdatedDate(d.getUpdatedDate()); }
-        if (d.getOwnerId() != null) { dto.setOwnerUsername(d.getOwnerId().getUserName()); }
+        if (d.getOwner() != null) { dto.setOwnerUsername(d.getOwner().getUserName()); }
         
         d.getBallots().stream().forEach(b -> dto.getBallots().add(BallotDTO.build(b)));
         

@@ -20,6 +20,8 @@ import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
 import org.psu.edu.sweng.capstone.backend.dao.BallotTypeDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedPairWinnerDAO;
+import org.psu.edu.sweng.capstone.backend.dao.RankedWinnerDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
@@ -53,13 +55,19 @@ class DecisionServiceImplTest extends ServiceImplTest {
 	private BallotTypeDAO ballotTypeDao;
 	
 	@Mock
+	private BallotVoteDAO ballotResultDao;
+	
+	@Mock
 	private BallotOptionDAO ballotOptionDao;
 	
 	@Mock
 	private DecisionUserDAO decisionUserDao;
 	
 	@Mock
-	private BallotVoteDAO ballotResultDao;
+	private RankedWinnerDAO rankedWinnerDao;
+	
+	@Mock
+	private RankedPairWinnerDAO rankedPairWinnerDao;
 		
 	@InjectMocks
 	private DecisionServiceImpl decisionServiceImpl;
