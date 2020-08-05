@@ -1,11 +1,13 @@
 package org.psu.edu.sweng.capstone.backend.security;
 
 import java.util.Date;
+import java.util.List;
 
 import org.psu.edu.sweng.capstone.backend.dao.BallotDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
+import org.psu.edu.sweng.capstone.backend.dto.BallotVoteDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
 import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Ballot;
@@ -119,11 +121,13 @@ public class AuthCheck {
 	 * @return True if voting is still eligible, false if not
 	 * @throws EntityNotFoundException When a Ballot cannot be found
 	 */
-	public boolean votingActive(final Long ballotId) throws EntityNotFoundException {
+	public boolean votingActive(final List<BallotVoteDTO> vote) throws EntityNotFoundException {
 		final Date currentDate = new Date();
 		
-		final Ballot ballot = ballotDao.findById(ballotId).orElseThrow(
-				() -> new EntityNotFoundException("Ballot " + ballotId));
+		final BallotVoteDTO firstVote = vote.stream().findFirst().get();
+		
+		final Ballot ballot = ballotDao.findById(firstVote.getBallotId()).orElseThrow(
+				() -> new EntityNotFoundException("Ballot " + firstVote.getBallotId()));
 		
 		return currentDate.before(ballot.getExpirationDate());
 	}

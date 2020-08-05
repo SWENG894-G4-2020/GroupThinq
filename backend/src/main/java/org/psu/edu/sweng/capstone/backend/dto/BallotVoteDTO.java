@@ -7,14 +7,23 @@ import org.psu.edu.sweng.capstone.backend.model.BallotVote;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BallotResultDTO {
+public class BallotVoteDTO {
 
+	private Long id;
 	private Long ballotId;
 	private Long ballotOptionId;
 	private String userName;
 	private Long rank;
 	private Date voteDate;
 	private Date voteUpdatedDate;
+	
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
 	
 	public Long getBallotId() {
 		return ballotId;
@@ -64,9 +73,10 @@ public class BallotResultDTO {
 		this.voteUpdatedDate = voteUpdatedDate;
 	}
 	
-	public static BallotResultDTO build(BallotVote br) {
-		BallotResultDTO dto = new BallotResultDTO();
+	public static BallotVoteDTO build(BallotVote br) {
+		BallotVoteDTO dto = new BallotVoteDTO();
 		
+		if (br.getId() != null) { dto.setId(br.getId()); }
 		if (br.getBallot() != null) { dto.setBallotId(br.getBallot().getId()); }
 		if (br.getBallotOption() != null) { dto.setBallotOptionId(br.getBallotOption().getId()); }
 		if (br.getUser() != null) { dto.setUserName(br.getUser().getUserName()); }
