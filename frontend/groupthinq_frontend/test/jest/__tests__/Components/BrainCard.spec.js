@@ -108,8 +108,6 @@ describe('Edit Decision Card tests', () => {
 
     await vm.getML({ id: 5 })
     expect(axios.get).toHaveBeenCalled()
-    expect(vm.$data.results).toHaveLength(3)
-    
   })
 
 })
