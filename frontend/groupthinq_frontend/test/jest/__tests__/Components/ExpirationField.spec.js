@@ -90,7 +90,7 @@ describe('Expiration field tests', () => {
     localVue })
     const vm = wrapper.vm
     expect(vm.isValid.call()).toBeFalsy()
-    
+    expect(vm.isValid.call({ datetime: "2018-10-10T04:00:00.000Z" })).toBeFalsy()
   })
 
   it('will not validate malformed dates', async () => {
