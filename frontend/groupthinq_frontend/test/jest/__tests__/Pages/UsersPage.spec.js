@@ -52,4 +52,22 @@ describe('Users page tests', () => {
     await localVue.nextTick() // wait for the mounted function to finish
     expect(console.log).toHaveBeenCalledWith('Test Error')
   })
+
+  it('filters data', async () => {
+    const testData = { data: {data: [
+      {
+        userName: "jDoe",
+        firstName: "John",
+        lastName: "Doe",
+        emailAddress: "jDoe@foo.com"
+      }
+    ]}}
+    const wrapper = shallowMount(Users, { localVue })
+    const vm = wrapper.vm
+    vm.$data.users = testData.data.data
+    await localVue.nextTick() // wait for the mounted function to finish
+    vm.$data.search = 'foo'
+    await localVue.nextTick()
+    expect(vm.filteredUsers.length).toBe(0)
+  })
 })

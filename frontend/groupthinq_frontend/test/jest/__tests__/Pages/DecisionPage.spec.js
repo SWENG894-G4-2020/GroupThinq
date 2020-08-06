@@ -81,6 +81,7 @@ describe('Decision page tests', () => {
   })
 
   it('handles zero length data', async () => {
+    console.log = jest.fn()
     // set up the Axios mock
     axios.get = jest.fn(() => Promise.resolve({data: {data: []}}))
     localVue.prototype.$axios = axios
@@ -187,6 +188,7 @@ describe('Decision page tests', () => {
   })
 
   it('catches axios put errors', async () => {
+    console.log = jest.fn()
     axios.put = jest.fn(() => Promise.reject())
     localVue.prototype.$axios = axios
     const wrapper = shallowMount(Decision, { localVue })
