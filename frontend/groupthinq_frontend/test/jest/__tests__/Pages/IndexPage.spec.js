@@ -47,6 +47,24 @@ const testData = { data: { data: [
     deleted: false,
     ballots: [{expirationDate: '2020-12-12T09:26:00-04:00'}],
     includedUsers: [{userName: 'testUser'}]
+  },
+  {
+    id: 7,
+    name: "ExpiredTitle",
+    description: "AnotherDescription",
+    ownerUsername: "testUser",
+    deleted: false,
+    ballots: [{expirationDate: '2010-12-12T09:26:00-04:00'}],
+    includedUsers: [{userName: 'testUser'}]
+  },
+  {
+    id: 8,
+    name: "ExpiredTitleAgain",
+    description: "AnotherDescription",
+    ownerUsername: "testUser",
+    deleted: false,
+    ballots: [{expirationDate: '2010-11-12T09:26:00-04:00'}],
+    includedUsers: [{userName: 'testUser'}]
   }
 ]}}
 
@@ -122,6 +140,20 @@ describe('Decisions page tests', () => {
     await localVue.nextTick()
     expect(vm.filteredDecisions)
       .toHaveLength(2)
+  })
+
+  it('filters expired decisions', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    const wrapper = shallowMount(Index, { localVue })
+    const vm = wrapper.vm
+    
+    await localVue.nextTick()
+    vm.$data.search = 'expir'
+    await localVue.nextTick()
+    expect(vm.filteredDecisions)
+      .toHaveLength(2)
+    vm.$data.currentSort.value = 'badtest'
+    await localVue.nextTick()
   })
 
 })

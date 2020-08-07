@@ -72,7 +72,6 @@ describe('Account Info Card tests', () => {
     vm.$data.userInfo.emailAddress = "test@test.com"
     await vm.onConfirm()
     expect(axios.put).toHaveBeenCalledTimes(1)
-    expect(vm.$route.path).toBe('/main/account')
   })
 
   it('catches validation errors', async () => {
@@ -110,7 +109,7 @@ describe('Account Info Card tests', () => {
     await localVue.nextTick()
     
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
-    expect(console.log).toHaveBeenCalledTimes(3)
+    expect(console.log).toHaveBeenCalledTimes(4)
   })
 
   it('modifies the field color when editing', () => {

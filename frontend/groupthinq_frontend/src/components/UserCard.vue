@@ -1,17 +1,18 @@
 <template>
-  <q-card elevated bordered>
-      <q-card-section horizontal>
-        <q-card-section class="q-pt-xs">
-          <div class="text-overline">{{userName}}</div>
-          <div class="text-h5 q-mt-sm q-mb-xs">{{firstName}} {{lastName}}</div>
-        </q-card-section>
+<div class="q-pa-sm">
+  <q-card bordered>
+    <q-card-section horizontal>
+      <q-card-section class="q-pt-xs">
+        <div class="text-overline">{{userName}}</div>
+        <div class="text-h5 q-mt-sm q-mb-xs">{{firstName}} {{lastName}}</div>
       </q-card-section>
-      <q-separator />
-
-      <q-card-section>
+    </q-card-section>
+    <q-separator />
+    <q-card-section>
       <div class="text-caption text-grey">{{emailAddress}}</div>
-      </q-card-section>
-    </q-card>
+    </q-card-section>
+  </q-card>
+</div>
 </template>
 
 <script>

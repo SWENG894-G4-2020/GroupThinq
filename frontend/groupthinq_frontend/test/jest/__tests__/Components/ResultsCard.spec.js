@@ -26,42 +26,54 @@ describe('Results Card tests', () => {
   localVue.prototype.$axios = axios
 
   const testPropsTemplate = {
-    decisionInfo: {name: 'Test Decision', description: 'This is a test.'},
-    ballot: {
-      ballotOptions: [
-        {
-          ballotId: 0,
-          createdDate: "2020-07-19T02:02:31.006Z",
-          description: "string",
-          id: 0,
-          title: "string",
-          updatedDate: "2020-07-19T02:02:31.006Z",
-          userName: "string"
-        },
-        {
-          ballotId: 0,
-          createdDate: "2020-07-19T02:02:31.006Z",
-          description: "string",
-          id: 1,
-          title: "string",
-          updatedDate: "2020-07-19T02:02:31.006Z",
-          userName: "string"
-        },
-        {
-          ballotId: 0,
-          createdDate: "2020-07-19T02:02:31.006Z",
-          description: "string",
-          id: 2,
-          title: "string",
-          updatedDate: "2020-07-19T02:02:31.006Z",
-          userName: "string"
-        }
+    decision: {
+      id: 5,
+      name: "Decision 1",
+      description: "Decision with Ballot and 4 Ballot Options",
+      ownerUsername: "testUser",
+      includedUsers: [
+          {userName: "test"},
+          {userName: "test2"}
       ],
-      createdDate: "2020-07-19T02:02:31.006Z",
-      decisionId: 0,
-      expirationDate: "2020-07-19T02:02:31.006Z",
-      id: 0,
-      updatedDate: "2020-07-19T02:02:31.006Z"
+      ballots: [
+        {
+        ballotOptions: [
+          {
+            ballotId: 0,
+            createdDate: "2020-07-19T02:02:31.006Z",
+            description: "string",
+            id: 0,
+            title: "string",
+            updatedDate: "2020-07-19T02:02:31.006Z",
+            userName: "string"
+          },
+          {
+            ballotId: 0,
+            createdDate: "2020-07-19T02:02:31.006Z",
+            description: "string",
+            id: 1,
+            title: "string",
+            updatedDate: "2020-07-19T02:02:31.006Z",
+            userName: "string"
+          },
+          {
+            ballotId: 0,
+            createdDate: "2020-07-19T02:02:31.006Z",
+            description: "string",
+            id: 2,
+            title: "string",
+            updatedDate: "2020-07-19T02:02:31.006Z",
+            userName: "string"
+          }
+        ],
+        ballotTypeId: 1,
+        createdDate: "2020-07-19T02:02:31.006Z",
+        decisionId: 0,
+        expirationDate: "2020-07-19T02:02:31.006Z",
+        id: 0,
+        updatedDate: "2020-07-19T02:02:31.006Z"
+      }
+      ]
     }
   }
   var testProps = {}
@@ -69,26 +81,118 @@ describe('Results Card tests', () => {
   const testData = { data: { data: [
     {
       ballotId: 0,
-      ballotOptionId: 1,
-      userName: "testuser1",
+      ballotOptionId: 0,
+      userName: "testuser",
       voteDate: "2020-07-17T20:11:47.334+00:00",
-      voteUpdatedDate: null
+      voteUpdatedDate: null,
+      id: 1,
+      rank: 1
     },
     {
       ballotId: 0,
       ballotOptionId: 1,
-      userName: "testUser",
+      userName: "testuser",
       voteDate: "2020-07-17T20:11:59.481+00:00",
-      voteUpdatedDate: null
+      voteUpdatedDate: null,
+      id: 2,
+      rank: 2
     },
     {
       ballotId: 0,
       ballotOptionId: 2,
-      userName: "testUser",
+      userName: "testuser",
       voteDate: "2020-07-17T20:11:59.481+00:00",
-      voteUpdatedDate: null
+      voteUpdatedDate: null,
+      id: 3,
+      rank: 3
     }]}}
 
+    const testRankedResults = { data: 
+      {
+        success:true,
+        status:200,
+        data: [{
+          ballotId:0,
+          winner:{
+            ballotId: 0,
+            createdDate: "2020-07-19T02:02:31.006Z",
+            description: "string",
+            id: 0,
+            title: "string",
+            updatedDate: "2020-07-19T02:02:31.006Z",
+            userName: "string"
+          },
+          rankedPairWinners:[
+          {
+            winner:{
+              ballotId: 0,
+              createdDate: "2020-07-19T02:02:31.006Z",
+              description: "string",
+              id: 0,
+              title: "string",
+              updatedDate: "2020-07-19T02:02:31.006Z",
+              userName: "string"
+            },
+            loser: {
+              ballotId: 0,
+              createdDate: "2020-07-19T02:02:31.006Z",
+              description: "string",
+              id: 1,
+              title: "string",
+              updatedDate: "2020-07-19T02:02:31.006Z",
+              userName: "string"
+            },
+            margin:1
+          },
+          {
+            winner: {
+              ballotId: 0,
+              createdDate: "2020-07-19T02:02:31.006Z",
+              description: "string",
+              id: 0,
+              title: "string",
+              updatedDate: "2020-07-19T02:02:31.006Z",
+              userName: "string"
+            },
+            loser: {
+              ballotId: 0,
+              createdDate: "2020-07-19T02:02:31.006Z",
+              description: "string",
+              id: 2,
+              title: "string",
+              updatedDate: "2020-07-19T02:02:31.006Z",
+              userName: "string"
+            },
+            margin:1
+            },
+            {
+              winner:{
+                ballotId: 0,
+                createdDate: "2020-07-19T02:02:31.006Z",
+                description: "string",
+                id: 1,
+                title: "string",
+                updatedDate: "2020-07-19T02:02:31.006Z",
+                userName: "string"
+              },
+              loser:{
+                ballotId: 0,
+                createdDate: "2020-07-19T02:02:31.006Z",
+                description: "string",
+                id: 2,
+                title: "string",
+                updatedDate: "2020-07-19T02:02:31.006Z",
+                userName: "string"
+              },
+              margin:1
+              }
+            ]
+          }
+          ],
+            errors:[]
+          }
+    }
+    
   beforeEach( () => {
     testProps = JSON.parse(JSON.stringify(testPropsTemplate))
     jest.clearAllMocks()
@@ -105,20 +209,11 @@ describe('Results Card tests', () => {
     expect(axios.get).toHaveBeenCalledTimes(1)
   })
 
-  it('calls anonymous functions', async () => {
-    axios.get = jest.fn(() => Promise.resolve(testData))
-    const wrapper = shallowMount(ResultsCard, { propsData: testProps, localVue })
-    const vm = wrapper.vm
-    
-    vm.$data.columns[0].field('row')
-    vm.$data.columns[0].format('val')
-  })
-
-  it('contains a Results table after initial data fetch', async () => {
+  it('displays the correct table depending on ballot type', async () => {
     // set up the Axios mock
-    axios.get = jest.fn(() => Promise.resolve(testData))
+    axios.get = jest.fn(() => Promise.resolve(testRankedResults))
     localVue.prototype.$axios = axios
-
+    testProps.decision.ballots[0].ballotTypeId = 2
     // mount the component under test
     const wrapper = shallowMount(ResultsCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
@@ -126,7 +221,8 @@ describe('Results Card tests', () => {
     // test for expected results
     await localVue.nextTick() // wait for the mounted function to finish
     expect(vm.isLoaded).toBe(true)
-    expect(wrapper.findComponent(ResultsCard).exists()).toBe(true)
+    expect(vm.rankedPairResults)
+      .toHaveLength(3)
   })
 
   it('catches axios errors', async () => {
@@ -141,4 +237,6 @@ describe('Results Card tests', () => {
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
     expect(console.log).toHaveBeenCalledTimes(1)
   })
+
+  
 })

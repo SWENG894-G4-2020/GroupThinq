@@ -14,7 +14,7 @@
       <q-slide-transition>
         <div v-show="detailsExpanded" style="width:100%">
           <q-input class="q-my-xs text-h5" style="width: 100%" v-model="newDecision.name" label="Title" :rules="[val => !!val || '*Required']" />
-          <q-input autogrow clearable type="textarea" class="q-my-md text-body2 text-grey-5" style="width: 100%; max-height: 6em" v-model="newDecision.description" label="Description (Optional)" />
+          <q-input autogrow clearable v-model="newDecision.description" label="Description (Optional)" />
             <q-input v-model="newExpirationDate" label="Expiration Date" :rules="[val => checkValidDate(val) || '*Valid Date Required']" mask="datetime" style="width: 100%" hint="YYYY/MM/DD HH:mm">
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer" @click="openDatetimeDialog()">
@@ -178,6 +178,8 @@ export default {
       this.addedUsers.forEach((user) => this.newDecision.includedUsers.push({ userName: user }))
       this.newDecision.ballots[0].ballotTypeId = this.ballotType
       this.newDecision.ballots[0].ballotOptions = this.optionsList
+
+      console.log(this.newDecision)
 
       try {
         await this.$axios.post(`${process.env.BACKEND_URL}/decision/`, this.newDecision)
