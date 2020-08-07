@@ -42,7 +42,7 @@
 import { CollapseTransition } from 'vue2-transitions'
 
 export default {
-  name: 'VueFaqAccordion',
+  name: 'FaqAccordionCard',
 
   components: {
     CollapseTransition

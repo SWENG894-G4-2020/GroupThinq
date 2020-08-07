@@ -2,7 +2,7 @@
  <div class="flex flex-center">
     <h3>Frequently Asked Questions</h3>
     <!-- DEFAULT -->
-    <VueFaqAccordion
+    <FaqAccordionCard
       @categorySelect="onCategorySelect"
       @itemSelect="onItemSelect"
       :items="myItems"
@@ -13,11 +13,11 @@
 </template>
 
 <script>
-import VueFaqAccordion from 'src/components/vue-faq-accordion'
+import FaqAccordionCard from 'src/components/FaqAccordionCard'
 export default {
   name: 'PageHelp',
   components: {
-    VueFaqAccordion
+    FaqAccordionCard
   },
   data () {
     return {
