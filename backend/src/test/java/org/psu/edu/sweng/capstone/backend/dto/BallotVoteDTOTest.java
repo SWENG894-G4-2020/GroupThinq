@@ -81,6 +81,4 @@ public class BallotVoteDTOTest {
         assertNull(testDTO.getVoteUpdatedDate());
         assertNull(testDTO.getBallotId());
     }
-
-
 }
