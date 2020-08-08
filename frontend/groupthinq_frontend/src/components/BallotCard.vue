@@ -284,7 +284,7 @@ export default {
     async getBallot () {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/decision/${this.decision.id}`)
-        this.getVotes()
+        await this.getVotes()
         this.populateWithBallot(response.data.data[0].ballots[0])
       } catch (error) {
         console.log(error)
@@ -340,7 +340,7 @@ export default {
         } else {
           await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
         }
-        this.getVotes()
+        await this.getVotes()
         this.populateWithBallot(this.decision.ballots[0])
         this.onVoteCancel()
       } catch (error) {

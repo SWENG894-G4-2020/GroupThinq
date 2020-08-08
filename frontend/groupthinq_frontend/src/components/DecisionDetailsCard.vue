@@ -124,7 +124,7 @@ export default {
     },
 
     filterFn (val, update, abort) {
-      if (val.length < 3) {
+      if (val.length < 2) {
         abort()
         return
       }
@@ -153,6 +153,7 @@ export default {
 
       if (this.decision) {
         decision.id = this.decision.id
+        decision.includedUsers.splice(0, 1)
       }
       return decision
     }

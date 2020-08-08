@@ -8,7 +8,6 @@ import BallotCard from 'src/components/BallotCard'
 import axios from 'axios'
 import auth from 'src/store/auth'
 import * as All from 'quasar'
-import { exp } from '@tensorflow/tfjs'
 
 // add all of the Quasar objects to the test harness
 const { Quasar, date, ClosePopup } = All
@@ -34,8 +33,9 @@ describe('Ballot Card tests', () => {
       description: "Decision with Ballot and 4 Ballot Options",
       ownerUsername: "testUser",
       includedUsers: [
-          {userName: "test"},
-          {userName: "test2"}
+          {userName: "testUser"},
+          {userName: "testUser1"},
+          {userName: "testUser2"}
       ],
       ballots: [
         {
@@ -45,7 +45,7 @@ describe('Ballot Card tests', () => {
             createdDate: "2020-07-19T02:02:31.006Z",
             description: "string",
             id: 0,
-            title: "string",
+            title: "option 1",
             updatedDate: "2020-07-19T02:02:31.006Z",
             userName: "string"
           },
@@ -54,7 +54,7 @@ describe('Ballot Card tests', () => {
             createdDate: "2020-07-19T02:02:31.006Z",
             description: "string",
             id: 1,
-            title: "string",
+            title: "option 2",
             updatedDate: "2020-07-19T02:02:31.006Z",
             userName: "string"
           },
@@ -63,7 +63,7 @@ describe('Ballot Card tests', () => {
             createdDate: "2020-07-19T02:02:31.006Z",
             description: "string",
             id: 2,
-            title: "string",
+            title: "option 3",
             updatedDate: "2020-07-19T02:02:31.006Z",
             userName: "string"
           }
@@ -297,13 +297,14 @@ const testVotesNormal= { data: { data: [
     const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
     await vm.$nextTick()
-    vm.$data.newVoteSelection = 1
+    wrapper.setData({ ballotTypeId: 2 })
+    vm.onVoteStart()
     await vm.onVoteConfirm()
     expect(vm.$data.voting).toBe(false)
     expect(axios.put).toHaveBeenCalledTimes(1)
   })
 
-  it('catches axios errors when submitting', async () => {
+  it('catches axios errors when submitting a vote', async () => {
     axios.put= jest.fn(() => Promise.reject('Test Axios Error'))
     console.log = jest.fn()
     const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
@@ -318,7 +319,25 @@ const testVotesNormal= { data: { data: [
     expect(console.log).toHaveBeenCalledTimes(1)
   })
 
-  it('adds a decision in view mode', async () => {
+  it('catches axios errors', async () => {
+    axios.get= jest.fn(() => Promise.reject('Test Axios Error'))
+    axios.post= jest.fn(() => Promise.reject('Test Axios Error'))
+    axios.put= jest.fn(() => Promise.reject('Test Axios Error'))
+    console.log = jest.fn()
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    // no need for getResultsData() call since it occurs when mounted]
+
+    await vm.getBallot()
+    await vm.addBallotOption({})
+    await vm.onVoteConfirm()
+    await vm.getVotes()
+    
+    expect(console.log).toHaveBeenCalledWith('Test Axios Error')
+    expect(console.log).toHaveBeenCalledTimes(4)
+  })
+
+  it('adds an option in view mode', async () => {
     axios.get = jest.fn(() => Promise.resolve(testVotesNormal))
     const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
     const vm = wrapper.vm
@@ -331,7 +350,18 @@ const testVotesNormal= { data: { data: [
     expect(vm.addBallotOption).toBeCalled()
   })
 
-  it('adds a decision in create mode', async () => {
+
+  it('adds an option to a ballot', async () => {
+    axios.post = jest.fn(() => Promise.resolve())
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    vm.getBallot = jest.fn(() => Promise.resolve())
+    await vm.addBallotOption({ title: 'Added title', userName: 'test' })
+    expect(vm.getBallot).toHaveBeenCalledTimes(1)
+    expect(axios.get).toHaveBeenCalledTimes(1)
+  })
+
+  it('adds an option in create mode', async () => {
     const wrapper = shallowMount(BallotCard, { propsData: { mode: 'create' }, localVue })
     const vm = wrapper.vm
     wrapper.setData({newOption: {
@@ -341,7 +371,7 @@ const testVotesNormal= { data: { data: [
     expect(vm.options).toHaveLength(1)
   })
 
-  it('removes a decision in create mode', async () => {
+  it('removes an option in create mode', async () => {
     const wrapper = shallowMount(BallotCard, { propsData: { mode: 'create' }, localVue })
     const vm = wrapper.vm
     wrapper.setData({
@@ -357,6 +387,105 @@ const testVotesNormal= { data: { data: [
       userName: 'test'
     })
     expect(vm.options).toHaveLength(0)
+  })
+
+  it('correctly checks if the user is included', async () => {
+    auth.getTokenData = jest.fn(() => ({sub: 'notHere'}))
+    axios.get = jest.fn(() => Promise.resolve(testVotesNormal))
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    await vm.$nextTick()
+    expect(vm.userIncluded).toBe(false)
+  })
+
+  it('retrieves a ballot', async () => {
+    axios.get = jest.fn(() => Promise.resolve({ data: { data: [ testProps.decision ] } }))
+
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    vm.getVotes = jest.fn(() => Promise.resolve())
+    await vm.getBallot()
+    expect(axios.get).toHaveBeenCalledTimes(2)
+    expect(vm.getVotes).toHaveBeenCalledTimes(2)
+  })
+
+  it('creates a request object with an initial decision', async () => {
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+    vm.$refs = { datetime: { datetime: '2020/08/08 12:45'}}
+    const reqObj = vm.getRequestObject()
+    expect(reqObj.ballotTypeId).toBe(1)
+    expect(reqObj.expirationDate).toEqual(new Date('2020/08/08 12:45'))
+    expect(reqObj.ballotOptions).toHaveLength(3)
+  })
+
+  it('creates a request object with an initial decision', async () => {
+    const wrapper = shallowMount(BallotCard, { propsData: { mode: 'create' }, localVue })
+    const vm = wrapper.vm
+    vm.$refs = { datetime: { datetime: '2020/08/08 12:45'}}
+    vm.$data.ballotTypeId = 2
+    vm.$data.options = [{ title: 'Added title', userName: 'testUser'}]
+    const reqObj = vm.getRequestObject()
+    expect(reqObj.ballotTypeId).toBe(2)
+    expect(reqObj.expirationDate).toEqual(new Date('2020/08/08 12:45'))
+    expect(reqObj.ballotOptions).toHaveLength(1)
+  })
+
+  it('sets expired on event', async () => {
+    const wrapper = shallowMount(BallotCard, { propsData: { mode: 'create' }, localVue })
+    const vm = wrapper.vm
+    vm.setExpired()
+    expect(vm.$data.expired).toBe(true)
+  })
+
+  it('validates fields', async () => {
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    vm.$refs = { datetime: { isValid: () => false }}
+    expect(vm.isValid.call()).toBe(false)
+    vm.$refs = { datetime: { isValid: () => true }}
+    vm.$data.ballotTypeId = 42
+    expect(vm.isValid.call()).toBe(false)
+    vm.$data.ballotTypeId = 1
+    vm.$data.options = []
+    expect(vm.isValid.call()).toBe(false)
+    vm.$data.options = [{ title: 'Added title', userName: 'testUser'}]
+    expect(vm.isValid.call()).toBe(true)
+  })
+
+  it('moves option ranks up', async () => {
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    vm.onVoteStart()
+    
+    expect(vm.$data.newVote[0].value).toBe(0)
+    vm.moveRankUp(vm.$data.newVote[0])
+    expect(vm.$data.newVote[0].value).toBe(1)
+    expect(vm.$data.newVote[1].value).toBe(2)
+    expect(vm.$data.newVote[2].value).toBe(0)
+    vm.moveRankUp(vm.$data.newVote[2])
+    expect(vm.$data.newVote[0].value).toBe(1)
+    expect(vm.$data.newVote[1].value).toBe(0)
+    expect(vm.$data.newVote[2].value).toBe(2)
+  })
+
+  it('moves option ranks down', async () => {
+    const wrapper = shallowMount(BallotCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    vm.onVoteStart()
+    
+    expect(vm.$data.newVote[2].value).toBe(2)
+    vm.moveRankDown(vm.$data.newVote[2])
+    expect(vm.$data.newVote[0].value).toBe(2)
+    expect(vm.$data.newVote[1].value).toBe(0)
+    expect(vm.$data.newVote[2].value).toBe(1)
+    vm.moveRankDown(vm.$data.newVote[0])
+    expect(vm.$data.newVote[0].value).toBe(0)
+    expect(vm.$data.newVote[1].value).toBe(2)
+    expect(vm.$data.newVote[2].value).toBe(1)
   })
 
 })
