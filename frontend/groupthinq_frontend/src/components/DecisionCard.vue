@@ -20,7 +20,7 @@
           </q-menu>
         </q-btn>
       </div>
-      <div class="q-mb-sm" v-if="description">
+      <div class="q-mb-sm">
           <span class="text-overline q-mr-sm">Description:</span>
           <span class="text-body-1">{{description}}</span>
       </div>

@@ -1,6 +1,6 @@
 <template>
 <div class="q-pa-sm">
-  <q-card flat bordered class="column" style="height: 100%">
+  <q-card bordered class="column" style="height: 100%">
     <q-card-section class="q-py-xs">
       <div class="text-h5">
         <q-icon v-if="!expired" name="event_available" class="text-positive"  />
@@ -26,7 +26,7 @@
     </q-card-section>
     <q-card-section class="q-py-xs col-grow">
       <div v-if="!expired"><q-icon name="alarm_on" class="text-positive" /> {{daysRemaining}}d {{hoursRemaining}}h {{minutesRemaining}}m {{secondsRemaining}}s</div>
-      <div v-else><q-icon name="alarm_off" class="text-negative" /> {{ prettyDate }}</div>
+      <div><q-icon v-if="expired" name="alarm_off" class="text-negative" /> {{ prettyDate }}</div>
     </q-card-section>
     <q-card-actions vertical >
       <q-btn
@@ -35,6 +35,7 @@
         label="Vote"
         class="q-mx-xs"
         color="primary"
+        :to="'/decisions/' + decision.id"
          />
       <q-btn
         v-else
@@ -42,6 +43,7 @@
         label="View Results"
         class="q-mx-xs"
         color="primary"
+        :to="'/decisions/' + decision.id"
          />
     </q-card-actions>
   </q-card>
@@ -50,6 +52,7 @@
 
 <script>
 import auth from 'src/store/auth'
+import { date } from 'quasar'
 
 export default {
   name: 'DecisionSummaryCard',
@@ -63,6 +66,18 @@ export default {
       minutesRemaining: '',
       secondsRemaining: ''
     }
+  },
+
+  props: {
+    decision: {
+      type: Object,
+      required: true
+    }
+  },
+
+  mounted () {
+    this.currentUserName = auth.getTokenData().sub
+    this.calculateRemainingTime()
   },
 
   computed: {
@@ -81,7 +96,7 @@ export default {
     },
 
     prettyDate: function () {
-      return new Date(this.decision.ballots[0].expirationDate).toLocaleString()
+      return date.formatDate(new Date(this.decision.ballots[0].expirationDate), 'YYYY/MM/DD HH:mm')
     },
 
     overUsers: function () {
@@ -101,25 +116,14 @@ export default {
     }
   },
 
-  props: {
-    decision: {
-      type: Object,
-      required: true
-    }
-  },
-
-  mounted () {
-    this.currentUserName = auth.getTokenData().sub
-    this.calculateRemainingTime()
-  },
-
   methods: {
     calculateRemainingTime () {
-      const secondsTiemr = setInterval(() => {
+      const secondsTimer = setInterval(() => {
         const diff = (new Date(this.decision.ballots[0].expirationDate) - Date.now()) / 1000
 
         if (diff < 0) {
-          clearInterval(secondsTiemr)
+          this.$emit('reload')
+          clearInterval(secondsTimer)
           return
         }
 

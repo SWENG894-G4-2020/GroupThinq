@@ -18,8 +18,8 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'account', component: () => import('pages/AccountInfo.vue') },
       { path: 'users', component: () => import('pages/Users.vue') },
-      { path: 'decisions', component: () => import('pages/Decisions.vue') },
-      { path: 'results', component: () => import('pages/Results.vue') },
+      { path: '/decisions/new', component: () => import('pages/NewDecision.vue') },
+      { path: '/decisions/:id', component: () => import('pages/Decision.vue') },
       { path: 'help', component: () => import('pages/Help.vue') }
     ],
     meta: {
