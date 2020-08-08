@@ -36,7 +36,7 @@ public class RankedPairCalculator {
 	/** Creates unique pairs based upon the a list of Ballot Options.
 	 * @param options The list of Ballot options (sorted alphabetically).
 	 */
-	private ArrayList<UniquePair> createUniquePairs(final List<Long> options) {
+	protected ArrayList<UniquePair> createUniquePairs(final List<Long> options) {
 		ArrayList<UniquePair> uniquePairs = new ArrayList<>();
 		
 		for (int x = 0; x < options.size(); x++) {
@@ -66,8 +66,7 @@ public class RankedPairCalculator {
 	 * @param votes A list of all the votes casted.
 	 * @return A HashMap containing the winning difference between one unique pair.
 	 */
-	private void determinePairWinners(final Ballot ballot, final ArrayList<UniquePair> uniquePairs, final List<ArrayList<Long>> votes) {
-		
+	protected void determinePairWinners(final Ballot ballot, final ArrayList<UniquePair> uniquePairs, final List<ArrayList<Long>> votes) {
 		ArrayList<RankedPairWinner> winners = new ArrayList<>();
 		
 		uniquePairs.forEach(pair -> {			
@@ -127,7 +126,7 @@ public class RankedPairCalculator {
 	 * @return A list of the locked winners, sorted in order.
 	 */
 	@SuppressWarnings("unchecked")
-	private ArrayList<UniquePair> sortAndLockWinners(final Ballot ballot) {
+	protected ArrayList<UniquePair> sortAndLockWinners(final Ballot ballot) {
 		ArrayList<RankedPairWinner> winners = rankedPairWinnerDao.findAllByBallotOrderByMarginDesc(ballot);
 		
 		ArrayList<UniquePair> lockedGraph = new ArrayList<>();
@@ -157,7 +156,7 @@ public class RankedPairCalculator {
 	 * @param optionListSize An integer containing the list size of all ballot options.
 	 * @return The winning Ballot Option
 	 */
-	private Long calculateWinner(final ArrayList<UniquePair> lockedWinners, int optionListSize) {
+	protected Long calculateWinner(final ArrayList<UniquePair> lockedWinners, int optionListSize) {
 		List<Long> sourceList = new ArrayList<>();
 		List<Long> uniqueDestinations = new ArrayList<>();
 		
@@ -185,15 +184,13 @@ public class RankedPairCalculator {
 	 * @return If graph is acyclic (does not contain any cycles)
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean isAcyclic(final ArrayList<UniquePair> graph) {
+	protected boolean isAcyclic(final ArrayList<UniquePair> graph) {
 		// A Graph containing 0 or 1 edges is by nature acyclic
 		if (graph.isEmpty() || graph.size() == 1) { return true; }
 
 		// A graph with non-zero edges but no leafs is by nature cyclic
 		Optional<Long> leaf = findLeaf(graph);
-		if (!graph.isEmpty() && !leaf.isPresent()) {
-			return false;
-		}
+		if (!leaf.isPresent()) { return false; }
 
 		// Otherwise, find and remove a leaf and test again
 		ArrayList<UniquePair> reducedGraph = (ArrayList<UniquePair>) graph.clone();
@@ -207,7 +204,7 @@ public class RankedPairCalculator {
 	 * @param graph The graph for which a leaf node should be found from.
 	 * @return An Optional containing a String of a leaf node, if it exists.
 	 */
-	private Optional<Long> findLeaf(final ArrayList<UniquePair> graph) {
+	protected Optional<Long> findLeaf(final ArrayList<UniquePair> graph) {
 		// A leaf is a node which has incoming edges but no outgoing edges (ie. only a sink)
 		// First, collect all sources and sinks
 		Set<Long> sources = new HashSet<>();
