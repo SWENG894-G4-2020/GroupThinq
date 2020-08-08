@@ -90,7 +90,44 @@ describe('Expiration field tests', () => {
     localVue })
     const vm = wrapper.vm
     expect(vm.isValid.call()).toBeFalsy()
-    expect(vm.isValid.call({ datetime: "2018-10-10T04:00:00.000Z" })).toBeFalsy()
+  })
+
+  it('will validate future dates on create', async () => {
+    jest.useFakeTimers()
+    Date.now = jest.fn(() => new Date('2020-09-02T09:26:00-04:00'))
+    const wrapper = shallowMount(ExpirationField, { 
+      propsData: {
+        initialDate: "2020-10-02T09:26:00-04:00",
+        showTimer: true,
+        mode: 'create'
+      }, 
+    localVue })
+    const vm = wrapper.vm
+    expect(vm.isValid.call()).toBeTruthy()
+  })
+
+  it('will update when the initial date is changed', () => {
+    //jest.useFakeTimers()
+    Date.now = jest.fn(() => new Date('2020-09-02T09:26:00-04:00'))
+    const wrapper = shallowMount(ExpirationField, { 
+      propsData: {
+        initialDate: "2020-10-02T09:26:00-04:00",
+        showTimer: true,
+        mode: 'create'
+      }, 
+    localVue })
+    const vm = wrapper.vm
+
+    expect(vm.$data.datetime).toBe("2020/10/02 08:26")
+    
+    wrapper.setProps({
+      initialDate: "2020-11-02T09:26:00-04:00",
+      showTimer: true,
+      mode: 'create'
+    })
+    vm.$nextTick(() => {
+      expect(vm.$data.datetime).toBe("2020/11/02 08:26")
+    })
   })
 
   it('will not validate malformed dates', async () => {
