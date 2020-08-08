@@ -190,9 +190,7 @@ public class RankedPairCalculator {
 
 		// A graph with non-zero edges but no leafs is by nature cyclic
 		Optional<Long> leaf = findLeaf(graph);
-		if (!graph.isEmpty() && !leaf.isPresent()) {
-			return false;
-		}
+		if (!leaf.isPresent()) { return false; }
 
 		// Otherwise, find and remove a leaf and test again
 		ArrayList<UniquePair> reducedGraph = (ArrayList<UniquePair>) graph.clone();
