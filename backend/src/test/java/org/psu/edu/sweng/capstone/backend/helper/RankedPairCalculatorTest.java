@@ -123,7 +123,7 @@ public class RankedPairCalculatorTest {
 		final Optional<Long> leaf = CALCULATOR.findLeaf(graph);
 		
 		// then
-		assertTrue(leaf.isEmpty());
+		assertFalse(leaf.isPresent());
 	}
 	
 	@Test
@@ -138,7 +138,7 @@ public class RankedPairCalculatorTest {
 		final Optional<Long> leaf = CALCULATOR.findLeaf(graph);
 		
 		// then
-		assertFalse(leaf.isEmpty());
+		assertTrue(leaf.isPresent());
 	}
 	
 	@Test
