@@ -92,16 +92,12 @@ export default {
       type: String,
       default: '#1976D2'
     },
-    /**
-     * Color for borders
-     */
+
     borderColor: {
       type: String,
       default: '#9E9E9E'
     },
-    /**
-     * Color for fonts
-     */
+
     fontColor: {
       type: String,
       default: '#000000'

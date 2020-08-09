@@ -1,15 +1,10 @@
 <template>
  <div class="flex flex-center">
     <h3>Frequently Asked Questions</h3>
-    <!-- DEFAULT -->
     <FaqAccordionCard
-      @categorySelect="onCategorySelect"
-      @itemSelect="onItemSelect"
       :items="myItems"
     />
-
   </div>
-
 </template>
 
 <script>
@@ -23,8 +18,9 @@ export default {
     return {
       myItems: [
         /**
-          * General related questions
+          * ----------General related questions----------
         */
+
         {
           title: 'What is groupThinq?',
           value: 'groupThinq is a decision making engine for any group of people to use to facilitate a vote',
@@ -35,9 +31,11 @@ export default {
           value: "While the function of this application is focused on setting up a vote for something. The boundaries of what you can do is only limited by imagination. Where do you want to go to lunch? What should your D&D campaign be about? Which Jonas brother really is the best? Any question you've ever had can be put up to a vote",
           category: 'General Questions'
         },
+
         /**
-          * Account related questions
+          * ----------Account related questions----------
         */
+
         {
           title: "What happens to all of the in-app activity I've done if I delete my account?",
           value: 'The decisions that you have created and the votes submitted by you will be removed so as not affect ongoing ballots',
@@ -53,9 +51,11 @@ export default {
           value: "You can update most of your user information on the 'My Account' page",
           category: 'Account Questions'
         },
+
         /**
-          * Decision related questions
+          * ----------Decision related questions----------
         */
+
         {
           title: 'How do I create a decision?',
           value: "Select the 'New Decision' page and follow the easy to use sheet to fill out your decision",
@@ -76,9 +76,11 @@ export default {
           value: 'You can update your vote as many times as you want before the deadline, but be careful. Only your final vote will count',
           category: 'Decision Questions'
         },
+
         /**
-          * Users related questions
+          * ----------Users related questions----------
         */
+
         {
           title: 'What users can see a decision I create?',
           value: 'Only users that you have added to a decision are able to see that decision',
@@ -100,14 +102,6 @@ export default {
           category: 'User Questions'
         }
       ]
-    }
-  },
-  methods: {
-    onCategorySelect (args) {
-      console.log('onCategorySelect', args)
-    },
-    onItemSelect (args) {
-      console.log('onItemSelect', args)
     }
   }
 }
