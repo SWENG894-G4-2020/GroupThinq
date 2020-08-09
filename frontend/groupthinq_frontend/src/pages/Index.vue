@@ -68,6 +68,7 @@ export default {
   data () {
     return {
       currentUserName: '',
+      currentUserRole: 'User',
       isLoaded: false,
       isError: false,
       decisionList: [],
@@ -126,6 +127,7 @@ export default {
 
   mounted () {
     this.currentUserName = auth.getTokenData().sub
+    this.currentUserRole = auth.getTokenData().role
     this.getData()
   },
 
@@ -140,7 +142,13 @@ export default {
     async getData () {
       try {
         const userName = auth.getTokenData().sub
-        const response = await this.$axios.get(`${process.env.BACKEND_URL}/user/${userName}/decisions`)
+
+        let response
+        if (this.currentUserRole === 'Admin') {
+          response = await this.$axios.get(`${process.env.BACKEND_URL}/decisions`)
+        } else {
+          response = await this.$axios.get(`${process.env.BACKEND_URL}/user/${userName}/decisions`)
+        }
         this.decisionList = response.data.data
         this.isLoaded = true
       } catch (error) {
