@@ -34,6 +34,20 @@ const testData = {data: {
   }]}
 }
 
+const testAdminData = {data: { 
+  data: [{
+    birthDate: '',
+    createdDate: '',
+    emailAddress: '',
+    firstName: '',
+    lastLoggedIn: '',
+    lastName: '',
+    password: '',
+    updatedDate: '',
+    userName: 'test1'
+  }]}
+}
+
 describe('Account Info Card tests', () => {
   const localVue = createLocalVue()
   const router = new VueRouter()
@@ -52,6 +66,17 @@ describe('Account Info Card tests', () => {
     await vm.onCancel()
     expect(vm.$data.deleteConfirm).toBe(false)
     expect(vm.$data.editEnabled).toBe(false)
+  })
+
+  it('loads a different user if admin', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testAdminData))
+    auth.getTokenData = jest.fn(() => ({sub: 'test', role: 'Admin'}))
+    const wrapper = shallowMount(AccountInfoCard, { localVue, router})
+    const vm = wrapper.vm
+    vm.$route.params.user = 'test1'
+    await vm.$nextTick()
+    expect(vm.$data.currentUserRole).toBe('Admin')
+    expect(vm.$data.userInfo.userName).toBe('test1')
   })
 
   it('can delete a user', async () => {

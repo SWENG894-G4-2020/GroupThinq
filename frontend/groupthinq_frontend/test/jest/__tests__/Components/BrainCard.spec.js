@@ -22,7 +22,7 @@ const components = Object.keys(All).reduce((object, key) => {
   return object
 }, {})
 
-describe('Edit Decision Card tests', () => {
+describe('Brain Card tests', () => {
   const localVue = createLocalVue()
   localVue.use(Quasar, { components }, tfmodel) // , lang: langEn
 
