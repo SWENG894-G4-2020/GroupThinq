@@ -1,6 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -168,7 +169,7 @@ public class RankedPairCalculator {
 			}
 		}
 		
-		List<Long> winners = new ArrayList<>(sourceList);
+		List<Long> winners = Collections.synchronizedList(new ArrayList<>(sourceList));
 		for (Long s : winners) {
 			if (uniqueDestinations.contains(s)) {
 				winners.remove(s);
