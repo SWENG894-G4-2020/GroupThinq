@@ -156,4 +156,15 @@ describe('Decisions page tests', () => {
     await localVue.nextTick()
   })
 
+  it('calls the correct endpoint when an admin', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    auth.getTokenData = jest.fn(() => ({sub: 'testUser', role: 'Admin'}))
+    const wrapper = shallowMount(Index, { localVue })
+    const vm = wrapper.vm
+    
+    await localVue.nextTick()
+
+    expect(vm.$data.currentUserRole).toBe('Admin')
+  })
+
 })
