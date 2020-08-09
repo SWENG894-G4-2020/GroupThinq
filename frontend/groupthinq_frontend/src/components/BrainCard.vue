@@ -95,7 +95,7 @@ export default {
         this.results = await tfmodel.getSimilarityScores(input)
         this.isLoaded = true
       } catch (error) {
-        this.error = true
+        this.isError = true
         this.errorMsg = error.message
         console.log(error)
         this.$emit('error')

@@ -87,7 +87,7 @@ export default {
       newOption: { title: '', userName: this.currentUserName },
       options: [],
       newVote: [],
-      newVoteSelection: '',
+      newVoteSelection: -1,
       expired: false,
       initialDate: '',
       votes: [],
@@ -150,7 +150,7 @@ export default {
       this.options = []
       this.votes = []
       this.newOption = { title: '', userName: this.currentUserName }
-      this.newVoteSelection = ''
+      this.newVoteSelection = -1
       this.newVote = []
     },
 
@@ -190,11 +190,11 @@ export default {
       this.options.sort((a, b) => a.rank - b.rank)
     },
 
-    addDecisionOption () {
+    async addDecisionOption () {
       if (this.mode === 'create' && this.newOption.title !== '') {
         this.options.push({ title: this.newOption.title, userName: this.currentUserName })
       } else if (this.newOption.title !== '') {
-        this.addBallotOption({ title: this.newOption.title, userName: this.currentUserName, ballotId: this.decision.ballots[0].id })
+        await this.addBallotOption({ title: this.newOption.title, userName: this.currentUserName, ballotId: this.decision.ballots[0].id })
         this.$emit('reload')
       }
       this.newOption = { title: '', userName: this.currentUserName }
@@ -284,7 +284,7 @@ export default {
     async getBallot () {
       try {
         const response = await this.$axios.get(`${process.env.BACKEND_URL}/decision/${this.decision.id}`)
-        this.getVotes()
+        await this.getVotes()
         this.populateWithBallot(response.data.data[0].ballots[0])
       } catch (error) {
         console.log(error)
@@ -313,7 +313,7 @@ export default {
     async onVoteConfirm () {
       const votePayload = []
       if (this.ballotTypeId === 1) {
-        if (!this.newVoteSelection) {
+        if (this.newVoteSelection < 0) {
           this.onVoteCancel()
           return
         }
@@ -340,7 +340,7 @@ export default {
         } else {
           await this.$axios.post(`${process.env.BACKEND_URL}/ballot/${this.decision.ballots[0].id}/vote`, votePayload)
         }
-        this.getVotes()
+        await this.getVotes()
         this.populateWithBallot(this.decision.ballots[0])
         this.onVoteCancel()
       } catch (error) {

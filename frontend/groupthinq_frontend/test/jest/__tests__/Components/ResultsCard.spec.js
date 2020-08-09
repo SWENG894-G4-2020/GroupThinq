@@ -196,7 +196,7 @@ describe('Results Card tests', () => {
   beforeEach( () => {
     testProps = JSON.parse(JSON.stringify(testPropsTemplate))
     jest.clearAllMocks()
-    auth.getTokenData = jest.fn(() => ({sub: 'testUser'}))
+    auth.getTokenData = jest.fn(() => ({sub: 'testuser'}))
   })
 
   it('gets results data on mount', async () => {
@@ -207,6 +207,19 @@ describe('Results Card tests', () => {
     // no need for getResultsData() call since it occurs on mount
     
     expect(axios.get).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles zero length ballots', async () => {
+    axios.get = jest.fn(() => Promise.resolve(testData))
+    testProps.decision.ballots[0].ballotOptions = []
+    const wrapper = shallowMount(ResultsCard, { propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    // no need for getResultsData() call since it occurs on mount
+    await localVue.nextTick()
+    expect(axios.get).toHaveBeenCalledTimes(1)
+    expect(vm.tabulatedResults).toHaveLength(0)
+    await localVue.nextTick()
   })
 
   it('displays the correct table depending on ballot type', async () => {

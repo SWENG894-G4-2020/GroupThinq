@@ -10,6 +10,7 @@ import auth from 'src/store/auth'
 import tfmodel from 'src/store/tfmodel'
 import * as All from 'quasar'
 import { exp } from '@tensorflow/tfjs'
+import tfModel from 'src/store/tfmodel'
 
 // add all of the Quasar objects to the test harness
 const { Quasar, date } = All
@@ -95,19 +96,40 @@ describe('Edit Decision Card tests', () => {
 
     await localVue.nextTick()// wait for the mounted function to finish
     expect(console.log).toHaveBeenCalledWith('Test Error')
-
+    expect(vm.$data.isError).toBe(true)
   })
 
   it('gets the correct number of similarity scores back', async () => {
     tfmodel.getSimilarityScores = jest.fn(() => Promise.resolve([0.15, 0.25, 0.35]))
-    axios.get = jest.fn(() => Promise.reject({ data: { data: testProps.decision } }))
+    axios.get = jest.fn(() => Promise.resolve({ data: { data: [ testProps.decision ] } }))
     localVue.prototype.$axios = axios
 
     const wrapper = shallowMount(BrainCard, {propsData: testProps, localVue })
     const vm = wrapper.vm
 
-    await vm.getML({ id: 5 })
-    expect(axios.get).toHaveBeenCalled()
+    await vm.$nextTick()
+    expect(axios.get).toBeCalledTimes(1)
+    expect(tfModel.getSimilarityScores).toBeCalledTimes(1)
+    expect(vm.$data.results).toHaveLength(3)
+    expect(vm.$data.isLoaded).toBe(true)
+    expect(vm.tabulatedResults).toHaveLength(3)
+    expect(vm.tabulatedResults[0]).toHaveProperty('percentage')
+  })
+
+  it('updates on a change in the decision', async () => {
+    tfmodel.getSimilarityScores = jest.fn(() => Promise.resolve([0.15, 0.25, 0.35]))
+    axios.get = jest.fn(() => Promise.resolve({ data: { data: [ testProps.decision ] } }))
+    localVue.prototype.$axios = axios
+
+    const wrapper = shallowMount(BrainCard, {propsData: testProps, localVue })
+    const vm = wrapper.vm
+
+    await vm.$nextTick()
+    const newProps = JSON.parse(JSON.stringify(testProps));
+    newProps.decision.name = 'Changed Name'
+    wrapper.setProps(newProps)
+    await vm.$nextTick()
+    expect(vm.decision.name).toBe('Changed Name')
   })
 
 })
