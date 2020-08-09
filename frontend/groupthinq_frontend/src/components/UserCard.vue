@@ -11,13 +11,25 @@
     <q-card-section>
       <div class="text-caption text-grey">{{emailAddress}}</div>
     </q-card-section>
+  <q-card-section v-if="currentUserRole === 'Admin'">
+      <q-btn icon="edit" label="Admin Edit" name="admin-edit" :to="'/account/' + userName"/>
+  </q-card-section>
   </q-card>
 </div>
 </template>
 
 <script>
+import auth from 'src/store/auth'
+
 export default {
   name: 'UserCard',
+
+  data () {
+    return {
+      currentUserRole: 'User'
+    }
+  },
+
   props: {
     userName: {
       type: String,
@@ -38,6 +50,10 @@ export default {
       type: String,
       default: ''
     }
+  },
+
+  mounted () {
+    this.currentUserRole = auth.getTokenData().role
   }
 }
 </script>

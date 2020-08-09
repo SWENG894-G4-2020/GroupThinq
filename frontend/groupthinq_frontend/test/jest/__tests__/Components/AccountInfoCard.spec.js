@@ -109,7 +109,7 @@ describe('Account Info Card tests', () => {
     await localVue.nextTick()
     
     expect(console.log).toHaveBeenCalledWith('Test Axios Error')
-    expect(console.log).toHaveBeenCalledTimes(4)
+    expect(console.log).toHaveBeenCalledTimes(5)
   })
 
   it('modifies the field color when editing', () => {

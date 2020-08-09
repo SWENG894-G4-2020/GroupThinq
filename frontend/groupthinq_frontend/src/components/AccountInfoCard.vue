@@ -17,10 +17,10 @@
       </q-card-section>
       <q-card-section>
         <div class="row reverse q-gutter-sm">
-          <q-btn v-if="editEnabled" class="col-xs-12 col-sm-auto" size="lg" icon="check" color="positive" label="Confirm" name="account-confirm" @click="onConfirm()"/>
-          <q-btn v-if="!editEnabled" class="col-xs-12 col-sm-auto" size="lg" icon="edit" label="Edit" name="account-edit" @click="editEnabled=true"/>
-          <q-btn class="col-xs-12 col-sm-auto" icon="delete" size="lg" color="negative" label="Delete" @click="deleteConfirm = true" name="account-delete"/>
-          <q-btn v-if="editEnabled" class="col-xs-12 col-sm-auto" icon="close" size="lg" label="Cancel" name="account-edit-cancel" @click="onCancel()"/>
+          <q-btn v-if="(currentUserName === userInfo.userName || currentUserRole === 'Admin') && editEnabled" class="col-xs-12 col-sm-auto" size="lg" icon="check" color="positive" label="Confirm" name="account-confirm" @click="onConfirm()"/>
+          <q-btn v-if="(currentUserName === userInfo.userName || currentUserRole === 'Admin') && !editEnabled" class="col-xs-12 col-sm-auto" size="lg" icon="edit" label="Edit" name="account-edit" @click="editEnabled=true"/>
+          <q-btn v-if="currentUserName === userInfo.userName || currentUserRole === 'Admin'" class="col-xs-12 col-sm-auto" icon="delete" size="lg" color="negative" label="Delete" @click="deleteConfirm = true" name="account-delete"/>
+          <q-btn v-if="(currentUserName === userInfo.userName || currentUserRole === 'Admin') && editEnabled" class="col-xs-12 col-sm-auto" icon="close" size="lg" label="Cancel" name="account-edit-cancel" @click="onCancel()"/>
         </div>
       </q-card-section>
     </q-card>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 export default {
   name: 'AccountInfoCard',
 
@@ -48,7 +48,8 @@ export default {
     return {
       deleteConfirm: false,
       editEnabled: false,
-      storedUserName: '',
+      currentUserName: '',
+      currentUserRole: 'User',
 
       userInfo: {
         birthDate: '',
@@ -77,7 +78,8 @@ export default {
   },
 
   mounted () {
-    this.storedUserName = auth.getTokenData().sub
+    this.currentUserName = auth.getTokenData().sub
+    this.currentUserRole = auth.getTokenData().role
     this.getData()
   },
 
@@ -88,24 +90,30 @@ export default {
       this.getData()
     },
 
-    onConfirm () {
+    async onConfirm () {
       if (!this.validInputs) { return }
       this.updatedDate = Date.now()
-      this.$axios.put(`${process.env.BACKEND_URL}/user/${this.storedUserName}`,
+      await this.$axios.put(`${process.env.BACKEND_URL}/user/${this.userInfo.userName}`,
         this.userInfo)
         .then(this.getData())
         .catch(error => (console.log(error)))
       this.editEnabled = false
+      await this.getData()
     },
 
     onDelete () {
-      this.$axios.delete(`${process.env.BACKEND_URL}/user/${this.storedUserName}`)
+      this.$axios.delete(`${process.env.BACKEND_URL}/user/${this.userInfo.userName}`)
         .then(() => { this.$router.push('/') })
         .catch(error => (console.log(error)))
     },
 
     getData () {
-      this.$axios.get(`${process.env.BACKEND_URL}/user/${this.storedUserName}`)
+      let name = this.currentUserName
+      if (this.currentUserRole === 'Admin' && this.$route.params.user) {
+        name = this.$route.params.user
+      }
+
+      this.$axios.get(`${process.env.BACKEND_URL}/user/${name}`)
         .then((response) => {
           this.userInfo = response.data.data[0]
         })
