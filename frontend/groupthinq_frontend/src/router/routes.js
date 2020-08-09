@@ -16,6 +16,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Index.vue') },
+      { path: '/account/:user', component: () => import('pages/AccountInfo.vue') },
       { path: 'account', component: () => import('pages/AccountInfo.vue') },
       { path: 'users', component: () => import('pages/Users.vue') },
       { path: '/decisions/new', component: () => import('pages/NewDecision.vue') },
