@@ -317,11 +317,16 @@ export default {
           this.onVoteCancel()
           return
         }
-        votePayload.push({
+        const newVote = {
           ballotId: this.decision.ballots[0].id,
           ballotOptionId: this.newVoteSelection,
           userName: this.currentUserName
-        })
+        }
+        if (this.haveVoted) {
+          newVote.id = this.myVotes[0].id
+        }
+
+        votePayload.push(newVote)
       } else {
         this.newVote.forEach(vote => {
           votePayload.push({
