@@ -15,6 +15,7 @@ public class TC_master {
 
 		
 		doNow = false;
+		//doNow = true;
 		if(doNow){ // run sign-up automated tests
 			result = TC2_1.main(args);
 			UpdateResultsFile.main(file, result);
@@ -34,10 +35,9 @@ public class TC_master {
 			UpdateResultsFile.main(file, result);		
 		}
 			
-		result = TC1_2.main(args);
-		UpdateResultsFile.main(file, result);
 		
 		doNow = false;
+	    //doNow = true;
 		if(doNow){ // run login automated tests
 			result = TC1_1.main(args);
 			UpdateResultsFile.main(file, result);
@@ -67,6 +67,20 @@ public class TC_master {
 			UpdateResultsFile.main(file, result);
 		}
 		
+		doNow = false;
+	    doNow = true;
+		if(doNow){ // run login automated tests
+			result = TC4_1.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC4_2.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC4_3.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC4_4.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC4_5.main(args);
+			UpdateResultsFile.main(file, result);
+		}
 		
 		
     }

@@ -48,6 +48,8 @@ public class TC4_1 {
 		
 		String tcNumber = "TC4_1 ";
 		
+		//Object createUser;
+		
 		System.setProperty("webdriver.gecko.driver","C:\\Users\\non-admin\\groupthinq\\integration\\lib\\drivers\\geckodriver.exe");
 		FirefoxOptions capabilities = new FirefoxOptions(); //DesiredCapabilities.firefox()
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
@@ -59,94 +61,62 @@ public class TC4_1 {
 		WebDriver driver = new FirefoxDriver();
 		js = (JavascriptExecutor) driver;
 		
+		String userName = "autotester1";
+		//TC_CreaterUser.main(userName);
+		userName = "autotester2";
+		//TC_CreaterUser.main(userName);
+		
 	    //Launch the groupthinq Website
 		driver.get("https://staging.groupthinq.us/#/");
 		
 	    driver.manage().window().setSize(new Dimension(1200, 1000));
-	    driver.findElement(By.cssSelector(".q-btn:nth-child(1) .block")).click();
+	    driver.findElement(By.xpath("//a[2]/span[2]/span/span")).click();
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).sendKeys("auto");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label/div/div/div/input")).sendKeys("autotester1");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).sendKeys("tester");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[3]/div/div/div/input")).sendKeys("autotester@gmail.com");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[4]/div/div/div/input")).sendKeys("1990/01/01");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[5]/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[5]/div/div/div/input")).sendKeys("TC4_1_TesterUser0");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[6]/div/div/div/input")).sendKeys("TC4_1_TesterUser0");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[3]/div/button[2]/span[2]/span/span")).click();
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).sendKeys("autotester1");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[3]/div/button[2]/span[2]/span")).click();
+	    Thread.sleep(4000);
+	    driver.findElement(By.xpath("//a/span[2]")).click();
+	    driver.findElement(By.name("details-name")).click();
+	    driver.findElement(By.name("details-name")).sendKeys("create decision");
+	    driver.findElement(By.name("details-description")).click();
+	    driver.findElement(By.name("details-description")).sendKeys("all fields populated");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/div/div/div[2]/label/div/div/div/div/input")).click();
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/div/div/div[2]/label/div/div/div/div/input")).sendKeys("autotester2");
+	    Thread.sleep(2000);
+	    driver.findElement(By.cssSelector(".q-item__section:nth-child(2) > .q-item__label")).click();    /// click pop-up
+	    //driver.findElement(By.xpath("//div[4]/div[2]/div")).click();   /// click pop-up
+	    driver.findElement(By.name("expiration-datetime")).click();
+	    driver.findElement(By.name("expiration-datetime")).sendKeys("2020/09/02 01:05");
+	    driver.findElement(By.name("ballot-option-name")).click();
+	    driver.findElement(By.name("ballot-option-name")).sendKeys("choice1");
+	    driver.findElement(By.name("ballot-option-add")).click();
+	    driver.findElement(By.name("ballot-option-name")).click();
+	    driver.findElement(By.name("ballot-option-name")).sendKeys("choice2");
+	    driver.findElement(By.name("ballot-option-add")).click();
+	    driver.findElement(By.name("ballot-option-name")).click();
+	    driver.findElement(By.name("ballot-option-name")).sendKeys("choice3");
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/div[2]/div/div[2]/label/div/div/div[2]/button/span[2]/span/i")).click();
+	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div[2]/div/button/span[2]/span/span")).click();
 
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".q-btn__content > .material-icons:nth-child(1)")));
-		Thread.sleep(1000);
+        //WebDriverWait wait = new WebDriverWait(driver, 10);
+        //wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".q-btn__content > .material-icons:nth-child(1)")));
+		Thread.sleep(2000);
 
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/aside/div/div/a[3]/div[3]/div")).click();
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/button/span[2]/span/span")).click();
-	    driver.findElement(By.xpath("//label/div/div/div/input")).click();
-	    driver.findElement(By.xpath("//label/div/div/div/input")).sendKeys("TC4_1 create decision test"); // Title of Decision
-	    
-		//try {Robot robot = new Robot();  // Tab to next...
-        //	robot.keyPress(KeyEvent.VK_TAB);
-        //	robot.keyRelease(KeyEvent.VK_TAB);
-		//} catch (AWTException e) {
-		//	e.printStackTrace();
-		//}
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//label[2]/div/div/div")).click();
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//textarea")).sendKeys("create decision"); // Text for Decision Description
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//label[3]/div/div/div/input")).click();
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//label[3]/div/div/div/input")).sendKeys("2021/01/01 00:00");  // Expiration Date & Time value
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//div[3]/div/button/span[2]/span/i")).click(); 				// Expand 'Add Decision Options'
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//div[2]/div/div/label/div/div/div/input")).click();				// Click Option Title
-	    driver.findElement(By.xpath("//*[@aria-label='Option Title']")).click();				// Click Option Title
-	    
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//*[@aria-label='Option Title']")).sendKeys("option 1");  // Text for Option Title
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//label[2]/div/div/div/input")).click();
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//*[@aria-label='Option Description']")).sendKeys("option description");    // Text for Option Description
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//div[3]/div[2]/div/button/span[2]/span/i")).click();				// Click add decision option 
-	    Thread.sleep(500);
-	    driver.findElement(By.xpath("//div[4]/button[2]/span[2]/span/span")).click();				// Click add decision option 
-	    Thread.sleep(500);
 	    
 		String result = "unchanged";
         Screen screen = new Screen();
-        Pattern img = new Pattern("successfulDecisionCreated.png");
+        Pattern img = new Pattern("decisionCreated.png");
         
         try {
             Region region = screen.find(img);
-            region.setW(450);
-            region.setH(100);
             region.highlight(2);
             result = (tcNumber + "= PASS");
         } catch (Exception e) {
         	result = (tcNumber + "= FAIL");
         }
-        Thread.sleep(100);
-		/*
-		 * driver.findElement(By.xpath("//span[text()='TC4_1_TesterUser2']")).click();
-		 * // User Account Drop Down Thread.sleep(500);
-		 * driver.findElement(By.xpath("//div[2]/div/div")).click(); // Account Settings
-		 * Thread.sleep(500);
-		 * driver.findElement(By.xpath("//div[2]/div/div/button/span[2]/span/i")).click(
-		 * ); // Edit Profile Thread.sleep(500);
-		 * driver.findElement(By.xpath("//div[2]/div[2]")).click(); // Delete
-		 * Thread.sleep(500);
-		 * driver.findElement(By.xpath("//button[2]/span[2]/span")).click(); // Confirm
-		 * Delete
-		 */		
-        
-		//Wait for 5 Sec
+
 		Thread.sleep(1000);
 		 
         // Close the driver
