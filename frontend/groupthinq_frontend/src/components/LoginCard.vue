@@ -1,11 +1,14 @@
 <template>
-  <q-card elevated bordered class="q-pa-lg">
+  <q-card elevated bordered class="q-pa-lg" style="width:50%">
     <q-card-section>
       <div class="text-h4">Login</div>
     </q-card-section>
     <q-card-section>
-      <q-input filled class="q-my-md" v-model="UserName" label="Username" />
-      <q-input filled class="q-my-md" v-model="Password" type="password" label="Password" />
+      <q-input filled class="q-my-md" v-model="userName" label="Username" />
+      <q-input filled class="q-mt-md" v-model="password" type="password" label="Password" />
+    </q-card-section>
+    <q-card-section v-if="isError">
+      <div id="LoginError" class="text-body text-negative text-center"> An invalid login has been provided. Please try again. </div>
     </q-card-section>
     <q-card-actions align="right">
       <div class="row items-end">
@@ -17,39 +20,46 @@
 </template>
 
 <script>
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 export default {
   name: 'LoginCard',
 
   data () {
     return {
-      UserName: '',
-      Password: ''
+      userName: '',
+      password: '',
+      isError: false
     }
   },
 
   props: {},
+
+  mounted () {
+    // this is neccesary in case a browser has stale JWTs from a previous session
+    auth.removeTokens()
+  },
 
   methods: {
     cancel () {
       this.$router.push('/')
     },
     login () {
+      this.isError = false
       this.$axios
         .post(`${process.env.BACKEND_URL}/login`, {
-          userName: this.UserName,
-          password: this.Password
+          userName: this.userName,
+          password: this.password
         })
         .then((response) => {
           auth.storeToken(response.headers.authorization)
         })
         .then(() => {
           this.$router.push('/main')
-            .catch(error => { console.log('The vue router errored ' + error) })
+            .catch(error => { console.log(`Vue router error: ${error}`) })
         })
         .catch(error => {
-          console.log('There was a login error: ' + error)
-          this.$router.push('/login')
+          this.isError = true
+          console.log(error)
         })
     }
   }

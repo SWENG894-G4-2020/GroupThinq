@@ -13,8 +13,11 @@
 
         <q-toolbar-title vertical-bottom>
           <div class="row items-end">
-            <div style="font-size: 1.5em">GroupThinq</div>
-            <div style="font-size: .75em">&nbsp;&nbsp;Make Better Decisions. Together.</div>
+            <div style="font-size: 1.25em">GroupThinq</div>
+            <q-icon name="img:statics/img/groupthinq.svg" style="font-size: 1.5em" />
+          </div>
+          <div class="row items-end">
+            <div class="text-weight-light" style="font-size: .6em">Make Better Decisions. Together.</div>
           </div>
         </q-toolbar-title>
 
@@ -34,12 +37,13 @@
           class="text-grey-8"
           style="font-size: 1.25em"
         >
-          Navigation
+          Menu
         </q-item-label>
         <NavItem
           v-for="navLink in navLinks"
           :key="navLink.title"
           v-bind="navLink"
+          :name="navLink.name"
         />
       </q-list>
     </q-drawer>
@@ -51,8 +55,8 @@
 </template>
 
 <script>
-import NavItem from 'components/NavItem'
-import UserMenu from 'components/UserMenu'
+import NavItem from 'src/components/NavItem'
+import UserMenu from 'src/components/UserMenu'
 
 export default {
   name: 'MainLayout',
@@ -67,40 +71,39 @@ export default {
       leftDrawerOpen: false,
       navLinks: [
         {
-          title: 'Home',
-          caption: 'Return to the Homescreen',
-          icon: 'home',
-          link: '/main'
-        },
-        {
-          title: 'Account Info',
-          caption: 'View and Edit Your Account Information',
-          icon: 'assignment_ind',
-          link: '/main/account'
-        },
-        {
           title: 'Decisions',
-          caption: 'View All Decisions',
-          icon: 'speaker_notes',
-          link: '/main/decisions'
+          caption: 'See your decisions',
+          icon: 'poll',
+          link: '/main',
+          name: 'nav-decisions'
         },
         {
-          title: 'Results',
-          caption: 'View All Results',
-          icon: 'assignment_turned_in',
-          link: '/main/results'
-        },
-        {
-          title: 'Help',
-          caption: 'GroupThinq Documentation',
-          icon: 'help_outline',
-          link: '/main/help'
+          title: 'New Decision',
+          caption: 'Create a New Decision',
+          icon: 'add_chart',
+          link: '/decisions/new',
+          name: 'nav-new'
         },
         {
           title: 'Users',
-          caption: 'View All Users',
+          caption: 'View all users',
           icon: 'face',
-          link: '/main/users'
+          link: '/main/users',
+          name: 'nav-users'
+        },
+        {
+          title: 'My Account',
+          caption: 'View and edit your account information',
+          icon: 'assignment_ind',
+          link: '/main/account',
+          name: 'nav-account'
+        },
+        {
+          title: 'Help',
+          caption: 'Find help on using Groupthinq',
+          icon: 'help_outline',
+          link: '/main/help',
+          name: 'nav-help'
         }
       ]
     }

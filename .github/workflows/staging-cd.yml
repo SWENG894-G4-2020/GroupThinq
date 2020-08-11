@@ -1,0 +1,136 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: CD to Staging Server
+
+on:
+  push:
+    branches: [ staging ]
+
+jobs:
+  migrate-db:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Upload SQL File
+      uses: actions-hub/gcloud@master
+      env:
+        PROJECT_ID: sweng894-gp4-cap
+        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      with:
+        args: cp ./database/scripts/setup.sql gs://db-sql-staging/
+        cli: gsutil
+
+    - name: Import SQL
+      uses: actions-hub/gcloud@master
+      env:
+        PROJECT_ID: sweng894-gp4-cap
+        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      with:
+        args: sql import sql groupthinq-db-staging gs://db-sql-staging/setup.sql --database=groupthinq
+        cli: gscloud
+
+  deploy-backend:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Grant execute permission for gradlew
+      working-directory: ./backend
+      run: chmod +x gradlew
+      
+    - name: Build with Gradle
+      working-directory: ./backend
+      run: ./gradlew build
+
+    - name: Docker Build
+      run: docker build --tag gcr.io/sweng894-gp4-cap/backend-staging ./backend
+
+    - name: Configure Google Cloud SDK CLI
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+    - name: Run gcloud Auth for Docker Login
+      run: |
+        gcloud auth configure-docker
+
+    - name: Docker Push
+      run: |
+        docker push gcr.io/sweng894-gp4-cap/backend-staging
+
+    - name: Set GitHub Commit Hash Vars
+      id: vars
+      shell: bash
+      run: |
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+    
+    - name: Create new instance template based on docker image
+      run: |
+        gcloud compute --project=sweng894-gp4-cap instance-templates create-with-container backend-staging-${{ steps.vars.outputs.sha_short }} --machine-type=n1-standard-1 --network=projects/sweng894-gp4-cap/global/networks/default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=346437609033-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --tags=allow-health-check,http-server --image=cos-stable-81-12871-119-0 --image-project=cos-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=backend-staging-${{ steps.vars.outputs.sha_short }} --container-image=gcr.io/sweng894-gp4-cap/backend-staging --container-restart-policy=always --container-env=POSTGRES_PASSWORD=${{ secrets.STAGE_POSTGRES_PASSWORD }},POSTGRES_USER=${{ secrets.STAGE_POSTGRES_USER }},POSTGRES_DB=${{ secrets.STAGE_POSTGRES_DB }},JWT_SECRET=${{ secrets.STAGE_JWT_SECRET }},JWT_EXP=${{ secrets.STAGE_JWt_EXP }},DB_CONN=${{ secrets.STAGE_DB_CONN }} --labels=container-vm=cos-stable-81-12871-119-0 --metadata=google-logging-enabled=true 
+      
+    - name: Roll out update across instance group
+      run: |
+        gcloud compute instance-groups managed rolling-action start-update ${{ secrets.STAGE_INSTANCE_GROUP }} --version template=backend-staging-${{ steps.vars.outputs.sha_short }} --zone us-central1-a --project=sweng894-gp4-cap
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+  
+    - name: Setup Node.js 13.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 13.x
+      
+    - name: Install dependencies
+      working-directory: ./frontend/groupthinq_frontend
+      run: | 
+        npm install -g @vue/cli
+        npm install -g @quasar/cli
+        npm install
+        
+    - name: Execute Tests
+      working-directory: ./frontend/groupthinq_frontend
+      run: | 
+        quasar test --unit jest
+
+    - name: Run build
+      working-directory: ./frontend/groupthinq_frontend
+      run: | 
+        quasar build
+      env:
+        NODE_ENV: production
+        BACKEND_URL: ${{ secrets.STAGE_BACKEND_URL }}
+
+    - name: Copy SPA to Bucket
+      uses: actions-hub/gcloud@master
+      env:
+        PROJECT_ID: sweng894-gp4-cap
+        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      with:
+        args: cp -r ./frontend/groupthinq_frontend/dist/spa/. gs://staging.groupthinq.page
+        cli: gsutil
+        key:  
+
+    - name: Set Cache Policy on Bucket
+      uses: actions-hub/gcloud@master
+      env:
+        PROJECT_ID: sweng894-gp4-cap
+        APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      with:
+        args: setmeta -r -h "Cache-control:${{ secrets.STAGE_CACHE_CONTROL }}" gs://staging.groupthinq.page
+        cli: gsutil
+        key:  
+        

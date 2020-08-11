@@ -1,17 +1,20 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
-import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
+import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
-import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
+import org.psu.edu.sweng.capstone.backend.exception.EntityConflictException;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
 import org.psu.edu.sweng.capstone.backend.model.UserRole;
@@ -32,68 +35,70 @@ public class UserServiceImpl implements UserService {
 	private RoleDAO roleDao;
 	
 	@Autowired
-	private UserRoleDAO userRoleDao;
+	private DecisionDAO decisionDao;
 	
 	@Autowired
 	private DecisionUserDAO decisionUserDao;
 	
 	@Autowired
+	private BallotVoteDAO ballotVoteDao;
+	
+	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	private static final String ERROR_HEADER = "User ";
+	
 	@Override
-	public List<UserDTO> getUsers() {
+	public ResponseEntity<UserDTO> getUsers() {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+		
 		List<User> users = userDao.findAll();
 		
-		List<UserDTO> response = new ArrayList<>();
-		for (User u : users) {
-			UserDTO userDto = UserDTO.buildDTO(u);
-			response.add(userDto);
-		}
+		users.stream().forEach(u -> response.getData().add(UserDTO.build(u)));
+		
+		response.attachGenericSuccess();
 		
 		return response;
 	}
 
 	@Override
-	public UserDTO getUser(String userName) {
-		User user = userDao.findByUserName(userName);
+	public ResponseEntity<UserDTO> getUser(final String username) throws EntityNotFoundException {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+
+		final User user = userDao.findByUserName(username).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		return (user != null) ? UserDTO.buildDTO(user) : null;
+		response.getData().add(UserDTO.build(user));
+		response.attachGenericSuccess();
+			
+		return response;
 	}
-	
+
 	@Override
-	public String deleteUser(String userName) {
-		User user = userDao.findByUserName(userName);
+	public ResponseEntity<UserDTO> deleteUser(final String username) throws EntityNotFoundException {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
+
+		final User user = userDao.findByUserName(username).orElseThrow(
+				() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
-		if (user == null) {
-			return "User does not exist";
-		}
-    
-    ArrayList<UserRole> userRoles = userRoleDao.findAllByUser(user);
-		ArrayList<DecisionUser> userDecisions = decisionUserDao.findAllByUser(user);
+		ballotVoteDao.deleteByUser(user);
+		decisionUserDao.deleteByUser(user);		
+		decisionDao.deleteByOwnerId(user);
 		
-		if (userRoles.size() > 0) {
-			userRoleDao.deleteAll(userRoles);
-		}
-		
-		if (userDecisions.size() > 0) {
-			decisionUserDao.deleteAll(userDecisions);
-		}
-		
+		user.getRoles().clear();
+
 		userDao.delete(user);
-
-		StringBuilder builder = new StringBuilder();
-		builder.append(userName).append(" has been deleted.");
 		
-		return builder.toString();
+		response.attachGenericSuccess();
+		
+		return response;
 	}
 
 	@Override
-	public String updateUser(String userName, UserDTO userDto) {
-		User user = userDao.findByUserName(userName);
+	public ResponseEntity<UserDTO> updateUser(final String username, final UserDTO userDto) throws EntityNotFoundException {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
-		if (user == null) {
-			return "User does not exist";
-		}
+		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
 		
 		if (userDto.getLastName() != null) { user.setLastName(userDto.getLastName()); }
 		if (userDto.getFirstName() != null) { user.setFirstName(userDto.getFirstName()); }
@@ -104,19 +109,51 @@ public class UserServiceImpl implements UserService {
 		
 		userDao.save(user);
 		
-		StringBuilder builder = new StringBuilder();
-		builder.append(userName).append(" has been updated.");
-		
-		return builder.toString();
+		response.attachGenericSuccess();
+				
+		return response;
 	}
 
 	@Override
-	public String createUser(String userName, UserDTO userDto) {
-		User user = userDao.findByUserName(userName);
+	public ResponseEntity<UserDTO> createUser(final UserDTO userDto) throws EntityConflictException {
+		ResponseEntity<UserDTO> response = new ResponseEntity<>();
 		
-		if (user != null) { return "User already exists"; }
+		final String username = userDto.getUserName();
+		final Optional<User> user = userDao.findByUserName(username);
 		
-		User newUser = new User(userName,
+		if (user.isPresent()) {
+			throw new EntityConflictException(ERROR_HEADER + user.get().getUserName());
+		}
+		else {
+			createNewUser(userDto);
+		}
+		
+		response.attachCreatedSuccess();
+		
+		return response;
+	}
+
+	@Override
+	public ResponseEntity<DecisionDTO> getDecisions(final String username) throws EntityNotFoundException {
+		ResponseEntity<DecisionDTO> response = new ResponseEntity<>();
+		
+		final User user = userDao.findByUserName(username).orElseThrow(() -> new EntityNotFoundException(ERROR_HEADER + username));
+				
+		decisionUserDao.findAllByUser(user).stream().forEach(du -> {
+			DecisionDTO dto = DecisionDTO.build(du.getDecision());
+			
+			dto = DecisionDTO.buildDecisionUserList(decisionUserDao.findAllByDecision(du.getDecision()), dto);
+			
+			response.getData().add(dto);
+		});
+		
+		response.attachGenericSuccess();
+		
+		return response;
+	}
+	
+	private void createNewUser(UserDTO userDto) {
+		User newUser = new User(userDto.getUserName(),
 				bCryptPasswordEncoder.encode(userDto.getPassword()),
 				userDto.getLastName(),
 				userDto.getFirstName(),
@@ -126,17 +163,10 @@ public class UserServiceImpl implements UserService {
 		
 		newUser.setCreatedDate(new Date());
 		
-		Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
+		final Optional<Role> role = roleDao.findByName(RoleEnum.USER.getDescription());
 		
-		if (role.isPresent()) {
-			newUser.getUserRoles().add(new UserRole(newUser, role.get()));
-		}
+		if (role.isPresent()) { newUser.getRoles().add(new UserRole(newUser, role.get())); }
 		
 		userDao.save(newUser);
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append(userName).append(" has been created.");
-		
-		return builder.toString();
 	}
 }

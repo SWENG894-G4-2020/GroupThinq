@@ -1,9 +1,12 @@
 plugins {
+	id 'idea'
+	id 'java'
+	id 'jacoco'
+	id 'eclipse'
+
+	id 'org.barfuin.gradle.jacocolog' version '1.0.1'
 	id 'org.springframework.boot' version '2.3.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'java'
-    id 'eclipse'
-    id 'idea'
 }
 
 group = 'org.psu.edu.sweng.capstone'
@@ -26,27 +29,43 @@ dependencies {
 	implementation 'com.auth0:java-jwt:3.10.3'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.security:spring-security-test'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.security:spring-security-test'
 
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'    
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
 
 	runtimeOnly 'org.postgresql:postgresql:42.2.6'
-    
+
+	testImplementation('org.mockito:mockito-junit-jupiter:3.3.3')    
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
     testImplementation('org.junit.jupiter:junit-jupiter-params:5.6.2')
-	testImplementation('org.mockito:mockito-junit-jupiter:3.3.3')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+	testImplementation group: 'com.google.guava', name: 'guava-testlib', version: '29.0-jre'
 
 	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
 }
 
 test {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+				'org/psu/edu/sweng/capstone/backend/application/*',
+				'org/psu/edu/sweng/capstone/backend/security/**'
+            ])
+        }))
+    }
+    
+    dependsOn test
 }

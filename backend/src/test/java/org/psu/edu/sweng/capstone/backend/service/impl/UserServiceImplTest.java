@@ -1,7 +1,7 @@
 package org.psu.edu.sweng.capstone.backend.service.impl;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,21 +18,54 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.psu.edu.sweng.capstone.backend.dao.BallotVoteDAO;
+import org.psu.edu.sweng.capstone.backend.dao.DecisionDAO;
 import org.psu.edu.sweng.capstone.backend.dao.DecisionUserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.RoleDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserDAO;
 import org.psu.edu.sweng.capstone.backend.dao.UserRoleDAO;
+import org.psu.edu.sweng.capstone.backend.dto.DecisionDTO;
+import org.psu.edu.sweng.capstone.backend.dto.ResponseEntity;
 import org.psu.edu.sweng.capstone.backend.dto.UserDTO;
 import org.psu.edu.sweng.capstone.backend.enumeration.RoleEnum;
+import org.psu.edu.sweng.capstone.backend.exception.EntityConflictException;
+import org.psu.edu.sweng.capstone.backend.exception.EntityNotFoundException;
 import org.psu.edu.sweng.capstone.backend.model.Decision;
 import org.psu.edu.sweng.capstone.backend.model.DecisionUser;
 import org.psu.edu.sweng.capstone.backend.model.Role;
 import org.psu.edu.sweng.capstone.backend.model.User;
-import org.psu.edu.sweng.capstone.backend.model.UserRole;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceImplTest {
+class UserServiceImplTest extends ServiceImplTest {
+		
+	@Mock
+	private UserDAO userDao;
+	
+	@Mock
+	private RoleDAO roleDao;
+	
+	@Mock
+	private DecisionDAO decisionDao;
+	
+	@Mock
+	private UserRoleDAO userRoleDao;
+	
+	@Mock
+	private BallotVoteDAO ballotVoteDao;
+	
+	@Mock
+	private DecisionUserDAO decisionUserDao;
+	
+	@Mock
+	private static DecisionUserDAO staticDecisionUserDao;
+	
+	@Mock
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@InjectMocks
+	private UserServiceImpl userServiceImpl;
 	
 	private String userName;
 	private String password; 
@@ -46,27 +79,10 @@ class UserServiceImplTest {
 	
 	private User user;
 	private UserDTO userDto;
-
-	@Mock
-	private UserDAO userDao;
-	
-	@Mock
-	private RoleDAO roleDao;
-	
-	@Mock
-	private UserRoleDAO userRoleDao;
-	
-	@Mock
-	private DecisionUserDAO decisionUserDao;
-	
-	@Mock
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-	@InjectMocks
-	private UserServiceImpl userServiceImpl;
 	
 	@BeforeEach
-	void setup() {
+	void setUp() {        
+        // given
 		userName = "JUnitTestUser";
 		password = "fakepw";
 		lastName = "User";
@@ -82,60 +98,77 @@ class UserServiceImplTest {
 		user.setUpdatedDate(updatedDate);
 		user.setLastLoggedIn(lastLoggedIn);
 		
-		userDto = UserDTO.buildDTO(user);
+		userDto = UserDTO.build(user);
 		userDto.setPassword("fakepw");
 	}
-
+		
 	@Test
-	void createUser_worksProperly_withUserNotAlreadyInSystem() {
+	void createUser_worksProperly_withUserNotAlreadyInSystemAndRoleData() throws EntityConflictException {
+		// given
+		Optional<User> noUser = Optional.empty();
+
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(null);
+		when(userDao.findByUserName(userName)).thenReturn(noUser);
 		when(roleDao.findByName(RoleEnum.USER.getDescription())).thenReturn(Optional.of(new Role()));
 		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
-		String returnMessage = userServiceImpl.createUser(userName, userDto);
+		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
 
 		// then
-		assertEquals(userName + " has been created.", returnMessage);
+		assertCreatedSuccess(response);
 		verify(userDao, times(1)).save(Mockito.any());
 	}
 	
 	@Test
-	void createUser_worksProperly_withUserAlreadyInSystem() {
-		// when
-		when(userDao.findByUserName(userName)).thenReturn(user);
-		String returnMessage = userServiceImpl.createUser("JUnitTestUser", userDto);
-		
-		// then
-		assertEquals("User already exists", returnMessage);
-	}
-	
-	@Test
-	void getUser_returnsUserThatExists() {
-		// when
-		when(userDao.findByUserName(userName)).thenReturn(user);
-		UserDTO actualDTO = userServiceImpl.getUser(userName);
-		
-		// then
-		assertEquals(userDto.getUserName(), actualDTO.getUserName());
-		assertEquals(userDto.getLastName(), actualDTO.getLastName());
-		assertEquals(userDto.getFirstName(), actualDTO.getFirstName());
-		assertEquals(userDto.getEmailAddress(), actualDTO.getEmailAddress());
-	}
-	
-	@Test
-	void getUser_returnsNoUser() {
+	void createUser_worksProperly_withUserNotAlreadyInSystemAndNoRoleData() throws EntityConflictException {
 		// given
-		String userName = "JUnitTestUser";
-		
+		Optional<Role> noRole = Optional.empty();
+		Optional<User> noUser = Optional.empty();
+
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(null);
-		
+		when(userDao.findByUserName(userName)).thenReturn(noUser);
+		when(roleDao.findByName(RoleEnum.USER.getDescription())).thenReturn(noRole);
+		when(bCryptPasswordEncoder.encode(password)).thenReturn("fdsjiaopfjsdaiopfdjdsopifaj");
+		ResponseEntity<UserDTO> response = userServiceImpl.createUser(userDto);
+
 		// then
-		assertNull(userServiceImpl.getUser(userName));		
+		assertCreatedSuccess(response);
+		verify(userDao, times(1)).save(Mockito.any());
 	}
 	
 	@Test
-	void getUsers_returnsListOfUsers() {
+	void createUser_worksProperly_withUserAlreadyInSystem() throws EntityConflictException {
+		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
+	    assertThrows(EntityConflictException.class, () -> { userServiceImpl.createUser(userDto); });
+	}
+	
+	@Test
+	void getUser_returnsUserThatExists() throws EntityNotFoundException {
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
+		ResponseEntity<UserDTO> response = userServiceImpl.getUser(userName);
+		
+		// then
+		assertEquals(userDto.getUserName(), response.getData().get(0).getUserName());
+		assertEquals(userDto.getLastName(), response.getData().get(0).getLastName());
+		assertEquals(userDto.getFirstName(), response.getData().get(0).getFirstName());
+		assertEquals(userDto.getEmailAddress(), response.getData().get(0).getEmailAddress());
+	}
+	
+	@Test
+	void getUser_returnsNoUser() throws EntityNotFoundException {
+		// given
+		Optional<User> noUser = Optional.empty();
+		String username = "JUnitTestUser";
+		
+		// when
+		when(userDao.findByUserName(username)).thenReturn(noUser);
+		
+		// then
+	    assertThrows(EntityNotFoundException.class, () -> { userServiceImpl.getUser(username); });
+	}
+	
+	@Test
+	void getUsers_returnsListOfUsers() throws Exception {
 		// given
 		User user1 = new User("mboyer87", "fakepw", "Boyer", "Matt", "mboyer87@gmail.com", new Date(1337L));
 		User user2 = new User("testUser", "fakepw", "User", "Test", "testUser@foo.bar", new Date(1337L));
@@ -144,8 +177,8 @@ class UserServiceImplTest {
 		userList.add(user1);
 		userList.add(user2);
 		
-		UserDTO userDto1 = UserDTO.buildDTO(user1);
-		UserDTO userDto2 = UserDTO.buildDTO(user2);
+		UserDTO userDto1 = UserDTO.build(user1);
+		UserDTO userDto2 = UserDTO.build(user2);
 		
 		List<UserDTO> userDTOList = new ArrayList<>();
 		userDTOList.add(userDto1);
@@ -155,95 +188,117 @@ class UserServiceImplTest {
 		when(userDao.findAll()).thenReturn(userList);
 		
 		// then
-		assertEquals(2, userServiceImpl.getUsers().size());		
+		assertEquals(2, userServiceImpl.getUsers().getData().size());		
 	}
 	
 	@Test
-	void deleteUser_worksProperly_withUserNotAlreadyInSystem() {
+	void deleteUser_worksProperly_withUserNotAlreadyInSystem() throws EntityNotFoundException {
 		// given
-		String userName = "JUnitTestUser";
+		Optional<User> noUser = Optional.empty();		
+		String username = "JUnitTestUser";
 				
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(null);
-		String returnMessage = userServiceImpl.deleteUser(userName);
-		
+		when(userDao.findByUserName(username)).thenReturn(noUser);
+
 		// then
-		assertEquals("User does not exist", returnMessage);
+	    assertThrows(EntityNotFoundException.class, () -> { userServiceImpl.deleteUser(username); });
 		verify(userDao, times(0)).delete(Mockito.any());
 	}
 	
 	@Test
-	void deleteUser_worksProperly_withUserAlreadyInSystem_noChildDependencies() {
+	void deleteUser_worksProperly_withUserAlreadyInSystem_noChildDependencies() throws EntityNotFoundException {
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(user);
-		when(userRoleDao.findAllByUser(user)).thenReturn(new ArrayList<>());
-		when(decisionUserDao.findAllByUser(user)).thenReturn(new ArrayList<>());
-		String returnMessage = userServiceImpl.deleteUser(userName);
+		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
+		ResponseEntity<UserDTO> response = userServiceImpl.deleteUser(userName);
 		
 		// then
-		assertEquals(userName + " has been deleted.", returnMessage);
+		assertGenericSuccess(response);
 		verify(userDao, times(1)).delete(Mockito.any());
 	}
 
 	@Test
-	void deleteUser_worksProperly_withUserAlreadyInSystem_childDependencies() {
-		// given
-		ArrayList<UserRole> userRoles = new ArrayList<>();
-		ArrayList<DecisionUser> decisionUsers = new ArrayList<>();
-		
-		Decision newDecision = new Decision(2L, "New Decision");
-		User newUser = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
-		DecisionUser newDecisionUser = new DecisionUser(newDecision, newUser);
-		
-		// given
-		User newUser2 = new User("TReyob", "fakepw", "Reyob", "Ttam", "TtamReyob@gmail.com", new Date(1337L));
-		Role newRole = new Role();
-		UserRole userRole = new UserRole(newUser2, newRole);
-		
-		decisionUsers.add(newDecisionUser);
-		userRoles.add(userRole);
-		
+	void deleteUser_worksProperly_withUserAlreadyInSystem_childDependencies() throws EntityNotFoundException {
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(user);
-		when(userRoleDao.findAllByUser(user)).thenReturn(userRoles);
-		when(decisionUserDao.findAllByUser(user)).thenReturn(decisionUsers);
-		String returnMessage = userServiceImpl.deleteUser(userName);
+		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
+		ResponseEntity<UserDTO> response = userServiceImpl.deleteUser(userName);
 		
 		// then
-		assertEquals(userName + " has been deleted.", returnMessage);
+		assertGenericSuccess(response);
 		verify(userDao, times(1)).delete(Mockito.any());
 	}
 	
 	@Test
-	void updateUser_savesUser_whenGivenNullValues() {
+	void updateUser_savesUser_whenGivenNullValues() throws EntityNotFoundException {
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(user);
-		String returnMessage = userServiceImpl.updateUser(userName, new UserDTO());
+		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
+		ResponseEntity<UserDTO> response = userServiceImpl.updateUser(userName, new UserDTO());
 
 		// then
-		assertEquals(userName + " has been updated.", returnMessage);
+		assertGenericSuccess(response);
 		verify(userDao, times(1)).save(Mockito.any());		
 	}
 	
 	@Test
-	void updateUser_returnsNull_whenNoUserToUpdate() {
+	void updateUser_returnsNull_whenNoUserToUpdate() throws EntityNotFoundException {
+		// given
+		Optional<User> noUser = Optional.empty();
+
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(null);
-		String returnMessage = userServiceImpl.updateUser(userName, userDto);
-		
+		when(userDao.findByUserName(userName)).thenReturn(noUser);
+
 		// then
-		assertEquals("User does not exist", returnMessage);
+		assertThrows(EntityNotFoundException.class, () -> { userServiceImpl.updateUser(userName, userDto); });
 		verify(userDao, times(0)).save(Mockito.any());	
 	}
 	
 	@Test
-	void updateUser_savesUser_whenGivenUserThatExists() {
+	void updateUser_savesUser_whenGivenUserThatExists() throws EntityNotFoundException {
 		// when
-		when(userDao.findByUserName(userName)).thenReturn(user);
-		String returnMessage = userServiceImpl.updateUser(userName, userDto);
+		when(userDao.findByUserName(userName)).thenReturn(Optional.of(user));
+		ResponseEntity<UserDTO> response = userServiceImpl.updateUser(userName, userDto);
 
 		// then
-		assertEquals(userName + " has been updated.", returnMessage);
+		assertGenericSuccess(response);
 		verify(userDao, times(1)).save(Mockito.any());
+	}
+	
+	@Test
+	void getDecisions_hasNoUser() throws EntityNotFoundException {
+	    when(userDao.findByUserName(userName)).thenReturn(Optional.empty());
+	    assertThrows(EntityNotFoundException.class, () -> { userServiceImpl.getDecisions(userName); });
+	}
+	
+	@Test
+	void getDecisions_hasUser_noDecisionUsers() throws EntityNotFoundException {
+		// given
+		Optional<User> userOptional = Optional.of(user);
+
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(userOptional);
+	    ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
+		
+		// then
+	    assertEquals(0, response.getData().size());
+	}
+	
+	@Test
+	void getDecisions_hasUser_hasDecision() throws EntityNotFoundException {
+		// given
+		Decision decisionOne = new Decision("New Decision #1", user);
+		
+		ArrayList<DecisionUser> duList = new ArrayList<>();
+		
+		duList.add(new DecisionUser(decisionOne, user));
+		
+		Optional<User> userOptional = Optional.of(user);
+
+		// when
+		when(userDao.findByUserName(userName)).thenReturn(userOptional);
+		when(decisionUserDao.findAllByUser(userOptional.get())).thenReturn(duList);
+		when(decisionUserDao.findAllByDecision(decisionOne)).thenReturn(duList);
+		ResponseEntity<DecisionDTO> response = userServiceImpl.getDecisions(userName);
+		
+		// then
+	    assertEquals(1, response.getData().size());
 	}
 }

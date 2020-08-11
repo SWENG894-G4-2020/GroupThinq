@@ -56,7 +56,7 @@ class UserControllerTest {
 	@Test
 	void getUser_callsRightServiceFunction() throws Exception {
 		// when
-		mockMvc.perform(get("/users/{username}", userName)).andExpect(status().isOk());
+		mockMvc.perform(get("/user/{username}", userName)).andExpect(status().isOk());
 		
 		// then
 		verify(userServiceImpl, times(1)).getUser(userName);		
@@ -65,7 +65,7 @@ class UserControllerTest {
 	@Test
 	void deleteUser_callsRightServiceFunction() throws Exception {
 		// when
-		mockMvc.perform(delete("/users/{username}", userName)).andExpect(status().isOk());
+		mockMvc.perform(delete("/user/{username}", userName)).andExpect(status().isOk());
 		
 		// then
 		verify(userServiceImpl, times(1)).deleteUser(userName);
@@ -74,20 +74,20 @@ class UserControllerTest {
 	@Test
 	void createUser_callsRightServiceFunction() throws Exception {		
 		// when
-		mockMvc.perform(post("/users/{username}", userName, userDto)
+		mockMvc.perform(post("/user", userDto)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDto)))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 		
 		// then
-		verify(userServiceImpl, times(1)).createUser(Mockito.anyString(), Mockito.any(UserDTO.class));
+		verify(userServiceImpl, times(1)).createUser(Mockito.any(UserDTO.class));
 	}
 	
 	@Test
 	void updateUser_callsRightServiceFunction() throws Exception {
 		// when
-		mockMvc.perform(put("/users/{username}", userName, userDto)
+		mockMvc.perform(put("/user/{username}", userName, userDto)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDto)))
@@ -95,5 +95,14 @@ class UserControllerTest {
 		
 		// then
 		verify(userServiceImpl, times(1)).updateUser(Mockito.anyString(), Mockito.any(UserDTO.class));
+	}
+	
+	@Test
+	void getUserDecisions_callsRightServiceFunction() throws Exception {
+		// when
+		mockMvc.perform(get("/user/{username}/decisions", userName)).andExpect(status().isOk());
+		
+		// then
+		verify(userServiceImpl, times(1)).getDecisions(userName);	
 	}
 }

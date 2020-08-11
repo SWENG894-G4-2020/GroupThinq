@@ -14,9 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 @Entity
 @Table(name = "USERS")
 public class User {
@@ -52,9 +49,8 @@ public class User {
 	@Column(name = "LAST_LOGGED_IN")
 	private Date lastLoggedIn;
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
-	@Fetch(FetchMode.SELECT)
-	private Set<UserRole> userRoles = new HashSet<>();
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = UserRole.class)
+	private Set<UserRole> roles = new HashSet<>();
 	
 	protected User() {}
 	
@@ -65,6 +61,14 @@ public class User {
 		this.firstName = firstName;
 		this.emailAddress = emailAddress;
 		this.birthDate = birthDate;
+	}
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getUserName() {
@@ -139,10 +143,14 @@ public class User {
 		this.lastLoggedIn = lastLoggedIn;
 	}
 
-	public Set<UserRole> getUserRoles() {
-		return userRoles;
+	public Set<UserRole> getRoles() {
+		return roles;
 	}
 
+	public void setRoles(Set<UserRole> userRoles) {
+		this.roles = userRoles;
+	}
+	
 	public String getFullName() {
 		StringBuilder builder = new StringBuilder();
 		

@@ -4,20 +4,20 @@
       <div class="text-h4">Sign Up for GroupThinq!</div>
     </q-card-section>
     <q-card-section>
-      <q-input filled class="q-my-md" v-model="FirstName" label="First Name" />
-      <q-input filled class="q-my-md" v-model="LastName" label="Last Name" />
-      <q-input filled class="q-my-md" v-model="EmailAddress" label="Email Address" />
-      <q-input filled class="q-my-md" v-model="BirthDate" mask="date" :rules="['date']" label="Birth Date">
+      <q-input filled class="q-my-sm" v-model="newUser.firstName" label="First Name" :rules="[val => !!val || '*Required']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.lastName" label="Last Name" :rules="[val => !!val || '*Required']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.emailAddress" label="Email Address" :rules="[val => !!val || '*Required']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.birthDate" mask="date" :rules="['date']" label="Birth Date (YYYY/MM/DD)">
         <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-              <q-date v-model="BirthDate" @input="() => $refs.qDateProxy.hide()" />
+              <q-date v-model="newUser.birthDate" @input="() => $refs.qDateProxy.hide()" />
             </q-popup-proxy>
           </q-icon>
         </template>
       </q-input>
-      <q-input filled class="q-my-md" v-model="UserName" label="Username" />
-      <q-input filled class="q-my-md" v-model="Password" type="password" label="Password" />
+      <q-input filled class="q-my-sm" v-model="newUser.userName" label="Username" :rules="[val => val.length > 3 || '*Required (>3 characters)']"/>
+      <q-input filled class="q-my-sm" v-model="newUser.password" type="password" :rules="[val => val.length > 3 || '*Required (>3 characters)']" label="Password" />
     </q-card-section>
     <q-card-actions align="right">
       <div class='row items-end'>
@@ -37,54 +37,71 @@
 </template>
 
 <script>
-import auth from '../store/auth'
+import auth from 'src/store/auth'
 export default {
   name: 'SignUpCard',
 
   data () {
     return {
-      FirstName: '',
-      LastName: '',
-      EmailAddress: '',
-      BirthDate: '',
-      UserName: '',
-      Password: ''
+      newUser: {
+        firstName: '',
+        lastName: '',
+        emailAddress: '',
+        birthDate: '',
+        userName: '',
+        password: ''
+      }
     }
   },
 
   props: {
   },
 
+  computed: {
+    validInputs: function () {
+      if (this.newUser.firstName.length < 1) { return false }
+      if (this.newUser.lastName.length < 1) { return false }
+      if (this.newUser.emailAddress.length < 1) { return false }
+      if (this.newUser.userName.length < 3) { return false }
+      if (this.newUser.password.length < 3) { return false }
+      return true
+    }
+  },
+
+  mounted () {
+    // this is neccesary in case a browser has stale JWTs from a previous session
+    auth.removeTokens()
+  },
+
   methods: {
     cancel () {
       this.$router.push('/')
     },
-    signUp () {
-      const isoDate = new Date(this.BirthDate).toISOString()
-      this.$axios.post(`${process.env.BACKEND_URL}/users/${this.UserName}`,
-        {
-          userName: this.UserName,
-          firstName: this.FirstName,
-          lastName: this.LastName,
-          birthDate: isoDate,
-          emailAddress: this.EmailAddress,
-          password: this.Password
-        })
-        .then(response => {
-          return this.$axios.post(`${process.env.BACKEND_URL}/login`,
-            {
-              userName: this.UserName,
-              password: this.Password
-            })
-        })
-        .then(response => {
-          auth.storeToken(response.headers.authorization)
-        })
-        .then(this.$router.push('/main'))
-        .catch(error => {
-          console.log(error)
-          this.$router.push('/login')
-        })
+
+    async signUp () {
+      const isoDate = new Date(this.newUser.birthDate).toISOString()
+      if (!this.validInputs) { return }
+      try {
+        await this.$axios.post(`${process.env.BACKEND_URL}/user`,
+          {
+            firstName: this.newUser.firstName,
+            lastName: this.newUser.lastName,
+            emailAddress: this.newUser.emailAddress,
+            birthDate: isoDate,
+            userName: this.newUser.userName,
+            password: this.newUser.password
+          })
+        const loginResponse = await this.$axios.post(`${process.env.BACKEND_URL}/login`,
+          {
+            userName: this.newUser.userName,
+            password: this.newUser.password
+          })
+        auth.storeToken(loginResponse.headers.authorization)
+        this.$router.push('/main')
+      } catch (error) {
+        console.log(error)
+        this.$router.push('/')
+      }
     }
   }
 }

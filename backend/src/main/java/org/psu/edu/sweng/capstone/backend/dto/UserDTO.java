@@ -100,7 +100,7 @@ public class UserDTO {
 		return userRoles;
 	}
 
-	public static UserDTO buildDTO(User u) {
+	public static UserDTO build(User u) {
 		UserDTO dto = new UserDTO();
 		
 		if (u.getUserName() != null) { dto.setUserName(u.getUserName()); }
@@ -112,7 +112,7 @@ public class UserDTO {
 		if (u.getUpdatedDate() != null) { dto.setUpdatedDate(u.getUpdatedDate()); }
 		if (u.getLastLoggedIn() != null) { dto.setLastLoggedIn(u.getLastLoggedIn()); }
 		
-		for (UserRole userRole : u.getUserRoles()) {
+		for (UserRole userRole : u.getRoles()) {
 			dto.getUserRoles().add(userRole.getRole().getName());
 		}
 		
