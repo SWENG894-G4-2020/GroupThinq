@@ -42,8 +42,8 @@ export default {
           category: 'Account Questions'
         },
         {
-          title: 'How can I change my password?',
-          value: 'Do we support that?',
+          title: 'How can I update my password?',
+          value: 'Currently you are unable to update your password, so make sure to keep it somewhere safe.',
           category: 'Account Questions'
         },
         {
