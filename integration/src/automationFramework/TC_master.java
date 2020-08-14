@@ -14,7 +14,7 @@ public class TC_master {
 
 		doNow = false;
 		//doNow = true;
-		if(doNow){ // run sign-up automated tests
+		if(doNow){ // SIGN UP TESTS
 			result = TC2_1.main(args);
 			UpdateResultsFile.main(file, result);
 			result = TC2_2.main(args);
@@ -36,7 +36,7 @@ public class TC_master {
 		
 		doNow = false;
 	    //doNow = true;
-		if(doNow){ // run login automated tests
+		if(doNow){ //   LOGIN TESTS
 			result = TC1_1.main(args);
 			UpdateResultsFile.main(file, result);
 			result = TC1_2.main(args);
@@ -66,8 +66,8 @@ public class TC_master {
 		}
 		
 		doNow = false;
-	    doNow = true;
-		if(doNow){ // run login automated tests
+	    //doNow = true;
+		if(doNow){ //       CREATE DECISION TESTS
 			result = TC4_1.main(args);
 			UpdateResultsFile.main(file, result);
 			result = TC4_2.main(args);
@@ -80,6 +80,31 @@ public class TC_master {
 			UpdateResultsFile.main(file, result);
 		}
 		
+		
+		doNow = false;
+	    //doNow = true;
+		if(doNow){ // VIEW DECISION TEST
+			result = TC3_1.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC5_1.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC6_1.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC7_1.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC7_2.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC7_2.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC7_3.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC7_4.main(args);
+			UpdateResultsFile.main(file, result);
+			result = TC8_1.main(args);
+			UpdateResultsFile.main(file, result);
+		}
+		result = TC8_1.main(args);
+		UpdateResultsFile.main(file, result);
 		
     }
 }

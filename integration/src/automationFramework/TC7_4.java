@@ -21,6 +21,7 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.sikuli.script.Screen;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.ImagePath;
+import org.sikuli.script.Key;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Region;
@@ -31,22 +32,15 @@ import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.File;  
 	import java.io.IOException; 
+	import java.awt.event.InputEvent;
 
-	//Test if User is able to create decision
-	//Create TC4_1_TesterUser
-	//Navigate to http://staging.groupthinq.us/#/main	
-	//Click "Decisions" 	
-	//Click "NewDecision"	
-	//Click Calendar Icon and select a date	
-	//Click Time and select a time	
-	//Click "Create Decision"	
 	
-public class TC4_5 {
+public class TC7_4 {
 	
 	public static Object main(String[] args) throws InterruptedException, FindFailed {
 		ImagePath.setBundlePath("C:\\Users\\non-admin\\groupthinq\\integration\\src\\imgDictionary");
 		
-		String tcNumber = "TC4_5 ";
+		String tcNumber = "TC7_4 ";
 		
 		//Object createUser;
 		
@@ -61,8 +55,8 @@ public class TC4_5 {
 		WebDriver driver = new FirefoxDriver();
 		js = (JavascriptExecutor) driver;
 		
-		String userName = "autotester1";
-		TC_CreaterUser.main(userName);
+		//String userName = "autotester1";
+		//TC_CreaterUser.main(userName); aria
 		//userName = "autotester2";
 		//TC_CreaterUser.main(userName);
 		
@@ -77,37 +71,34 @@ public class TC4_5 {
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[2]/label[2]/div/div/div/input")).sendKeys("autotester1");
 	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div/main/div/div[3]/div/button[2]/span[2]/span")).click();
 	    Thread.sleep(4000);
-	    driver.findElement(By.xpath("//div[2]/div/a/span[2]")).click();
-	    //driver.findElement(By.name("details-name")).click();
-	    //driver.findElement(By.name("details-name")).sendKeys("create decision - two");
-	    driver.findElement(By.name("details-description")).click();
-	    driver.findElement(By.name("details-description")).sendKeys("all fields populated");
-	    //driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/div/div/div[2]/label/div/div/div/div/input")).click();
-	    //driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/div/div/div[2]/label/div/div/div/div/input")).sendKeys("autotester2");
-	    Thread.sleep(0000);
-	    //driver.findElement(By.cssSelector(".q-item__section:nth-child(2) > .q-item__label")).click();    /// click pop-up
-	    //driver.findElement(By.xpath("//div[4]/div[2]/div")).click();   /// click pop-up
-	    driver.findElement(By.name("expiration-datetime")).click();
-	    driver.findElement(By.name("expiration-datetime")).sendKeys("2020/09/02 01:05");
-	    driver.findElement(By.name("ballot-option-name")).click();
-	    driver.findElement(By.name("ballot-option-name")).sendKeys("choice1");
-	    driver.findElement(By.name("ballot-option-add")).click();
-	    driver.findElement(By.name("ballot-option-name")).click();
-	    driver.findElement(By.name("ballot-option-name")).sendKeys("choice2");
-	    driver.findElement(By.name("ballot-option-add")).click();
-	    driver.findElement(By.name("ballot-option-name")).click();
-	    driver.findElement(By.name("ballot-option-name")).sendKeys("choice3");
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div/div[2]/div/div[2]/label/div/div/div[2]/button/span[2]/span/i")).click();
-	    driver.findElement(By.xpath("//div[@id=\'q-app\']/div/div[2]/main/div/div[2]/div/button/span[2]/span/span")).click();
-
-        //WebDriverWait wait = new WebDriverWait(driver, 10);
-        //wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".q-btn__content > .material-icons:nth-child(1)")));
-		Thread.sleep(2000);
 
 	    
+
+	    driver.findElement(By.name("nav-account")).click();  // user account button
+	    Thread.sleep(1000);
+	    driver.findElement(By.name("account-edit")).click();  // edit account button
+	    Thread.sleep(1000);
+
+	    driver.findElement(By.xpath("//div[@id='q-app']/div/div[2]/main/div/div/div[2]/label[4]/div/div/div/input")).click();
+	    try {
+	        Robot robot = new Robot();
+	        // Simulate a key press
+	        robot.keyPress(KeyEvent.VK_CONTROL);
+	        robot.keyPress(KeyEvent.VK_A);
+	        robot.keyRelease(KeyEvent.VK_CONTROL);
+	        robot.keyPress(KeyEvent.VK_DELETE);
+
+		} catch (AWTException e) {
+		        e.printStackTrace();
+		}
+	    driver.findElement(By.xpath("//div[@id='q-app']/div/div[2]/main/div/div/div[2]/label[4]/div/div/div/input")).sendKeys("2000-12-12T06:00:00.000+00:00");
+	    
+	    Thread.sleep(1000);
+	    driver.findElement(By.name("account-confirm")).click();  // edit account button
+	    Thread.sleep(1000);
 		String result = "unchanged";
         Screen screen = new Screen();
-        Pattern img = new Pattern("failCreateDecision.png");
+        Pattern img = new Pattern("myNewBirthday.png");
         
         try {
             Region region = screen.find(img);
