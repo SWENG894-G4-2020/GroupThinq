@@ -21,7 +21,6 @@
       <div v-else class="bg-grey-2 q-pa-sm" style="width: 100%">
         <div class=" text-h6 q-pa-xs">Winning Choice: <q-icon name="emoji_events" size="lg" class="text-green q-pa-xs"/>{{ resultsList[0].winner.title }}</div>
         <q-expansion-item
-          icon="read_more"
           label="Details"
           caption="See each 1v1 result"
         >

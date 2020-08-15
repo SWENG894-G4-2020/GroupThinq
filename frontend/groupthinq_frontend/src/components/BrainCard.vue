@@ -4,7 +4,7 @@
       <div class="text-h5"><q-icon color="accent" name="psychology" /> Groupthinq Brain&trade;</div>
     </q-card-section>
     <q-card-section v-if="isLoaded">
-      <div class="text-grey-7 q-pa-sm">Our machine learning model perdicts the following results for <span class="text-bold">"{{decision.name}}"</span></div>
+      <div class="text-grey-7 q-pa-sm">Our machine learning model predicts the following results for <span class="text-bold">"{{decision.name}}"</span></div>
       <div class="bg-grey-2 q-pa-sm" style="width: 100%">
         <div v-for="(result, idx) in tabulatedResults" :key="idx" class="q-pa-sm">
           <div class="row">
