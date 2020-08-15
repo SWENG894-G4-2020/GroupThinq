@@ -34,7 +34,7 @@ import java.io.File;
 
 	//Test if User is able to create decision
 	//Create TC4_1_TesterUser
-	//Navigate to http://staging.groupthinq.us/#/main	
+	//Navigate to http://staging.groupthinq.us/#/main	aria
 	//Click "Decisions" 	
 	//Click "NewDecision"	
 	//Click Calendar Icon and select a date	
@@ -62,9 +62,9 @@ public class TC4_1 {
 		js = (JavascriptExecutor) driver;
 		
 		String userName = "autotester1";
-		//TC_CreaterUser.main(userName);
+		TC_CreaterUser.main(userName);
 		userName = "autotester2";
-		//TC_CreaterUser.main(userName);
+		TC_CreaterUser.main(userName);
 		
 	    //Launch the groupthinq Website
 		driver.get("https://staging.groupthinq.us/#/");

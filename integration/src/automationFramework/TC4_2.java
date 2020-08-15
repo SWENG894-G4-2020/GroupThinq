@@ -61,9 +61,9 @@ public class TC4_2 {
 		WebDriver driver = new FirefoxDriver();
 		js = (JavascriptExecutor) driver;
 		
-		String userName = "autotester1";
+		//String userName = "autotester1";
 		//TC_CreaterUser.main(userName);
-		userName = "autotester2";
+		//userName = "autotester2";
 		//TC_CreaterUser.main(userName);
 		
 	    //Launch the groupthinq Website
